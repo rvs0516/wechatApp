@@ -1,0 +1,181 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+{if $operation == 'index'}
+<h3>
+    VIP用户列表
+</h3>
+<form class="searchbox" action="/index.php?m=honouredGuest&a=honouredGuest" method="post">
+    <p>
+        <input type="hidden" name="type" value="" id="type" />
+        <span>来自游戏：</span>
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="game" id="game" style="width: 98px;">
+            <option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+                <option value="{$key1}" {if $game eq $key1}selected="selected"{/if}>{$name}</option>
+            {/foreach}
+        </select>
+		<span>账号：</span>
+		<input style="width: 186px;" type="text" value="{$userName}" name="userName" id="userName" placeholder="请输入需要搜索的账号" />
+        <span>登录时间：</span>
+        <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+    </p>
+    {if $gid eq 1 || $gid eq 12}
+    <p>
+        <span>状态：</span>
+        <select name="status">
+            <option value="">请选择</option>
+            <option value="1" {if $status eq 1 }selected="selected"{/if}>已审核</option>
+            <option value="2" {if $status eq 2 }selected="selected"{/if}>未审核</option>
+        </select>
+    </p>
+    {/if}
+	<table style="clear:both;margin-top:10px; float:right;width:100%;">
+		<tr>
+			<td align="left" style="width: 100px"><button type="submit" class="su inline" id="ccc" >查询</button></td>
+            <td align="left">
+                {if (($gid eq 1) || ($gid eq 12))}<button type="submit" class="su" value="report" id="report">导出</button><font>考虑服务器性能损耗，一次导出最多导出三千条</font>{/if}
+            </td>
+
+		</tr>
+	</table>
+</form>
+<table class="list">
+    <tr style="background-color:#CCCCCC;">
+        <th width="10%">账号</th>
+        <th width="10%">上级游戏名</th>
+        <th width="10%">来自游戏</th>
+        <th width="10%">微信</th>
+        <th width="10%">QQ</th>
+        <th width="10%">最近登录时间</th>
+        <th width="10%">最后点击充值</th>
+        {if $gid eq 1 || $gid eq 12}
+        <th width="10%">归属</th>
+        {/if}
+        <th width="15%">操作</th>
+    </tr>
+	{foreach from=$dataList item=order}
+	<tr>
+        <td>{$order.userName}</td>
+        <td>{$order.upperName}</td>
+        <td>{$order.gameName}</td>
+        <td>{$order.weixin}</td>
+        <td>{$order.qq}</td>
+        <td>{$order.loginTime|date_format:"y-m-d"}</td>
+        <td>{$order.payTime|date_format:"y-m-d"}</td>
+        {if $gid eq 1 || $gid eq 12}
+        <td>{$order.replace}</td>
+        {/if}
+        <td>
+        {if $gid eq 1 || $gid eq 12}
+            {if $order.status eq 1}
+                <a href="javascript:void(0)" style="color: #CCCCCC">审核|</a>
+            {else}
+                <a href="/index.php?m=honouredGuest&a=honouredGuest&operation=allow&id={$order.id}">审核|</a>
+            {/if}
+            <a href="/index.php?m=honouredGuest&a=honouredGuest&operation=del&id={$order.id}" class="del">删除|</a>
+        {/if}
+        <a href="/index.php?m=honouredGuest&a=honouredGuest&operation=edit&userName={$order.userName}&gameName={$order.gameName}&gameAlias={$order.gameAlias}">修改|</a>
+        {if $order.same eq 1}
+        <a href="javascript:void(0)" style="color: #CCCCCC">回访</a>
+        {else}
+       <a href="/index.php?m=honouredGuest&a=honouredGuest&operation=revisit&id={$order.id}" class="revisit">回访</a>
+        {/if}
+        </td>
+    </tr>
+	{foreachelse}
+    <tr>
+        <td colspan="10">无数据</td>
+    </tr>
+	{/foreach}
+</table>
+
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+$('.del').click(function() {
+    return confirm('确定要删除用户信息？');
+});
+$('.revisit').click(function() {
+    return confirm('确定已进行用户回访？');
+});
+$("#ccc").click(function() {
+    $("#type").val("");
+});
+$("#report").click(function() {
+    $("#type").val("report");
+    $('.searchbox').submit();
+});
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+function gotoNext(page,pagesize){
+    $('#page').val(page);
+    $('.searchbox').submit();
+}
+function gotoNext(page,pagesize){
+        window.location.href = "/index.php?m=honouredGuest&a=honouredGuest&page=" + page+"&game={$game}&userName={$userName}&upperName={$upperName}&specialName={$specialName}&end_date={$end_date}&start_date={$start_date}&status={$status}";
+    }
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+{elseif $operation == 'add' ||  $operation == 'edit'}
+    <h3>
+        <span><a href="/index.php?m=sdkGame&a=game">返回列表</a></span>
+        {if $operation == 'add'}
+            添加VIP用户
+        {else}
+            编辑VIP用户
+        {/if}
+    </h3>
+    <form action="/index.php?m=honouredGuest&a=honouredGuest&operation=save" method="post" class="searchbox" enctype="multipart/form-data">
+        {if $operation == 'add'}
+        <input type="hidden" name="isNew" value="1" />
+        <input type="hidden" name="loginTime" value="{$loginTime}" />
+        {/if}
+        <input type="hidden" name="gameName" value="{$gameName}" />
+        <input type="hidden" name="gameAlias" value="{$gameAlias}" />
+        <input type="hidden" name="id" value="{$list.id}" />
+        <p>
+            <span>玩家账号：</span>
+            <input type="text" name="userName" value="{$userName}" readonly="readonly" />
+        </p>
+        <p>
+            <span>微信：</span>
+            <input type="text" name="weixin" value="{$list.weixin}"/>
+        </p>
+        <p>
+            <span>QQ：</span>
+            <input type="text" name="qq" value="{$list.qq}"/>
+        </p>
+        <p>
+            <span>联系电话：</span>
+            <input type="text" name="phoneNum" value="{$list.phoneNum}"/>
+        </p>
+        <p>
+            <span>用户生日：</span>
+            <input type="text" name="birthday" value="{if $list.birthday}{$list.birthday|date_format:'%Y-%m-%d'}{/if}" onfocus="WdatePicker()" ></input>
+        </p>
+        <p>
+            <span>备注：</span>
+            <textarea style=" width: 550px;" name="remark" cols="" rows="">{$list.remark}</textarea>
+        </p>
+        <p class="line">
+            <button type="submit" name="do" class="su">立即提交</button>
+        </p>
+    </form>
+{/if}
+{/block}

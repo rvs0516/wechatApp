@@ -1,0 +1,144 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<h3>
+<span><font color="#FF0000"><strong>温馨提示</strong>：</font>数据有所延迟，当日数据次日凌晨出；若某日没注册数且没充值数，则该日数据行将不显示</span>
+渠道流水</h3>
+<div class="clear"></div>
+{if $gid neq 7}
+<form class="searchbox" action="/index.php?m=statistics&a=deduction" method="post">
+    <input type="hidden" name="page" value="{$list_page}" id="page" />
+    <input type="hidden" name="operation" value="" id="operation" />
+	{if $is_admin}
+    <p>
+        <span>来自游戏：</span>
+        <select name="game" id="game">
+            <option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+            <option value="{$key1}" {if $game eq $key1}selected="selected"{/if}> {$key1|capitalize|truncate:1:"":true} — {$name}</option>
+            {/foreach}
+        </select>
+        <span>合作模式：</span>
+        <select name="cop_model" id="cop_model">
+            <option value="">请选择</option>
+            {foreach from=$cop_models item=name key=key1}
+            <option value="{$key1}" {if $res_cop_model eq $key1}selected="selected"{/if}>{$name}</option>
+            {/foreach}
+        </select>
+        <span>渠道：</span>
+        <select name="channel" id="channel">
+            <option value="">请选择</option>
+        </select>
+    </p>
+    <p>
+
+	{/if}
+        <span>起始时间：</span>
+        <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})">
+        至
+        <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">&nbsp;&nbsp;&nbsp;&nbsp;
+        <span></span><input style="width: 185px; margin-left: -8px;" type="text" placeholder="输入渠道别名搜索" name="channel_name" value="{$channel_name}" />
+        <span></span>&nbsp;&nbsp;<button type="submit" class="su" value="list" id="list">查询</button>
+        {if $is_admin}
+        <button type="button" class="su" value="report" id="report">导出EXCEL</button>
+        {/if}
+    </p>
+</form>
+{/if}
+<div class="auto-layout-table">
+{if $gid neq 7}
+        {if $is_admin}
+        <font color="red">总注册人数</font>(扣前)：{if (($is_admin eq 1) OR ($is_admin eq 0 && $role_regs))}{$total_reg}{/if}&nbsp;&nbsp;&nbsp;
+        <font color="red">总充值金额</font>(扣前)：{if (($is_admin eq 1) OR ($is_admin eq 0 && $role_pays))}{$total_amount}{/if}&nbsp;&nbsp;&nbsp;
+        {/if}
+        <font color="red">总注册人数</font>：{$total_reged}&nbsp;&nbsp;&nbsp;
+        {if (($is_admin) || ($cop_model == 'cps'))}
+        <font color="red">总充值金额</font>：{$total_amounted}
+        {/if}
+{/if}
+
+    <table class="list" style="width: 900px;">
+        <tr style="background-color:#CCCCCC;">
+            <th>游戏</th>
+            <th>渠道</th>
+            {if $is_admin eq 1 && $gid neq 7}<th>合作模式</th>{/if}
+            <th>日期</th>
+            {if $is_admin eq 1}<th>单价</th>{/if}
+            {if (($is_admin eq 1) OR ($is_admin eq 0 && $role_pays))}<th>充值金额{if ($is_admin eq 1)}/扣量后{/if}</th>{/if}
+            {if (($is_admin eq 1) OR ($is_admin eq 0 && $role_regs))}<th>注册人数{if ($is_admin eq 1)}/扣量后{/if}</th>{/if}
+        </tr>
+        {foreach from=$data item=row}
+        <tr>
+            <td>{if $games[$row.game]}{$games[$row.game]}{else}{$row.game}{/if}</td>
+            <td>{if $channels[$row.channel]}{$channels[$row.channel]['channel']} ({$row.channel}){else}{$row.channel}{/if}</td>
+            {if $is_admin eq 1 && $gid neq 7}<td>{$row.cop_model}</td>{/if}
+            <td>{$row.day}</td>
+            {if ($is_admin eq 1)}<td> {$row.unitprice}</td>{/if}
+            {if (($is_admin eq 1) OR ($is_admin eq 0 && $role_pays))}<td>{if ($is_admin eq 1)}{$row.amount} / {/if}{$row.amounted}</td>{/if}
+            {if (($is_admin eq 1) OR ($is_admin eq 0 && $role_regs))}<td>{if ($is_admin eq 1)}{$row.regs} / {/if}{$row.regsed}</td>{/if}
+        </tr>
+        {foreachelse}
+		<tr><td colspan="7">无数据</td></tr>
+        {/foreach}
+		</table>
+
+
+    <div id="pager"></div>
+    <script src="js/pager.js"></script>
+    <script>
+    function gotoNext(page,pagesize){
+    	window.location.href = "/index.php?m=statistics&a=deduction&page=" + page +"&game={$game}&channel={$channel}&cop_model={$res_cop_model}&start_date={$start_date}&end_date={$end_date}";
+    }
+    var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+    document.getElementById('pager').innerHTML = pageStr;
+    </script>
+    <script>
+    $(function() {
+    	get_servers();
+    	$("#cop_model").change(function(){
+    		get_servers();
+    		return false;
+    	});
+
+    	$("#list").click(function() {
+    		$("#operation").val("list");
+    		$('.searchbox').submit();
+    	});
+    	$("#report").click(function() {
+    		$("#operation").val("report");
+    		$('.searchbox').submit();
+    	});
+
+
+    	function get_servers() {
+    		var game = $('#game').val();
+    		var cop_model = $('#cop_model').val();
+    		var thisc = "{$smarty.session.qchannel}";
+    		if(game == '' || cop_model == ''){
+    			$("#channel option[text!='0']").remove();
+    			$("#channel").append('<option value="0">请选择</option>').change();
+    			return false;
+    		}
+
+    		$.ajax({
+    			type: "POST",
+    			url: "/?m=sdkChannel&a=getGameChannelsCop",
+    			data: "game="+game+"&cop_model="+cop_model+"&thisc="+thisc,
+    			dataType: 'text',
+
+    			success: function(result){
+    				console.log(result)
+    				$("#channel option[text!='0']").remove();
+    				$("#channel").append(result);
+    			}
+    		});
+    		return false;
+    	}
+    });
+
+    </script>
+</div>
+{/block}

@@ -1,0 +1,580 @@
+{extends file='layout/new.html'}
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script src="/js/jquery-1.8.1.min.js"></script>
+{if $gid neq 8}
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+{/if}
+{if $operation == 'index'}
+<h3>
+{if $uid eq 'baohuan' ||  $uid eq 'chenjh' || $uid == 'luojunri' || $uid == 'yfdata' || $uid == 'jianjianxiang' || $uid == 'heyongzhen' || $uid == 'yangzhenwei' || $uid == 'guofengchi'}
+    <span><a href="/index.php?m=statistics&a=batches">账号批量处理</a>  /  <a href="/index.php?m=batch&a=batchRelation">账号批量关联</a></span>
+{/if}
+    账号列表
+</h3>
+<form class="searchbox" action="/index.php?m=statistics&a=member" method="post">
+    <p>
+        <span>来自游戏：</span>
+        {if  $gid eq 2 || $gid eq 11 || $gid eq 19 || $gid eq 17 || $gid eq 15 || $gid eq 22}
+            <input type="hidden" id="gameStr" value="{$gameStr}" />
+        {/if}
+            <input type="hidden" id="gid" value="{$gid}" />
+        {if $gid neq 8}
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="game" id="game" style="width: 98px;">
+        {else}
+            <select name="game" id="game">
+        {/if}
+            <option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+                <option value="{$key1}" {if $game eq $key1}selected="selected"{/if}>{$name}</option>
+            {/foreach}
+        </select>
+        <span>渠道： </span>
+        <select name="channel" id="channel">
+         <option value="">请选择</option>
+            {foreach from=$channels key=key1 item=data}
+                <option value="{$key1}" {if ($channel_array == $key1)}selected="selected"{/if}>{$data}</option>
+            {/foreach}
+        </select>
+        <span>包号：</span>
+        <select name="apkNum" id="apkNum">
+            <option value="">请选择</option>
+            {foreach from=$committe_apknum key=key2 item=apk}
+                <option value="{$apk}" {if ($apkNum == $apk)}selected="selected"{/if}>{$apk}</option>
+            {/foreach}
+        </select>
+
+    </p>
+    <p>
+        <span>账号：</span>
+        <input style="width: 186px;" type="text" value="{$userid}" name="userid" id="userid" placeholder="请输入需要搜索的账号" />
+        <span>渠道账号：</span>
+        <input style="width: 186px;" type="text" value="{$platformUserId}" name="platformUserId" id="platformUserId" placeholder="请输入需要搜索的渠道账号" />
+        <span style="width: 194px;">输入省/市：</span>
+        <input style="width: 186px;" type="text" value="{$keywords}" placeholder="请输入省/市" name="keywords" id="keywords">
+        <span>注册时间：</span>
+        <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+    </p>
+    <p>
+    <span>IP/phoneID：</span>
+    <input style="width: 186px;" type="text" value="{$info}" name="info" placeholder="请输入IP/phoneID" />
+    </p>
+    <table style="clear:both;margin-top:10px; float:right;width:100%;">
+        <tr>
+            <td align="left"><button type="submit" class="su inline" style=" margin-left: 30px;">查询</button><font style="color:red;">&nbsp;*&nbsp;单击渠道账号或设备ID即可复制</font></td>
+        </tr>
+    </table>
+</form>
+<table class="list">
+    {if $gid eq 1 || $gid eq 6 || $gid eq 9 || $gid eq 12 || $gid eq 21 || $gid eq 22}
+        <tr style="background-color:#CCCCCC;">
+            <th width="7%">账号</th>
+            <th width="10%">渠道账号</th>
+            <th width="5%">包号</th>
+            <th width="9%">来自游戏</th>
+            <th width="7%">渠道</th>
+            <th width="5%">区服</th>
+            <th width="10%">角色名称</th>
+            <th width="10%">注册时间</th>
+            <th width="10%">IP</th>
+            {if $gid eq 1 || $gid eq 6 || $gid eq 12 || $gid eq 21 || $gid eq 22}
+                <th width="12%">设备信息</th>
+                <th width="14%">操作</th>
+            {else}
+                <th width="15%">设备信息</th>
+                <th width="7%">操作</th>
+            {/if}
+        </tr>
+        {foreach from=$order_list item=order}
+        <tr>
+            <td>
+            {if ($uid == 'luojiang' || $uid == 'chenjh' || $uid == 'baohuan' || $uid == 'luojunri' || $uid == 'yfdata' || $uid == 'jianjianxiang' || $uid == 'guofengchi')}
+            <a class="btn" data-clipboard-text="{$order.password}" style="text-decoration:none; color: #444;">{$order.userName}</a>
+            {else}
+            {$order.userName}
+            {/if}
+            </td>
+            <td><a class="btn" data-clipboard-text="{$order.platformUserId}" style="text-decoration:none; color: #444;">{$order.platformUserId|truncate:13:"..":true}</a></td>
+            <td>{$order.apkNum}</td>
+            <td title="{$order.gameName}">{$order.gameName|truncate:7:"..":true}</td>
+            <td>{$order.channelName}</td>
+            <td title="{$order.serverId}">{$order.serverId|truncate:7:"..":true}</td>
+            <td>{$order.roleName}</td>
+            <td style="color: red;">{$order.joinTime|date_format:"%y-%m-%d %H:%M"}</td>
+            <td>{$order.loginIp}</td>
+            <td><a class="btn" data-clipboard-text="{$order.loginPhoneId}" style="text-decoration:none; color: #444;">{if ($uid == 'luojiang' || $uid == 'chenjh' || $uid == 'baohuan' || $uid == 'heyongzhen' || $uid == 'yangzhenwei' || $uid == 'guofengchi') && $order.nickName}{$order.nickName}| {/if}{$order.loginPhoneId|truncate:13:"..":true}</a></td>
+            <td>
+            {if $gid eq 9 || $gid eq 12 || $gid eq 21 || $gid eq 22}
+            <a href="index.php?m=vipGuest&a=vipGuest&operation=add&userName={$order.userName}&gameName={$order.gameName}&gameAlias={$order.gameAlias}&loginTime={$order.loginTime}&channelName={$order.channelName}&channelId={$order.channelId}&joinTime={$order.joinTime}">VIP|</a>
+            {/if}
+            {if ($uid == 'luojiang' || $uid == 'chenjh' || $uid == 'baohuan' || $uid == 'luojunri' || $uid == 'heyongzhen' || $uid == 'yangzhenwei' || $uid == 'yfdata' || $uid == 'guofengchi' || $uid == 'jianjianxiang')}
+                <a href="index.php?m=statistics&a=member&operation=bindingRelieve&userName={$order.userName}" class="relieve">解绑|</a>
+                <a href="index.php?m=statistics&a=member&userName={$order.userName}&platformUserId={$order.platformUserId}&channelId={$order.channelId}&operation=edit">改密</a>&nbsp;|
+            {/if}
+            <!--{if $gid == 21}
+                <a href="index.php?m=statistics&a=member&userName={$order.userName}&platformUserId={$order.platformUserId}&channelId={$order.channelId}&operation=edit">改密</a>&nbsp;|
+            {/if}-->
+            {if $gid eq 1 || $gid eq 6|| $gid eq 12}
+                <a href="index.php?m=sdkGame&a=baned&banedKey={$order.loginPhoneId}" target="_blank">屏蔽|</a>
+            {/if}
+                <a  href="javascript:void(0)" onclick="onModified(this)" id="{$order.more}">更多</a>
+            </td>
+        </tr>
+        {foreachelse}
+        <tr>
+            <td colspan="6">无数据</td>
+        </tr>
+        {/foreach}
+    {else}
+        <tr style="background-color:#CCCCCC;">
+            <th width="10%">账号</th>
+            <th width="15%">渠道账号</th>
+            <th width="8%">包号</th>
+            <th width="10%">来自游戏</th>
+            <th width="10%">渠道</th>
+            <th width="15%">注册时间</th>
+            <th width="15%">IP</th>
+            {if $gid eq 11}
+                <th width="12%">phoneID</th>
+                <th width="5%">操作</th>
+            {else}
+                <th width="17%">phoneID</th>
+            {/if}
+        </tr>
+        {foreach from=$order_list item=order}
+        <tr>
+            <td>
+            {if $uid == 'zhangyi'}
+            <a class="btn" data-clipboard-text="{$order.password}" style="text-decoration:none; color: #444;">{$order.userName}</a>
+            {else}
+            {$order.userName}
+            {/if}
+            </td>
+            <td><a class="btn" data-clipboard-text="{$order.platformUserId}" style="text-decoration:none; color: #444;">{$order.platformUserId|truncate:15:"..":true}</a></td>
+            <td>{$order.apkNum}</td>
+            <td>{$order.gameName}</td>
+            <td>{$order.channelName}</td>
+            <td style="color: red;">{$order.joinTime|date_format:"%y-%m-%d %H:%M"}</td>
+            <td>{$order.loginIp}</td>
+            <td><a class="btn" data-clipboard-text="{$order.loginPhoneId}" style="text-decoration:none; color: #444;">{$order.loginPhoneId|truncate:13:"..":true}</a></td>
+            {if $gid eq 11}
+                <td>
+                <a  href="javascript:void(0)" onclick="onModified(this)" id="{$order.more}">更多</a>
+                </td>
+            {/if}
+        </tr>
+        {foreachelse}
+        <tr>
+            <td colspan="6">无数据</td>
+        </tr>
+        {/foreach}
+    {/if}
+</table>
+
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+$('.relieve').click(function() {
+    return confirm('确定要解除用户绑定？');
+});
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+function gotoNext(page,pagesize){
+    $('#page').val(page);
+    $('.searchbox').submit();
+}
+function gotoNext(page,pagesize){
+        window.location.href = "/index.php?m=statistics&a=member&page=" + page+"&game={$game}&channel={$channel_array}&userid={$userid}&keywords={$keywords}&start_date={$start_date}&end_date={$end_date}&apkNum={$apkNum}&upperName={$upperName}&specialName={$specialName}&info={$info}&gid={$gid}";
+    }
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+<script>
+    var clipboard = new Clipboard('.btn');
+
+    clipboard.on('success', function(e) {
+        console.log(e);
+    });
+
+    clipboard.on('error', function(e) {
+        console.log(e);
+    });
+</script>
+<script>
+function b64Decode(str) {
+  return decodeURIComponent(atob(str));
+}
+function onModified(btn){
+var btnData = new Array(); //定义一数组
+var atob = b64Decode(btn.id);
+btnData = atob.split("|"); //字符分割 
+var btnUseName = btnData[0];
+var btnCall = btnData[1];
+var idcard = btnData[2];
+var gid = document.getElementById("gid").value;
+        $.ajax({
+            type: "POST",
+            url: "/?m=statistics&a=getUserRole",
+            data: "userName="+btnUseName,
+            dataType: 'text',
+
+            success: function(result){
+                var res = new Array(); //定义一数组
+                res = result.split("||"); //字符分割 
+                if (btnCall != 0) {
+                    if (gid == 2 || gid == 11 || gid == 9) {
+                        resStr = '绑定的手机：已绑定\n';
+                    }else{
+                        resStr = '绑定的手机：' + btnCall + '\n';
+                    }
+                }else{
+                    resStr = '';
+                }
+                if (idcard && (gid == 1 || gid == 12)) {
+                    resStr += '身份证：' + idcard + '\n';
+                }
+                for (var i = 0; i < res.length; i++) {
+                    resStr +=  res[i] + '\n';
+                }
+                alert(resStr);
+            }
+        });
+}
+</script>
+{if $gid eq 8}
+<script type="text/javascript">
+$(function() {
+    get_servers();
+    $("#game").change(function(){
+        get_servers();
+        return false;
+    });
+    get_apkNum();
+    $("#channel").change(function(){
+        get_apkNum();
+        return false;
+    });
+
+    function get_servers() {
+        var game = $('#game').val();
+        var channel = $('#channel').val();
+        if(game == ''){
+            $("#channel option[text!='']").remove();
+            $("#channel").append('<option value="">请选择</option>').change();
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/?m=sdkChannel&a=getGameChannels",
+            data: "game="+game+"&channelId="+channel,
+            dataType: 'text',
+
+            success: function(result){
+                $("#channel option[text!='0']").remove();
+                $("#channel").append(result);
+            }
+        });
+        return false;
+    }
+    function get_apkNum() {
+        var game = $('#game').val();
+        var channel = $('#channel').val();
+        var apkNum = $('#apkNum').val();
+        if(channel == ''){
+            $("#apkNum option[text!='']").remove();
+            $("#apkNum").append('<option value="">请选择</option>').change();
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/?m=statistics&a=getApkNum",
+            data: "game="+game+"&channelId="+channel+"&apkNum="+apkNum,
+            dataType: 'text',
+
+            success: function(result){
+                $("#apkNum option[text!='0']").remove();
+                $("#apkNum").append(result);
+            }
+        });
+        return false;
+    }
+});
+</script>
+{/if}
+{elseif $operation == 'edit'}
+<style>
+    .insert{ width: 75px; margin-top: 10px; height: 30px; text-align: center; line-height: 25px; color: #FFF; font-size: 12px; display: block; background: url(/static/submit.jpg) no-repeat;text-decoration:none;}
+    .insert:hover { text-decoration: none;}
+    .scroll-body{
+        max-height: 150px !important;
+    }
+    .searchbox .label-content .xm-label-block {
+        width: auto;
+    }
+    /* 关联游戏 */
+    .label-content{
+        margin-top: 42px !important;
+        padding: unset !important;
+    }
+    /* 查找按钮 */
+    #userToGame{
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+    }
+    #hide{
+        display: none;
+    }
+    /* 收起按钮 */
+    #stop{
+        width: 30px;
+        color: #f00;
+        display:none;
+    }
+</style>
+<link href="../js/layui/css/layui.css" rel="stylesheet">
+<h3>
+    修改玩家信息
+</h3>
+<br/>
+<form class="layui-form"  action="/index.php?m=statistics&a=member&operation=save&userName={$userName}" method="post">
+    
+    <div class="layui-form-item">
+        <label class="layui-form-label">玩家账号：</label>
+        <div class="layui-input-inline" >
+            <input type="text" name="username" value="{$userName}" disabled="disabled" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"  id="userToGame">查找</div>
+        <div class="layui-form-mid layui-word-aux"  id="stop" >收起</div>
+    </div>
+    <div id="gameNameLists" style="display: none;"></div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码：</label>
+        <div class="layui-input-inline">
+            <input type="password" name="password" placeholder="请输入密码"  class="layui-input">
+        </div>
+        <font color="red">注：若密码为空，则不修改密码。</font>
+    </div>
+
+    {if ($uid == 'luojiang' || $uid == 'chenjh' || $uid == 'baohuan' || $uid == 'heyongzhen' || $uid == 'yangzhenwei' || $uid == 'yfdata' || $uid == 'luojunri' || $uid == 'guofengchi' || $uid == 'jianjianxiang' || $gid == 21)}
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户状态：</label>
+        <div class="layui-input-block "  style="width: 190px;">
+          <select name="type" lay-filter="aihao">
+            <option value="">请选择</option>
+            <option value="1" {if $type eq 1}selected="selected"{/if}>回流</option>
+            <option value="2" {if $type eq 2}selected="selected"{/if}>二次流失</option>
+          </select>
+        </div>
+    </div> 
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">关联游戏：</label>
+        <div id="Shuttle_box" class="demo-transfer" name="assGame"></div>
+    </div>
+
+    <div class="layui-form-item ">
+        <label class="layui-form-label">关联账号：</label>
+        <div class="layui-input-inline tags plus-tag-add" style="display: flex;">
+            <input type="text"  class="layui-input inputTags"  id="whiteListIP" style="margin-right: 5px;" placeholder="请输入账号并按回车确认"/>
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" style="height: 38px;"><i class="layui-icon"></i></button>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"></label>
+        <p class="plus-tag tagbtn clearfix" id="myTags" style="margin-left: 50px;width: 764px;">
+            {if $assUserName}
+            {foreach from=$assUserName item=item}
+            <a value="-1" title="{$item}" href="javascript:void(0);"><span>{$item}</span><em></em></a>
+            {/foreach}
+            {/if}
+        </p>
+    </div>
+
+    <input type="hidden" name="assGame" value="{$assGame}" id="assGame"/>
+    <input type="hidden" id="assUserName" name="assUserName" value="{$assUserName}"    >
+    <input type="hidden" name="platformUserId" value="{$platformUserId}" />
+    <input type="hidden" name="channelId" value="{$channelId}" />
+    <input type="hidden" name="is_new" value="{$is_new}" />
+
+    {/if}
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-demotransferactive="getData" id="insert">提交</button>
+        </div>
+    </div> 
+</form>
+
+<!-- 添加input自定义标签 -->
+
+<script type="text/javascript" src="/js/jQueryLabel/js/tab.js"></script>
+<link href="/js/jQueryLabel/css/tab.css" type="text/css" rel="stylesheet" />
+<!-- 关联游戏穿梭框 -->
+<script src="../js/layui/layui.js"></script>
+<script>
+    layui.use(['transfer', 'layer', 'util'], function(){
+        var $ = layui.$
+        ,transfer = layui.transfer
+        ,layer = layui.layer
+        ,util = layui.util;
+
+        //全部游戏
+        var data = [
+            {foreach from=$gameLists item=item}
+                {
+                    value:"{$item.alias}",
+                    title:"{$item.name}"
+                },
+            {/foreach}
+        ]
+
+        //已关联的游戏
+        var value = [
+            {foreach from=$assGame item=item}
+                "{$item}",
+            {/foreach}
+        ]
+
+        // 穿梭框基本配置
+        transfer.render({
+            elem: '#Shuttle_box'
+            ,data: data
+            ,title: ['未选择的游戏/回车搜索', '已选择的游戏/回车搜索']
+            ,showSearch: true
+            ,width:450
+            ,height:450
+            ,id:"key123"
+            ,value: value
+        })
+
+        //批量办法定事件
+        util.event('lay-demoTransferActive', {
+            getData: function(othis){
+
+                //清空穿梭框的搜索内容
+				var e = jQuery.Event("keyup");
+				$('.layui-transfer-box[data-index="0"] input[placeholder="关键词搜索"]').removeAttr("value");
+				$('.layui-transfer-box[data-index="1"] input[placeholder="关键词搜索"]').removeAttr("value");
+				$('.layui-transfer-box[data-index="0"] input[placeholder="关键词搜索"]').trigger(e);
+				$('.layui-transfer-box[data-index="1"] input[placeholder="关键词搜索"]').trigger(e);
+
+                //取消默认勾选功能
+                $('.layui-transfer-box[data-index="0"] div[lay-skin="primary"]').removeClass("layui-form-checked");
+				$('.layui-transfer-box[data-index="1"] div[lay-skin="primary"]').removeClass("layui-form-checked");
+
+                var getData = transfer.getData('key123'); //获取右侧穿梭数据
+
+                // 关联游戏数据
+                var assGame = ''
+                for (let i = 0; i < getData.length; i++) {
+
+                    if (i===getData.length-1){
+                        assGame += getData[i].value;
+                    }else{
+                        assGame += getData[i].value +','
+                    }
+
+                }
+                $("#assGame").attr("value",assGame);
+                
+                // 关联账号数据
+                var assGameArray = [];  
+                var assUserName
+
+                if ( $('#myTags a').length > 1 ) {
+                $("#myTags a span").each(function(){
+                    assGameArray.push( $(this).html() );
+                });
+                    assUserName = getStr(assGameArray)
+                }else{
+                    assUserName = $("#myTags a span").html()
+                }
+                $('#assUserName').val(assUserName)
+
+                // 提交表单
+                var r = confirm('你確定要修改该玩家的信息？');
+                if (r == true) {
+                    $('.layui-form').submit();
+                }
+    
+            }
+            
+        });
+    })
+</script>
+<script>
+    // 查找玩家账号登录过的游戏
+    $('#userToGame').click(function(){
+        // 展示收起按钮
+        $("#stop").css('display', 'inline-block');
+
+        // 清除掉原先的展示数据
+        $("#gameNameLists").empty()
+
+        var spanHtml = '<div>登录过的游戏:</div>';
+        $('#gameNameLists').append(spanHtml)
+
+        // 展示账号登录过的游戏
+        $("#gameNameLists").css('display', 'block');
+        // 获取玩家账号
+        var userName = $('input[name="userName"]').val()
+        $.ajax({
+            type: "post",
+            url: "/index.php?m=statistics&a=member",
+            data: {
+                userNameToGame : userName
+            },
+            dataType: "json",
+            success: function (data) {
+                for (let i = 0; i < data.length; i++) {
+                    if(i == 0){
+                        var gameHtml = '<ul style="margin-left: 100px;">'+
+                                   '<li style="color: #141e91;margin-top: -37px;" class="btn" data-clipboard-text="' + data[i] + '">' + data[i] + '</li>'+
+                                   '</ul>'
+                    }else{
+                        var gameHtml = '<ul style="margin-left: 100px;">'+
+                                   '<li style="color: #141e91;" class="btn" data-clipboard-text="' + data[i] + '">' + data[i] + '</li>'+
+                                   '</ul>'
+                    }
+                    $('#gameNameLists').append(gameHtml)
+                }
+            }
+        });
+    })
+    // 收起账号登录过的游戏
+    $('#stop').click(function(){
+        $("#gameNameLists").css('display', 'none');
+        $("#stop").css('display', 'none');
+    })
+    //遍历数组，加逗号
+    function getStr(assGameArray){
+            var str="";
+            for (var i = 0; i < assGameArray.length ; i++) {
+                if (i===assGameArray.length-1){
+                    str+=assGameArray[i];
+                }else{
+                    str+=assGameArray[i]+",";
+                }
+            }
+            return str;
+    }
+</script>
+
+{/if}
+{/block}

@@ -1,0 +1,88 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+{if $checkRoot eq 1}
+<h3>
+    转端批量处理
+</h3>
+<form class="searchbox" action="/index.php?m=statistics&a=batches" method="post">
+    <input type="hidden" name="batchesUserName" value="" id="batchesUserName" />
+    <input type="hidden" name="operation" value="" id="operation" />
+    <p>
+        <span>玩家账号：</span>
+        <textarea style="width:800px; height:60px;"  name="useNameStr" placeholder="单次处理条数不能超过100条"></textarea>
+    </p>
+    <p>
+        <span>密码：</span>
+        <input type="text" name="password" value=""/>&nbsp;<font color="red">注：密码不能为空。</font>
+    </p>
+    <p class="line">
+        <button type="submit" class="su inline" style=" margin-left: 30px;">查询</button>
+        <button type="submit" class="su" onclick="fun()">改密</button>
+    </p>
+</form>
+{if $user}
+<table class="list">
+        <tr style="background-color:#CCCCCC;">
+            <th>账号</th>
+            <th>最后登录角色</th>
+            <th>渠道</th>
+            <th>包号</th>
+            <th><input type="checkbox" onclick="swapCheck()" /></th>
+        </tr>
+        {foreach from=$memberList item=order}
+        <tr>
+            <td>{$order.userName}</td>
+            <td>{$order.roleName}</td>
+            <td>{$order.channelName}</td>
+            <td>{$order.apkNum}</td>
+            <td><input type="checkbox" name="userName" value="{$order.userName}" /></td>
+        </tr>
+        {foreachelse}
+        <tr>
+            <td colspan="6">无数据</td>
+        </tr>
+        {/foreach}
+</table>
+
+   
+    <script type="text/javascript"> 
+        var isCheckAll = false; 
+        function swapCheck() { 
+            if (isCheckAll) { 
+                $("input[type='checkbox']").each(function() { 
+                    this.checked = false; 
+                }); 
+                isCheckAll = false; 
+            } else { 
+                $("input[type='checkbox']").each(function() { 
+                    this.checked = true; 
+                }); 
+                isCheckAll = true; 
+            } 
+        } 
+        function fun(){
+            obj = document.getElementsByName("userName");
+            check_val = [];
+            for(k in obj){
+                if(obj[k].checked)
+                    check_val.push(obj[k].value);
+            }
+            //alert(check_val);
+            $("#operation").val("edit");
+            $("#batchesUserName").val(check_val);
+        }
+    </script> 
+    <!--<script type="text/javascript">
+    $("#edit").click(function() {
+        $("#operation").val("edit");
+        $('.searchbox').submit();
+    });
+    </script>-->
+{/if}
+{else}
+<div style="font-size: 20px; color:red; margin:5% 0 0 30%;">无权限查看相关数据</div>
+{/if}
+{/block}

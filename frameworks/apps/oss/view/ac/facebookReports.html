@@ -1,0 +1,60 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<h3>導出facebook報表</h3>
+<p align="right" style="color:red; margin-right:30px; margin-top:10px;">
+	快速導出&nbsp;
+	<a href="javascript:void(0);" class="quick_download" data-time="last_month">上個月</a>
+	<a href="javascript:void(0);" class="quick_download" data-time="current_month">本月</a>
+</p>
+<div class="clear"></div>
+<form class="searchbox" action="/index.php?m=ac&a=facebookReports" method="post">
+	<p>
+		<span>起始時間：</span>
+		<input type="text" name="start_date" id="start_date" class="date" value="2013-05-08" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="2013-05-08" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+	</p>
+	<p class="inline">
+		<button type="submit" class="su">導出</button>
+		<button type="reset" class="su">條件重置</button>
+	</p>
+</form>
+
+<script>
+	$(function() {
+		$('.quick_download').click(function() {
+			var date = getDate( $(this).attr('data-time') );
+			$('#start_date').val( date.start_date );
+			$('#end_date').val( date.end_date );
+			$('.searchbox').submit();
+			return false;
+		});
+		
+		/**
+		 * 计算日期
+		 * 
+		 * @param string type
+		 * @return object { start_date, end_date }
+		 */
+		function getDate(type) {
+			var cur_date = new Date(),
+				cur_year = cur_date.getFullYear(),
+				cur_month = cur_date.getMonth();
+			//上个月
+			if(type === 'last_month') {
+				cur_month--;
+			//本月
+			} else if(type === 'current_month') {
+				//不做任何事...
+			}
+			var last_day = new Date(cur_year, (cur_month + 1), 0).getDate();
+			return {
+				start_date: (cur_year + '-' + (cur_month + 1) + '-01'),
+				end_date: (cur_year + '-' + (cur_month + 1) + '-' + last_day)
+			};
+		}
+	});
+</script>
+{/block}

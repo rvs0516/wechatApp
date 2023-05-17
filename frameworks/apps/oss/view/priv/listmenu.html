@@ -1,0 +1,41 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3><span><a href="index.php?m=priv&a=addmenu&menuid={$menuid}">添加菜单</a></span>菜单列表</h3>
+<table class="list">
+<thead>
+    <th>ID</th>
+    <th>菜单名</th>
+    <th>父菜单</th>
+    <th>显示</th>
+    <th>排序</th>
+    <th>操作</th>
+  </thead>
+  {foreach from=$list key=k item=v}
+  <tr>
+    <td>{$v.id}</td>
+    <td>{$v.name}</td>
+    <td>{if $v.pname!=''}{$v.pname}{else}<font color="#FF0000">頂級菜单</font>{/if}</td>
+    <td>{if $v.display=='1'}是{else}否{/if}</td>
+    <td>{$v.sort}</td>
+    <td><a href="index.php?m=priv&a=delmenu&id={$v.id}" class="delete">刪除</a>&nbsp;<a href="index.php?m=priv&a=editmenu&id={$v.id}&menuid={$menuid}">修改</a></td>
+  </tr>
+  {/foreach}
+</table>
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+function gotoNext(page,pagesize){
+	window.location.href="index.php?m=priv&a=listmenu&page="+page;
+}
+
+$(function(){
+	var pageStr = new Page('{$page}', '{$rowcount}',5,'{$offset}','gotoNext').GetText();
+	$('#pager').html('');
+	$('#pager').html(pageStr);
+	$('.delete').click(function() {
+		return confirm('是否確定刪除？');
+	});
+});
+</script> 
+{/block} 

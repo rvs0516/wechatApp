@@ -1,0 +1,119 @@
+{extends file='layout/new.html'}
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+{if $operation == 'index'}
+    <h3>
+        <span><a href="/index.php?m=vipGuest&a=maintain&operation=add">添加处理</a></span>
+        账号跟进
+    </h3>
+    <form class="searchbox" action="/index.php?m=vipGuest&a=maintain" method="post">
+    <input type="hidden" name="op" value="" id="op" />
+    <p>
+        <span>跟进情况：</span>
+        <select  name="status" style="width: 150px;">
+            <option value="">请选择</option>
+            <option value="1" {if $status eq '1'}selected="selected"{/if}>已跟进</option>
+            <option value="2" {if $status eq '2'}selected="selected"{/if}>未跟进</option>
+            <option value="3" {if $status eq '3'}selected="selected"{/if}>停止通知</option>
+        </select>
+        <span>用户账号：</span>
+        <input style="width: 180px;" type="text" value="{$userName}" name="userName" placeholder="请输入账号">
+        <span>操作uid：</span>
+        <input style="width: 180px;" type="text" value="{$editUid}" name="editUid">
+        <span>操作时间：</span>
+        <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+        <span>排序：</span>
+        <select  name="sort" style="width: 150px;">
+            <option value="id" {if $sort eq 'id'}selected="selected"{/if}>记录降序</option>
+            <option value="time" {if $sort eq 'time'}selected="selected"{/if}>操作时间降序</option>
+            <option value="frequency" {if $sort eq 'frequency'}selected="selected"{/if}>发送次数降序</option>
+        </select>
+    </p>
+    <p>
+        <button type="submit" name="do" class="su" id="submit">查询</button>
+        <button type="submit" class="su" value="report" id="report">导出</button><font style="color: #f00;"> * 考虑服务器性能损耗，单次最多导出5000条</font>
+    </p>
+    </form>
+    <table class="list">
+        <tr style="background-color:#CCCCCC;">
+            <th style="width: 10%">用户账号</th>
+            <th style="width: 10%">处理类型</th>
+            <th style="width: 10%">通知方式</th>
+            <th style="width: 10%">通知邮件</th>
+            <th style="width: 10%">通知次数</th>
+            <th style="width: 10%">状态</th>
+            <th style="width: 10%">操作时间</th>
+            <th style="width: 10%">操作uid</th>
+            <th style="width: 10%">操作</th>
+        </tr>
+        {foreach from=$list item=game}
+        <tr>
+            <td>{$game.userName}</td>
+            <td>{if $game.handleType == 'login'}登录通知{/if}</td>
+            <td>{if $game.contactType == 'email'}邮件通知{/if}</td>
+            <td title="{$game.contactAddress}">{$game.contactAddress|truncate:30:"..":true}</td>
+            <td>{$game.frequency}</td>
+            <td>{if $game.status == 1}<a style="color: green;">已跟进</a>{elseif $game.status == 3}<a style="color: red;">停止通知</a>{else}未跟进{/if}</td>
+            <td>{$game.time|date_format:"%y-%m-%d %H:%M"}</td>
+            <td>{$game.uid}</td>
+            <td style="width:160px">
+            <a href="/index.php?m=vipGuest&a=maintain&operation=del&id={$game.id}" class="delete_confirm">刪除</a>
+            |<a href="/index.php?m=vipGuest&a=maintain&operation=maintain&id={$game.id}" class="maintain">跟进</a>
+            </td>
+        </tr>
+        {foreachelse}
+            <td colspan="8" ><font color="red">暂无该用户数据</font></td>
+        {/foreach}
+    </table>
+    <div id="pager"></div>
+
+<script src="js/pager.js"></script>
+<script>
+$('.delete_confirm').click(function() {
+    return confirm('删除数据不可恢复，是否继续');
+});
+$("#report").click(function() {
+    $("#op").val("report");
+    $('.searchbox').submit();
+});
+$("#submit").click(function() {
+    $("#op").val("");
+});
+function gotoNext(page,pagesize){
+    window.location.href = "/index.php?m=vipGuest&a=maintain&page=" + page+ "&userName={$userName}&start_date={$start_date}&end_date={$end_date}&status={$status}&editUid={$editUid}&sort={$sort}";
+}
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+
+{elseif $operation == 'add'}
+    <h3>
+        <span><a href="/index.php?m=vipGuest&a=maintain">返回列表</a></span>
+        添加处理
+    </h3>
+    <form action="/index.php?m=vipGuest&a=maintain&operation=save" method="post" class="searchbox" enctype="multipart/form-data">
+        <p>
+            <span>用户账号：</span>
+            <!--<input style="width: 180px;" type="text" value="" name="userName" id="userName" placeholder="请输入账号">-->
+            <textarea style="width:800px; height:60px;"  name="userNameStr" id="userNameStr" placeholder="单次处理条数不能超过50条"></textarea>
+        </p>
+        <p>
+            <span>处理类型：</span>
+            <label><input type="checkbox" value="login" name="handleType[]" id="login" checked="checked"/> 登录通知</label>
+        </p>
+        <p>
+            <span>通知类型：</span>
+            <label><input type="checkbox" value="email" name="contactType[]" id="login" checked="checked" /> 邮件</label>
+        </p>
+        <p>
+            <span>通知邮箱：</span>
+            <textarea style="width:800px; height:60px;"  name="contactAddress" id="contactAddress" placeholder="可添加多个邮箱地址，两个地址间用 | 分隔;不填默认使用jianxiang.jian@jieyougame.com"></textarea>
+        </p>
+        <p>
+            <button type="submit" name="do" class="su" id="submit">提交</button>
+        </p>
+    </form>
+
+{/if}
+{/block}

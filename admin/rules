@@ -1,0 +1,16 @@
+rewrite ^/index.html						/index.php last;
+#user
+rewrite ^/users/([0-9]+)/(.*)/(.*)/(.*)/(.*)/(.*)/(.*)		/index.php?m=index&a=users&page=$1&start_date=$2&end_date=$3&alias=$4&money=$5&level=$6&user=$7 last;
+rewrite ^/users/export						/index.php?m=index&a=users&do=export last;
+rewrite ^/users/([0-9]+)					/index.php?m=index&a=users&page=$1 last;
+rewrite ^/users/						/index.php?m=index&a=users last;
+#zhuandian
+rewrite ^/trans/([0-9]+)/(.*)/(.*)/(.*)/(.*)/(.*)/(.*)		/index.php?m=index&a=trans&page=$1&start_date=$2&end_date=$3&type=$4&game=$5&server=$6&user=$7 last;
+rewrite ^/trans/export						/index.php?m=index&a=trans&do=export last;
+rewrite ^/trans/([0-9]+)					/index.php?m=index&a=trans&page=$1 last;
+rewrite ^/trans/						/index.php?m=index&a=trans last;
+#payment
+rewrite ^/payment/([0-9]+)/(.*)/(.*)/(.*)/(.*)/(.*)/(.*)	/index.php?m=index&a=payment&page=$1&start_date=$2&end_date=$3&type=$4&game=$5&server=$6&user=$7 last;
+rewrite ^/payment/([0-9]+)					/index.php?m=index&a=payment&page=$1 last;
+rewrite ^/payment/						/index.php?m=index&a=payment last;
+rewrite ^/ajax/							/index.php?m=index&a=ajax last;

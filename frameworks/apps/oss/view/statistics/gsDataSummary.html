@@ -1,0 +1,117 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+
+<h3>
+    内服统计
+</h3>
+<form class="searchbox" action="/index.php?m=statistics&a=gsDataSummary" method="post">
+    <p>
+        <span>来自游戏：</span>
+            {if $gid eq 17 || $gid eq 11}
+            <input type="hidden" id="gameStr" value="{$gameStr}" />
+            <input type="hidden" id="gid" value="{$gid}" />
+            {/if}
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="game" id="game" style="width: 98px;">
+            <option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+                <option value="{$key1}" {if $game eq $key1}selected="selected"{/if}>{$name}</option>
+            {/foreach}
+        </select>
+        <span>区服ID：</span>
+        <select name="server" id="server" style="width: 150px;">
+            <option value="">请选择</option>
+            {foreach from=$serverData item=name key=key1}
+                <option value="{$name.cpServerNum}" {if $server eq $name.cpServerNum}selected="selected"{/if}>{$name.gameServerNum}({$name.cpServerNum})</option>
+            {/foreach}
+        </select>
+        <span>起始时间：</span>
+        <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})" style="width: 80px;"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )" style="width: 80px;">
+    </p>
+	<table style="clear:both;margin-top:10px; float:right;width:100%;">
+		<tr>
+			<td align="left"><button type="submit" class="su inline" style=" margin-left: 30px;">查询</button></td>
+		</tr>
+	</table>
+</form>
+{if $specialName}
+<div class="clear" style="margin-left: 20px;">
+<span style="display: block;">区服</span>
+{foreach from=$gsDataMon  item=name key=key1}
+<a style=" margin-right: 10px; color: #444"><strong>$</strong><font style="color: green">{$key1}</font>:{$name}</a>
+{/foreach}
+<br><span style="display: block;">基服</span>
+<p style="float: left; color: blue;">{$arpu}</p>
+</div>
+{/if}
+{if $operation == 'list'}
+<table class="list">
+    <tr style="background-color:#CCCCCC;">
+        <th>时间</th>
+        <th>上级级游戏名</th>
+        <th>专服游戏名</th>
+        <th>游戏</th>
+        {if $specialName}
+        <th>区服</th>
+        {/if}
+        <th>流水</th>
+    </tr>
+	{foreach from=$gsData item=order}
+	<tr>
+        <td>{$order.day}</td>
+        <td>{$order.upperName}</td>
+        <td>{$order.specialName}</td>
+        <td>{$order.gameName}</td>
+        {if $specialName}
+        <td>{$order.serverStr}</td>
+        {/if}
+        <td>{$order.payTotal}</td>
+    </tr>
+	{foreachelse}
+    <tr>
+        <td colspan="10">无数据</td>
+    </tr>
+	{/foreach}
+    <tr style="background-color:#CCCCCC;">
+        <td>汇总</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        {if $specialName}
+        <td></td>
+        {/if}
+        <td>{$allTotal}</td>
+    </tr>
+</table>
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+function gotoNext(page,pagesize){
+    $('#page').val(page);
+    $('.searchbox').submit();
+}
+function gotoNext(page,pagesize){
+        window.location.href = "/index.php?m=statistics&a=gsDataSummary&page=" + page+"&game={$game}&upperName={$upperName}&specialName={$specialName}&server={$server}&start_date={$start_date}&end_date={$end_date}";
+    }
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+
+{/if}
+{/block}

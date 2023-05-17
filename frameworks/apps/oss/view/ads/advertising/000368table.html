@@ -1,0 +1,66 @@
+    <table class="list">
+        <tr style="background-color:#CCCCCC;">
+            {if $formType neq "3"}<th>日期</th>{/if}
+            <!--<th>广告主ID</th>-->
+            <th>计划类型</th>
+            <th>计划ID</th>
+            <!-- <th>计划名称</th> -->
+            <th>广告ID</th>
+            <th>广告名称</th>
+            <th>创意ID</th>
+            <th>包名</th>
+            <th>展示量</th>
+            <th>点击量</th>
+            <th>下载量</th>
+            <th>花费</th>
+            <th>新增注册</th>
+            <th>新增充值</th>
+            {if $formType neq "1"}<th>新增充值人数</th>{/if}
+            <th>充值</th>
+            {if $formType neq "1"}<th>充值人数</th>{/if}
+        </tr>
+        {foreach from=$list item=game}
+        <tr align="center">
+            {if $formType neq "3"}<td>{if $game.reportDate}{$game.reportDate}{else}{$game.reportTime}{/if}</td>{/if}
+            <!--<td>{$game.advertiserId}</td>-->
+            <td>{$game.mediaType}</td>
+            <td>{$game.campaignId}</td>
+            <!-- <td>{$game.campaignName}</td> -->
+            <td>{$game.advertisementId}</td>
+            <td>{$game.advertisementName}</td>
+            <td>{$game.creativeId}</td>
+            <td>{$game.appPackage}</td>
+            <td>{$game.showCount}</td>
+            <td>{$game.clickCount}</td>
+            <td>{$game.downloadCount}</td>
+            <td>{$game.spent}</td>
+            <td>{$game.newRegist}</td>
+            <td>{$game.newAmount}</td>
+            {if $formType neq "1"}<td>{$game.newPayUser}</td>{/if}
+            <td>{$game.amount}</td>
+            {if $formType neq "1"}<td>{$game.payUser}</td>{/if}
+        </tr>
+        {foreachelse}
+                <td colspan="8" ><font color="red">暂无数据</font></td>
+        {/foreach}
+        {if $sum}
+        <tr align="center" style="background-color:#CCCCCC;">
+            {if $formType neq "3"}<td></td>{/if}
+            <td></td>
+            <td></td>
+            <td>{if $formType eq "3"}汇总{/if}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{$sum.showCount}</td>
+            <td>{$sum.clickCount}</td>
+            <td>{$sum.downloadCount}</td>
+            <td>{$sum.spent}</td>
+            <td>{$sum.newRegist}</td>
+            <td>{$sum.newAmount}</td>
+            {if $formType neq "1"}<td>{$sum.newPayUser}</td>{/if}
+            <td>{$sum.amount}</td>
+            {if $formType neq "1"}<td>{$sum.payUser}</td>{/if}
+        </tr>
+        {/if}
+    </table>

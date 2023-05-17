@@ -1,0 +1,113 @@
+{extends file='layout/new.html'}
+{block name=title}::儲值對賬-平臺金流{/block}
+{block name=head}
+<style>
+<!--
+.box{
+	width: 100%;
+	height:auto;
+}
+.search{
+	float: right;
+	padding:5px 0;
+}
+.search ul li{
+	float: left;
+	margin:0 5px;
+}
+-->
+</style>
+<script>
+function confirmOrder(ordertime, project, specific){
+	if(confirm("是否确认對賬一致？")){
+		var timestamp = Math.round(new Date().getTime() / 1000);
+		$.ajax({
+            type: 'POST',
+            url:  '?m=ac&a=checkgoldstream&action=ajax',
+            data: 'ordertime='+ ordertime+'&project=' + project + '&specific=' + specific +'&timestamp=' + timestamp,
+            dataType : "json",
+            success: function(msg) {
+				if(msg.code == 1){
+					$("#"+ordertime+project+specific).html("已确认");
+					return true;
+				}else{
+					alert("操作有誤");
+					return false;
+				}
+            }
+        })
+	}else return false;
+}
+</script>
+{/block}
+{block name=body}
+<div class="box">
+	<div>
+	<h3 style="float: left;">平臺金流</h3>
+	<form method="post">
+		<div class="search">
+			<ul>
+				<li style="vertical-align: middle;">
+					<select name="year">
+						{for $i=2012;$i<2016;$i++}<option {if $year && $year == $i}selected="selected"{/if}>{$i}</option>{/for}
+					</select> 年
+				</li>
+				<li>
+					<select name="month">
+						<option value="">全部</option>
+						{for $i=1;$i<13;$i++}<option {if $month && $month == $i}selected="selected"{/if}>{$i}</option>{/for}
+					</select> 月
+				</li>
+				<li>金流類型:
+					<select name="goldtype">
+						<option value="">全部</option>
+						{foreach item=item key=key from=$goldstreamsInfo}<option {if $goldtype && $goldtype == $key}selected="selected"{/if}>{$key}</option>{/foreach}
+					</select>
+				</li>
+				<li>确认對賬：
+						<select name="isconfirm">
+							<option value="" >全部</option>
+							<option value="1" {if $smarty.post.isconfirm == '1'}selected="selected"{/if}>已确认</option>
+							<option value="2" {if $smarty.post.isconfirm == '2'}selected="selected"{/if}>未确认</option>
+						</select>
+					</li>
+				<li><input type="submit" value="查询" style="width: 50px;height: 25px;"/></li>
+			</ul>
+		</div>
+	</form>
+	<div style="clear: both;">
+		<table class="list">
+			<thead>
+				<tr>
+					<th>開始時間</th>
+					<th>結束時間</th>
+					<th>金流類型</th>
+					<th>交易方式</th>
+					<th>儲值金額(己)</th>
+					<th>操作</th></tr>
+			</thead>
+			<tbody>
+				{if $total && count($total)}
+				{foreach item=item key=key from=$total}
+				<tr>
+					<td>{$item.starttime}</td>
+					<td>{$item.endtime}</td>
+					<td>{$item.goldtype}</td>
+					<td>{$item.specific}</td>
+					<td>{$item.total}</td>
+					{if $item.confirmOrder && $item.confirmOrder == 1}
+					<td>已确认</td>
+					{else}
+					<td id="{$item.ym}{$item.goldtype}{$item.pcode}"><a href="javascript:;" onclick="confirmOrder('{$item.ym}','{$item.goldtype}','{$item.pcode}')">對賬一致</a>&nbsp;&nbsp;<a href="?m=ac&a=finddifference&type=goldstream&project={$item.goldtype}&specific={$item.pcode}&ordertime={$item.ym}">查找差異</a></td>
+					{/if}
+				</tr>
+				{/foreach}
+				{else}
+				<tr><td colspan="7">數據不存在</td></tr>
+				{/if}
+			</tbody>
+		</table>
+	</div>
+	</div>
+</div>
+{/block}

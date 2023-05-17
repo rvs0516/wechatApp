@@ -1,0 +1,187 @@
+{extends file='layout/new.html'}
+{block name=body}
+{if $operation == 'index'}
+	<h3>
+		游戏列表
+	</h3>
+	<form class="searchbox" action="/index.php?m=sdkGame&a=gameParamConf" method="post">
+    <p>
+    	<span>来自游戏：</span>
+            <select name="game" id="game">
+                    <option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+                    <option value="{$key1}" {if $game eq $key1}selected="selected"{/if}>{$name}</option>
+            {/foreach}
+            </select>
+		<span style="width: 80px;">输入关键词：</span>
+		<input type="text" value="{$keywords}" name="keywords" id="keywords">
+        <button type="submit" class="su"  style="margin-top: 0px;">查询</button>
+    </p>
+	</form>
+	<style>
+		.show{ display:block; color:#3d203f; text-decoration:none; padding:10px; width:110px; position:relative; left:0; top:0; z-index:10; float:left;}
+		.show p{ display:none;}
+		.show:hover{ display:block; text-decoration:none; height:100%; position:relative; z-index:1000 !important;}
+		.show:hover p{ display:block; color:#3d203f; background:#cff0fc; position:absolute; left:-10px; top:-10px; white-space:normal; width:700px;; padding:10px; box-shadow:1px 1px 10px #333; cursor:pointer;}
+	</style>
+	<table class="list">
+		<tr>
+			<th>游戏</th>
+			<th>游戏介绍</th>
+			<th>游戏别名</th>
+			<th>TOKEN</th>
+			<th>SERVER KEY</th>
+			<th>服务器日志</th>
+			<th>支付切换</th>
+			<th style="width:40px;">操作</th>
+		</tr>
+		{foreach from=$game_list item=game}
+		<tr>
+			<td style="text-align: center;">{$game.name}</td>
+			<td style="text-align: center;"><a class="show">{$game.detail|truncate:10:"..":true}{if $game.detail}<p>{$game.detail}</p>{/if}</a></td>
+			<td>{$game.alias}</td>
+			<td>{if $config.key[$game.alias]['sdk']}{$config.key[$game.alias]['sdk']}<br /><font color="#00CCCC">{md5($config.key[$game.alias]['sdk'])}</font>{/if}</td>
+			<td><font color="#00CCCC">{$config.key[$game.alias]['game_server']}</font></td>
+			<td>{if $config.log[$game.alias]}<font color="red">是</font>{/if}</td>
+			<td>{if $config.key[$game.alias]['cp_order_inquiry'] eq 1}<font color="red">开</font>{else}<font color="green">关</font>{/if}</td>
+			<td style="width:40px"><a href="/index.php?m=sdkGame&a=gameParamConf&operation=edit&id={$game.alias}">编辑</a></td>
+		</tr>
+		{/foreach}
+	</table>
+	<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+function gotoNext(page,pagesize){
+	window.location.href = "/index.php?m=sdkGame&a=gameParamConf&page=" + page+ "&keywords={$keywords}";
+}
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+{elseif $operation == 'add' || $operation == 'edit'}
+	<h3>
+		<span><a href="/index.php?m=sdkGame&a=gameParamConf">返回列表</a></span>
+		游戏参数配置【{$alias}】
+	</h3>
+	<form action="/index.php?m=sdkGame&a=gameParamConf&operation=save" method="post" class="searchbox">
+		<input type="hidden" name="alias" id="alias" value="{$alias}" />
+		<p>
+			<span>TOKEN：</span>
+			<input type="text" name="sdk" id="sdk" placeholder="输入相对复杂的字符串" value="{$config.key[$alias]['sdk']}"  />&nbsp;注：所有输入项均不能含单引号、双引号、加号以及&
+		</p>
+		<p>
+			<span>SERVER KEY：</span>
+			<input type="text" name="game_server" id="game_server" placeholder="输入相对复杂的字符串" value="{$config.key[$alias]['game_server']}"  />
+		</p>
+		<p>
+			<span>兑换倍数：</span>
+			<input type="text" name="scale" id="scale" placeholder="输入一个正整数" value="{$config.key[$alias]['scale']}"  />
+		</p>
+		<p>
+			<span>货币单位：</span>
+			<input type="text" name="monetary_unit" id="monetary_unit" placeholder="如“元宝”" value="{$config.key[$alias]['monetary_unit']}" />
+		</p>
+		<p>
+			<span>充值回调：</span>
+			<input type="url" name="callback_url" id="callback_url" style="width:250px;" placeholder="http://" value="{$config.key[$alias]['callback_url']}" />
+		</p>
+		<p>
+			<span>定额支付：</span>
+			<input type="checkbox" value="" name="isration" id="isration" {if $config.key[$alias]['isration']}checked="checked"{/if} />
+		</p>
+		<p>
+			<span>悬浮控件：</span>
+			<input type="checkbox" value="" name="visible_float" id="visible_float" {if $config.key[$alias]['visible_float']}checked="checked"{/if} />
+		</p>
+		<p>
+			<span>服务端日志：</span>
+			<input type="checkbox" value="" name="logger" {if $config.log[$alias]}checked="checked"{/if} id="logger" />
+		</p>
+		<p class="line">
+			<button type="button" name="do" class="su">立即提交</button>
+			<button type="reset" class="re">条件重置</button>
+		</p>
+	</form>
+<script>
+$(function(){
+	$('.su').click(function(){
+		var alias = $("#alias").val();
+		var sdk = $("#sdk").val();
+		var game_server = $("#game_server").val();
+		var scale = $("#scale").val();
+		var monetary_unit = $("#monetary_unit").val();
+		var callback_url = $("#callback_url").val();
+		var logger = $("#logger").attr("checked");
+		var isration = $("#isration").attr("checked");
+		var visible_float = $("#visible_float").attr("checked");
+
+		if(isration == 'checked') {
+			isration = 1;
+		}else{
+			isration = 0;
+		}
+
+		if(visible_float == 'checked') {
+			visible_float = 1;
+		}else{
+			visible_float = 0;
+		}
+
+		if(logger == 'checked') {
+			logger = 1;
+		}else{
+			logger = 0;
+		}
+
+		if(sdk == '') {
+			alert('TOKEN不能为空');
+			return false;
+		}
+		if(game_server == '') {
+			alert('SERVER KEY不能为空');
+			return false;
+		}
+		if(scale == '') {
+			alert('兑换倍数不能为空');
+			return false;
+		}
+		if(monetary_unit == '') {
+			alert('货币单位不能为空');
+			return false;
+		}
+		if(callback_url == '') {
+			alert('充值回调不能为空');
+			return false;
+		}
+
+		sdk = filter(sdk);
+		game_server = filter(game_server);
+		callback_url = filter(callback_url);
+
+		$.ajax({
+			type: "POST",
+			url:"/index.php?m=sdkGame&a=gameParamConf&operation=save",
+			data: "alias="+alias+"&sdk="+sdk+"&game_server="+game_server+"&scale="+scale+"&monetary_unit="+monetary_unit+"&callback_url="+callback_url+"&logger="+logger+"&isration="+isration+"&visible_float="+visible_float,
+			dataType: 'text',
+
+			success: function(result){
+				if(result != '') {
+					alert(result)
+					return false;
+				}else {
+					alert('修改数据失败，请链接管理员');
+					return false;
+				}
+			}
+		});
+	});
+});
+
+function filter(str)
+{
+	str = str.replace(/\+/g,"%2b");
+	str = str.replace(/\&/g,"%26");
+	return str;
+}
+</script>
+{/if}
+{/block}

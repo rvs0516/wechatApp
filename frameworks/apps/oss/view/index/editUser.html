@@ -1,0 +1,33 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<div class="content">
+    	<h3><span><a href="?m=index&a=users" ">返回會員數據列表</a></span>修改會員詳細數據</h3>
+        <form class="searchbox"  id="form1" action="?m=index&a=editUser" method="post">
+        	<input type="hidden" name="mid" id="mid" value="{$user.mid}"/>     
+            <p><span>用戶名：</span>{$user.userid}</p>
+            <p><span>暱稱：</span><input name="nickname" id="nickname" type="text" value="{$user.nickname}" class="text"/></p>
+            <p><span>會員點數：</span>{$user.money}
+            <p><span>註冊IP：</span>{$user.joinip}</p>
+            <p><span>登錄IP：</span>{if $user.loginip}{$user.loginip}{else}無信息{/if}</p>
+            <p><span>註冊時間：</span>{$user.jointime|date_format:'%Y-%m-%d %H:%M:%S'}</p>
+            <p><span>性別：</span><input name="sex" id="sex" type="radio" value="保密" {if $user.sex eq '保密'}checked="checked"{/if} class="radio"/>保密<input name="sex" id="sex" type="radio" value="男" {if $user.sex eq '男'}checked="checked"{/if} class="radio"/>男<input name="sex" id="sex" type="radio" value="女" {if $user.sex eq '女'}checked="checked"{/if} class="radio"/>女</p>
+            <p><span>生日：</span><input name="birthday" id="birthday" type="text" value="{$user.birthday}" onclick="WdatePicker();" class="text"/></p>
+            <p><span>用戶等級：</span><select id="rank" name="rank">
+				<option value="0" {if $user.rank eq 0}selected="selected"{/if}>限制会员</option>
+				<option value="10" {if $user.rank eq 10}selected="selected"{/if}>注册会员</option>
+				<option value="100" {if $user.rank eq 100}selected="selected"{/if}>普通會員</option>
+				<option value="200" {if $user.rank eq 200}selected="selected"{/if}>vip会员</option>
+			</select></p>
+            <p><span>真實姓名：</span><input name="uname" id="uname" type="text" value="{$user.trueName}" class="text"/></p>
+            <p><span>聯絡電話：</span><input name="mobile" id="mobile" type="text" value="{$user.mobile}" class="text"/></p>
+            <p><span>聯絡E-mail：</span><input name="email" id="email" type="text" value="{$user.email}" class="text"/></p>
+            <p><span>身份證字號：</span><input name="regIdCard" id="regIdCard" type="text" value="{$user.regIdCard}" class="text"/></p>
+            <p class="inline">
+                <button type="submit" class="su" name="member">立即提交</button>
+                <button type="reset" class="su">條件重置</button>
+            </p>
+        </form>
+</div>
+{/block}

@@ -1,0 +1,545 @@
+{extends file='layout/new.html'}
+{block name=body}
+	<style>
+		.list td{ padding:10px 0;}
+		.show{ display:block; color:#3d203f; text-decoration:none; width:140px; position:relative; left:0; top:0; z-index:10; float:left; margin-left: 20px;}
+		.show p{ display:none;}
+		.show:hover{ display:block; text-decoration:none; height:100%; position:relative; z-index:1000 !important;}
+		.show:hover p{ display:block; color:#3d203f; background:#cff0fc; position:absolute; left:-10px; top:-10px; white-space:normal; width:700px;; padding:10px; box-shadow:1px 1px 10px #333; cursor:pointer;}
+	</style>
+<!--START 列表頁-->
+{if $operation == 'index'}
+	<h3>
+		{if $gid eq 1 || $gid eq 24}
+		<span><a href="/index.php?m=sdkGame&a=game&operation=add">新增游戏</a></span>
+		{/if}
+		游戏列表
+	</h3>
+	<form class="searchbox" action="/index.php?m=sdkGame&a=game" method="post">
+    <p>
+        <span>上架情况：</span>
+        <select  name="status" style="width: 150px;">
+            <option value="">请选择</option>
+            <option value="1" {if $status eq '1'}selected="selected"{/if}>上架</option>
+            <option value="2" {if $status eq '2'}selected="selected"{/if}>下架</option>
+        </select>
+		<span>输入关键词：</span>
+		<input type="text" value="{$keywords}" name="keywords" id="keywords">
+	{if ($uid == 'luojiang' || $uid == 'chenjh' || $uid == 'heyongzhen')}
+	</p>
+		<p>
+		<span>支付方式：</span>
+		<select  name="payMethod" style="width: 150px;" id="payMethod">
+            <option value="">请选择</option>
+            <option value="1" {if $payMethod eq 1}selected="selected"{/if}>APP支付</option>
+            <option value="2" {if $payMethod eq 2}selected="selected"{/if}>H5支付</option>
+        </select>
+		<span>微信来源：</span>
+		<select  name="weixinType" style="width: 157px;" id="weixinType">
+            <option value="">请选择</option>
+            <option value="huifubao|feituo" {if $weixinType eq 'huifubao|feituo'}selected="selected"{/if}>汇付宝|飞拓</option>
+            <option value="huifubao|yule" {if $weixinType eq 'huifubao|yule'}selected="selected"{/if}>汇付宝|鱼乐</option>
+            <option value="huifubao|yaofei" {if $weixinType eq 'huifubao|yaofei'}selected="selected"{/if}>汇付宝|耀非</option>
+            <option value="huifubao|zhangyue" {if $weixinType eq 'huifubao|zhangyue'}selected="selected"{/if}>汇付宝|掌跃</option>
+            <option value="huifubao|yiyao" {if $weixinType eq 'huifubao|yiyao'}selected="selected"{/if}>汇付宝|义耀</option>
+            <option value="huifubao|fandian" {if $weixinType eq 'huifubao|fandian'}selected="selected"{/if}>汇付宝|凡点</option>
+            <option value="huifubao|qianyou" {if $weixinType eq 'huifubao|qianyou'}selected="selected"{/if}>汇付宝|乾游</option>
+
+            <option value="xianzai|qianyou" {if $weixinType eq 'xianzai|qianyou'}selected="selected"{/if}>现在|乾游</option>
+            <option value="xianzai|fandian" {if $weixinType eq 'xianzai|fandian'}selected="selected"{/if}>现在|凡点</option>
+            <option value="xianzai|yiyao" {if $weixinType eq 'xianzai|yiyao'}selected="selected"{/if}>现在|义耀</option>
+
+            <option value="zhangling|zhangyue" {if $weixinType eq 'zhangling|zhangyue'}selected="selected"{/if}>掌灵|掌跃</option>
+            <option value="zhangling|fandian" {if $weixinType eq 'zhangling|fandian'}selected="selected"{/if}>掌灵|凡点</option>
+            <option value="zhangling|yiyao" {if $weixinType eq 'zhangling|yiyao'}selected="selected"{/if}>掌灵|义耀</option>
+            <option value="zhangling|yaofei" {if $weixinType eq 'zhangling|yaofei'}selected="selected"{/if}>掌灵|耀非</option>
+            <option value="zhangling|feituo" {if $weixinType eq 'zhangling|feituo'}selected="selected"{/if}>掌灵|飞拓</option>
+        </select>
+        <select  name="wxAppType" style="width: 157px;" id="wxAppType">
+            <option value="">请选择</option>
+            <option value="zlapp|fandian" {if $wxAppType eq 'zlapp|fandian'}selected="selected"{/if}>掌灵|凡点</option>
+            <option value="zlapp|yiyao" {if $wxAppType eq 'zlapp|yiyao'}selected="selected"{/if}>掌灵|义耀</option>
+            <!--<option value="hywapp|qianyou" {if $wxAppType eq 'hywapp|qianyou'}selected="selected"{/if}>汇雅威|乾游</option>
+            <option value="xzapp|qianyou" {if $wxAppType eq 'xzapp|qianyou'}selected="selected"{/if}>现在|乾游</option>
+            <option value="xzapp|yiyao" {if $wxAppType eq 'xzapp|yiyao'}selected="selected"{/if}>现在|义耀</option>
+            <option value="xzapp|fandian" {if $wxAppType eq 'xzapp|fandian'}selected="selected"{/if}>现在|凡点</option>-->
+        </select>
+		<span>支付宝来源：</span>
+		<select  name="alipayType" style="width: 150px;" id="alipayType">
+            <option value="">请选择</option>
+            <option value="alipay|qianyou" {if $alipayType eq 'alipay|qianyou'}selected="selected"{/if}>支付宝|乾游</option>
+            <option value="alipay|yiyao" {if $alipayType eq 'alipay|yiyao'}selected="selected"{/if}>支付宝|义耀</option>
+            <option value="alipay|fandian" {if $alipayType eq 'alipay|fandian'}selected="selected"{/if}>支付宝|凡点</option>
+
+            <option value="xianzai|qianyou" {if $alipayType eq 'xianzai|qianyou'}selected="selected"{/if}>现在|乾游</option>
+            <option value="xianzai|fandian" {if $alipayType eq 'xianzai|fandian'}selected="selected"{/if}>现在|凡点</option>
+
+            <option value="alipay2|qianyou" {if $alipayType eq 'alipay2|qianyou'}selected="selected"{/if}>支付宝2.0|乾游</option>
+            <option value="alipay2|yiyao" {if $alipayType eq 'alipay2|yiyao'}selected="selected"{/if}>支付宝2.0|义耀</option>
+            <option value="alipay2|fandian" {if $alipayType eq 'alipay2|fandian'}selected="selected"{/if}>支付宝2.0|凡点</option>
+            <option value="alipay2|zhangyue" {if $alipayType eq 'alipay2|zhangyue'}selected="selected"{/if}>支付宝2.0|掌跃</option>
+
+            <option value="zhanglingslh5|zhangyue" {if $alipayType eq 'zhanglingslh5|zhangyue'}selected="selected"{/if}>掌灵识路h5|掌跃</option>
+            <option value="zhanglingslapi|zhangyue" {if $alipayType eq 'zhanglingslapi|zhangyue'}selected="selected"{/if}>掌灵识路api|掌跃</option>
+
+        </select>
+        <select  name="aliAppType" style="width: 150px;" id="aliAppType">
+            <option value="">请选择</option>
+            <option value="aliapp|qianyou" {if $aliAppType eq 'aliapp|qianyou'}selected="selected"{/if}>支付宝|乾游</option>
+        </select>
+        </p>
+	<p style=" margin-top: 10px;">
+	{/if}
+        <button type="submit" class="su"  style="margin-top: 0px;">查询</button>
+    </p>
+	</form>
+	<table class="list">
+		<tr style="background-color:#CCCCCC;">
+			<th>项目</th>
+			<th>游戏</th>
+			<th>TOKEN</th>
+			<th>SERVER KEY</th>
+			<th>游戏介绍</th>
+			<th></th>
+			{if ($uid == 'luojiang' || $uid == 'chenjh' || $uid == 'heyongzhen')}
+			<th>支付方式</th>
+			<th>微信来源</th>
+			<th>支付宝来源</th>
+			{/if}
+			<th>排序</th>
+			<th>上架</th>
+			<th>操作</th>
+		</tr>
+		{foreach from=$game_list item=game}
+		<tr>
+			<td style="text-align: center;">{$game.upperName}</td>
+			<td style="text-align: center;">{$game.name}</td>
+			<td style="text-align: center;"><font color="green">{$game.tokenMd5}</font></td>
+			<td style="text-align: center;"><font color="green">{$game.serverKey}</font></td>
+			<td style="text-align: center;"><a class="show">{$game.detail|truncate:15:"..":true}{if $game.detail}<p>{$game.detail}</p>{/if}</a></td>
+			<td title="{$game.info}">				
+				{if $game.isration eq 1}定额支 {/if}
+				{if $game.visibleFloat eq 1}悬浮控件 {/if}
+				{if $game.logger eq 1}服务端日志{/if}
+			</td>
+			{if ($uid == 'luojiang' || $uid == 'chenjh' || $uid == 'heyongzhen' || $uid == 'yangzhenwei' || $uid == 'guofengchi')}
+			<!--<td>{if $game.weixinType1 eq 'youluo'}优络|
+				{elseif $game.weixinType1 eq 'huiyawei'}汇雅威|
+				{elseif $game.weixinType1 eq 'xianzai'}现在|
+				{elseif $game.weixinType1 eq 'zhangling'}掌灵|
+				{elseif $game.weixinType1 eq 'huifubao'}汇付宝|
+				{elseif $game.weixinType1 eq NULL}现在|
+				{else}{$game.weixinType1}{/if}
+				{if $game.weixinType2 eq 'qianyou'}乾游
+				{elseif $game.weixinType2 eq 'fandian'}凡点
+				{elseif $game.weixinType2 eq 'yiyao'}义耀
+				{elseif $game.weixinType2 eq NULL}凡点
+				{else}{$game.weixinType2}{/if}
+			</td>
+			<td>{if $game.alipayType1 eq 'alipay'}支付宝|
+				{elseif $game.alipayType1 eq 'xianzai'}现在|
+				{elseif $game.alipayType1 eq NULL}支付宝|
+				{else}{$game.alipayType1}{/if}
+				{if $game.alipayType2 eq 'qianyou'}乾游
+				{elseif $game.alipayType2 eq 'fandian'}凡点
+				{elseif $game.alipayType2 eq NULL}乾游
+				{else}{$game.alipayType2}{/if}
+			</td>-->
+			<td>{if $game.payMethod eq 1}<span style="color: red;">APP支付</span>{else}<span style="color: green;">H5支付</span>{/if}</td>
+			{if $game.payMethod eq 0}
+			<td>
+				{if $game.weixinType eq 'huiyawei|qianyou'}汇雅威|乾游
+				{elseif $game.weixinType eq 'xianzai|qianyou'}现在|乾游
+				{elseif $game.weixinType eq 'xianzai|fandian'}现在|凡点
+				{elseif $game.weixinType eq 'xianzai|yiyao'}现在|义耀
+				{elseif $game.weixinType eq 'zhangling|fandian'}掌灵|凡点
+				{elseif $game.weixinType eq 'zhangling|yiyao'}掌灵|义耀
+				{elseif $game.weixinType eq 'zhangling|zhangyue'}掌灵|掌跃
+				{elseif $game.weixinType eq 'zhangling|feituo'}掌灵|飞拓
+				{elseif $game.weixinType eq 'zhangling|yaofei'}掌灵|耀非
+				{elseif $game.weixinType eq 'huifubao|yiyao'}汇付宝|义耀
+				{elseif $game.weixinType eq 'huifubao|fandian'}汇付宝|凡点
+				{elseif $game.weixinType eq 'huifubao|qianyou'}汇付宝|乾游
+				{elseif $game.weixinType eq 'huifubao|yule'}汇付宝|鱼乐
+				{elseif $game.weixinType eq 'huifubao|feituo'}汇付宝|飞拓
+				{elseif $game.weixinType eq 'huifubao|yaofei'}汇付宝|耀非
+				{elseif $game.weixinType eq 'huifubao|zhangyue'}汇付宝|掌跃
+				{elseif $game.weixinType eq NULL}汇付宝|凡点{/if}
+			</td>
+			<td>
+				{if $game.alipayType eq 'alipay|qianyou'}支付宝|乾游
+				{elseif $game.alipayType eq 'alipay|yiyao'}支付宝|义耀
+				{elseif $game.alipayType eq 'alipay|fandian'}支付宝|凡点
+				{elseif $game.alipayType eq 'xianzai|qianyou'}现在|乾游
+				{elseif $game.alipayType eq 'xianzai|fandian'}现在|凡点
+				{elseif $game.alipayType eq 'alipay2|qianyou'}支付宝2.0|乾游
+				{elseif $game.alipayType eq 'alipay2|yiyao'}支付宝2.0|义耀
+				{elseif $game.alipayType eq 'alipay2|fandian'}支付宝2.0|凡点
+				{elseif $game.alipayType eq 'alipay2|zhangyue'}支付宝2.0|掌跃
+				{elseif $game.alipayType eq 'zhanglingslh5|zhangyue'}掌灵识路h5|掌跃
+				{elseif $game.alipayType eq 'zhanglingslapi|zhangyue'}掌灵识路api|掌跃
+				{elseif $game.alipayType eq NULL}支付宝|乾游{/if}
+			</td>
+			{elseif $game.payMethod eq 1}
+			<td>
+				{if $game.wxAppType eq 'zlapp|yiyao'}掌灵|义耀
+				{elseif $game.wxAppType eq 'zlapp|qianyou'}掌灵|乾游
+				{elseif $game.wxAppType eq NULL OR $game.wxAppType eq 'zlapp|fandian' }掌灵|凡点{/if}
+			</td>
+			<td>
+				{if $game.aliAppType eq 'aliapp|qianyou'}支付宝|乾游
+				{elseif $game.aliAppType eq NULL}支付宝|乾游{/if}
+			</td>
+			{/if}
+			{/if}
+			<td>{$game.sort}</td>
+			<td>{if $game.status eq 1}<font color="#00FF00">√</font>{else}<font color="#FF0000">×</font>{/if}</td>
+			<td style="width:160px">
+			<a href="/index.php?m=sdkGame&a=game&operation=view&id={$game.id}" target="_blank">查看</a>
+			{if ($gid eq 1 && $editor eq 1) || $gid eq 24}
+			 | <a href="/index.php?m=sdkGame&a=game&operation=edit&id={$game.id}" target="_blank">编辑</a>
+			 | <a href="/index.php?m=sdkGame&a=game&operation=del&id={$game.id}" class="delete_confirm">刪除</a> 
+			{/if}
+			 </td>
+		</tr>
+		{/foreach}
+	</table>
+	<div id="pager"></div>
+
+<script src="js/pager.js"></script>
+<script>
+select();
+$("#payMethod").change(function(){
+    select();
+    return false;
+});
+function select(){
+	var payMethod = $('#payMethod').val();
+	$("#weixinType ").prop("disabled", false);
+    $("#alipayType ").prop("disabled", false);
+   	if(payMethod == 1){
+        $('#wxAppType').show();
+        $('#aliAppType').show();
+        $('#weixinType').hide();
+        $('#alipayType').hide();
+    	$("#weixinType  option[value=''] ").attr("selected",true);
+    	$("#alipayType  option[value=''] ").attr("selected",true);
+    } else if (payMethod == 2) {
+        $('#wxAppType').hide();
+        $('#aliAppType').hide();
+        $('#weixinType').show();
+        $('#alipayType').show();
+    	$("#wxAppType  option[value=''] ").attr("selected",true);
+    	$("#aliAppType  option[value=''] ").attr("selected",true); 
+	} else {
+        $('#wxAppType').hide();
+        $('#aliAppType').hide();
+        $('#weixinType').show();
+        $('#alipayType').show();
+        $("#weixinType ").prop("disabled", true) 
+        $("#alipayType ").prop("disabled", true) 
+	}
+}
+$('.delete_confirm').click(function() {
+	return confirm('數據不可恢復，你確定要刪除嗎？');
+});
+
+function gotoNext(page,pagesize){
+	window.location.href = "/index.php?m=sdkGame&a=game&page=" + page+ "&status={$status}&keywords={$keywords}&weixinType={$weixinType}&alipayType={$alipayType}&payMethod={$payMethod}&wxAppType={$wxAppType}&aliAppType={$aliAppType}";
+}
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+
+
+{elseif $operation == 'add' || $operation == 'edit'}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+
+	<h3>
+		<span><a href="/index.php?m=sdkGame&a=game">返回列表</a></span>
+		{if $operation == 'add'}
+			新增游戏
+		{else}
+			编辑游戏
+		{/if}
+	</h3>
+	<form action="/index.php?m=sdkGame&a=game&operation=save" method="post" class="searchbox" enctype="multipart/form-data">
+		<input type="hidden" name="id" value="{$game.id}" />
+		<p>
+			<span>是否显示：</span>
+			<label><input type="checkbox" name="status" value="1" {if $game['status'] == 1} checked="checked"{/if} /></label>
+		</p>
+		<p>
+			<span>上级游戏名：</span>
+			<input type="text" name="upperName" value="{$game.upperName}" /><font color="#FF0000">&nbsp;*&nbsp;</font>规则：游戏名前面为拼音首字母大写，后面文字汉语，如魔石英雄为"M-魔石英雄"
+		</p>
+		<p>
+			<span>专服游戏名：</span>
+			<input type="text" name="specialName" value="{$game.specialName}" /><font color="#FF0000">&nbsp;*&nbsp;</font>规则：游戏名前面为拼音首字母大写，后面文字汉语，如魔石英雄为"M-魔石英雄"
+		</p>
+		<p>
+			<span>游戏名：</span>
+			<input type="text" name="name" value="{$game.name}" /><font color="#FF0000">&nbsp;*</font>
+		</p>
+		<p>
+			<span>游戏別名：</span>
+			<input type="text" name="alias" value="{$game.alias}" {if !empty($game)}disabled="disabled"{/if} /><font color="#FF0000">&nbsp;*</font>&nbsp;规则：游戏名前面两字全拼，后面其他文字汉语拼音的首字母，如魔石英雄为moshiyx
+		</p>
+		<p>
+			<span>描述：</span>
+			<textarea style="width:400px; height:128px;" name="detail">{$game.detail}</textarea>
+		</p>
+		<p>
+			<span>游戏包名：</span>
+			<input type="text" name="packageName" value="{$game.packageName}" /><font color="#FF0000">&nbsp;*&nbsp;</font>必须填写游戏包名，否则有可能影响正常充值
+		</p>
+		<p>
+			<span>CP名称：</span>
+			<input type="text" name="cpName" value="{$game.cpName}" /><font color="#FF0000">&nbsp;*&nbsp;</font>
+		</p>
+        <p>
+			<span>兑换倍数：</span>
+			<input type="text" name="scale" value="{$game.scale}" /><font color="#FF0000">&nbsp;*</font>
+		</p>
+        <p>
+			<span>货币单位：</span>
+			<input type="text" name="monetaryUnit" value="{$game.monetaryUnit}" /><font color="#FF0000">&nbsp;*</font>
+		</p>
+        <p>
+			<span>TOKEN：</span>
+			<input type="text" name="token" value="{$game.token}" /><font color="#FF0000">&nbsp;*</font>
+		</p>
+        <p>
+			<span>SERVER KEY：</span>
+			<input type="text" name="serverKey" value="{$game.serverKey}" /><font color="#FF0000">&nbsp;*</font>
+		</p>
+		<p>
+			<span>充值回调：</span>
+			<input type="url" name="callbackUrl" id="callbackUrl" style="width:250px;" placeholder="http://" value="{$game.callbackUrl}" />
+		</p>
+		<p>
+			<span>定额支付：</span>
+			<input type="checkbox" name="isration" id="isration"  value="1" {if $game['isration'] == 1} checked="checked"{/if} />
+		</p>
+		<p>
+			<span>悬浮控件：</span>
+			<input type="checkbox" name="visibleFloat" id="visibleFloat"  value="1" {if $game['visibleFloat'] == 1} checked="checked"{/if} />
+		</p>
+		<p>
+			<span>服务端日志：</span>
+			<input type="checkbox" name="logger" id="logger"  value="1" {if $game['logger'] == 1} checked="checked"{/if} />
+		</p>
+		{if ($uid == 'luojiang' || $uid == 'chenjh' || $uid == 'heyongzhen')}
+		<p>
+			<span>APP支付：</span>
+			<input type="checkbox" name="payMethod" id="payMethod"  value="1" {if $game['payMethod'] == 1} checked="checked"{/if} />
+		</p>
+		<p id="weixin">
+		<span>微信H5：</span>
+		<select  name="weixinType" style="width: 150px;">
+            <option value="zhangling|fandian" {if $game.weixinType eq 'zhangling|fandian'}selected="selected"{/if}>掌灵|凡点</option>
+            <option value="huifubao|feituo" {if $game.weixinType eq 'huifubao|feituo'}selected="selected"{/if}>汇付宝|飞拓</option>
+			<option value="huifubao|yule" {if $game.weixinType eq 'huifubao|yule'}selected="selected"{/if}>汇付宝|鱼乐</option>
+			<option value="huifubao|yaofei" {if $game.weixinType eq 'huifubao|yaofei'}selected="selected"{/if}>汇付宝|耀非</option>
+            <option value="huifubao|fandian" {if $game.weixinType eq 'huifubao|fandian'}selected="selected"{/if}>汇付宝|凡点</option>
+            <option value="huifubao|yiyao" {if $game.weixinType eq 'huifubao|yiyao'}selected="selected"{/if}>汇付宝|义耀</option>
+            <option value="huifubao|qianyou" {if $game.weixinType eq 'huifubao|qianyou'}selected="selected"{/if}>汇付宝|乾游</option>
+            <option value="huifubao|zhangyue" {if $game.weixinType eq 'huifubao|zhangyue'}selected="selected"{/if}>汇付宝|掌跃</option>
+            <option value="xianzai|fandian" {if $game.weixinType eq 'xianzai|fandian'}selected="selected"{/if}>现在|凡点</option>
+            <option value="xianzai|qianyou" {if $game.weixinType eq 'xianzai|qianyou'}selected="selected"{/if}>现在|乾游</option>
+            <option value="xianzai|yiyao" {if $game.weixinType eq 'xianzai|yiyao'}selected="selected"{/if}>现在|义耀</option>
+            <option value="zhangling|zhangyue" {if $game.weixinType eq 'zhangling|zhangyue'}selected="selected"{/if}>掌灵|掌跃</option>
+            <option value="zhangling|yiyao" {if $game.weixinType eq 'zhangling|yiyao'}selected="selected"{/if}>掌灵|义耀</option>
+            <option value="zhangling|yaofei" {if $game.weixinType eq 'zhangling|yaofei'}selected="selected"{/if}>掌灵|耀非</option>
+            <option value="zhangling|feituo" {if $game.weixinType eq 'zhangling|feituo'}selected="selected"{/if}>掌灵|飞拓</option>
+            <!--<option value="huiyawei|qianyou" {if $game.weixinType eq 'huiyawei|qianyou'}selected="selected"{/if}>汇雅威|乾游</option>
+            <option value="zhangling|yiyao" {if $game.weixinType eq 'zhangling|yiyao'}selected="selected"{/if}>掌灵|义耀</option>-->
+        </select>
+        <font color="#FF0000">&nbsp;*&nbsp;默认 汇付宝|飞拓</font>
+        </p>
+        <p id="alipay">
+		<span>支付宝H5：</span>
+		<select  name="alipayType" style="width: 150px;">
+            <option value="alipay|fandian" {if $game.alipayType eq 'alipay|fandian'}selected="selected"{/if}>支付宝|凡点</option>
+            <option value="alipay|qianyou" {if $game.alipayType eq 'alipay|qianyou'}selected="selected"{/if}>支付宝|乾游</option>
+            <option value="alipay|yiyao" {if $game.alipayType eq 'alipay|yiyao'}selected="selected"{/if}>支付宝|义耀</option>
+            <option value="xianzai|qianyou" {if $game.alipayType eq 'xianzai|qianyou'}selected="selected"{/if}>现在|乾游</option>
+            <option value="xianzai|fandian" {if $game.alipayType eq 'xianzai|fandian'}selected="selected"{/if}>现在|凡点</option>
+            <!--<option value="xianzai|yiyao" {if $game.alipayType eq 'xianzai|yiyao'}selected="selected"{/if}>现在|义耀</option>-->
+            <option value="alipay2|qianyou" {if $game.alipayType eq 'alipay2|qianyou'}selected="selected"{/if}>支付宝2.0|乾游</option>
+            <option value="alipay2|yiyao" {if $game.alipayType eq 'alipay2|yiyao'}selected="selected"{/if}>支付宝2.0|义耀</option>
+            <option value="alipay2|fandian" {if $game.alipayType eq 'alipay2|fandian'}selected="selected"{/if}>支付宝2.0|凡点</option>
+            <option value="alipay2|zhangyue" {if $game.alipayType eq 'alipay2|zhangyue'}selected="selected"{/if}>支付宝2.0|掌跃</option>
+            <option value="zhanglingslh5|zhangyue" {if $game.alipayType eq 'zhanglingslh5|zhangyue'}selected="selected"{/if}>掌灵识路h5|掌跃</option>
+            <option value="zhanglingslapi|zhangyue" {if $game.alipayType eq 'zhanglingslapi|zhangyue'}selected="selected"{/if}>掌灵识路api|掌跃</option>
+        </select>
+        <font color="#FF0000">&nbsp;*&nbsp;默认 支付宝|凡点</font>
+        </p>
+		<p  id="wxApp">
+		<span style="color: green;">微信APP：</span>
+		<select  name="wxAppType" style="width: 150px;">
+            <option value="zlapp|fandian" {if $game.wxAppType eq 'zlapp|fandian'}selected="selected"{/if}>掌灵|凡点</option>
+            <option value="zlapp|yiyao" {if $game.wxAppType eq 'zlapp|yiyao'}selected="selected"{/if}>掌灵|义耀</option>
+            <option value="zlapp|qianyou" {if $game.wxAppType eq 'zlapp|qianyou'}selected="selected"{/if}>掌灵|乾游</option>
+            <!--<option value="xzapp|qianyou" {if $game.wxAppType eq 'xzapp|yiyao'}selected="selected"{/if}>现在|乾游</option>
+            <option value="xzapp|yiyao" {if $game.wxAppType eq 'xzapp|yiyao'}selected="selected"{/if}>现在|义耀</option>
+            <option value="xzapp|fandian" {if $game.wxAppType eq 'xzapp|fandian'}selected="selected"{/if}>现在|凡点</option>
+            <option value="hywapp|qianyou" {if $game.wxAppType eq 'hywapp|qianyou'}selected="selected"{/if}>汇雅威|乾游</option>-->
+        </select>
+        <font color="#FF0000">&nbsp;*&nbsp;默认 掌灵|凡点</font>
+        </p>
+        <p  id="aliApp">
+		<span style="color: green;">支付宝APP：</span>
+		<select  name="aliAppType" style="width: 150px;">
+            <option value="aliapp|qianyou" {if $game.aliAppType eq 'aliapp|qianyou'}selected="selected"{/if}>支付宝|乾游</option>
+        </select>
+        <font color="#FF0000">&nbsp;*&nbsp;默认 支付宝|乾游</font>
+        </p>
+		{/if}
+		<p>
+			<span>数据同步：</span>
+			{foreach from=$syn item=name key=key1}
+			<label><input type="checkbox" name="channelSyn[]" value="{$key1}" {if in_array($key1, $channelSyn)}checked="checked"{/if} id="open_channels" />{$name}</label>
+			{/foreach}
+		</p>
+		<p>
+			<span>角色升级记录：</span>
+			<input type="checkbox" name="upGradeMark" id="upGradeMark"  value="1" {if $game['upGradeMark'] == 1} checked="checked"{/if} />
+		</p>
+		{if $checkRoot eq 1}
+		<p>
+			<span>CP分成：</span>
+			<input type="text" name="proportion" value="{$game.proportion}" id="proportion" />
+			<font color="#FF0000">&nbsp;*&nbsp;若cp分成所得为20%，即填0.2</font>
+		</p>
+		<p>
+			<span>CP通道费：</span>
+			<input type="text" name="cpAllowance" value="{$game.cpAllowance}"  id="cpAllowance" />
+			<font color="#FF0000">&nbsp;*&nbsp;若通道费为5%，即填0.05</font>
+		</p>
+		{/if}
+		<p>
+			<span>H5游戏链接：</span>
+			<input type="url" name="h5Url" id="h5Url" style="width:250px;" placeholder="http://" value="{$game.h5Url}" />
+		</p>
+		<p>
+		<span>关联游戏：</span>
+            <select name="relateUpper" id="upperName" style="width: 90px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $game.relateUpper eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="relateSpecial" id="specialName" style="width: 90px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $game.relateSpecial eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="relateGame" id="game" style="width: 90px;">
+                <option value="">请选择</option>
+        	{foreach from=$games item=name key=key1}
+                <option value="{$key1}" {if $game.relateGame eq $key1}selected="selected"{/if}> {$key1|capitalize|truncate:1:"":true} — {$name}</option>
+        	{/foreach}
+        </select>
+		</p>
+		{if !empty($game.basePic)}
+		<p style="margin-top: 30px;">
+			<span>游戏底图：</span>
+			<img src="{$static}{$game.basePic}" style="width: 300px; height: 200px;" />
+		</p>
+		{/if}
+		<p>
+			<span>{if !empty($game.basePic)}更换{/if}游戏底图：</span>
+			<input type="file" name="basePic[]" /><font color="red">图标标准尺寸：<font style=" font-weight: bold;">640*1280px</font></font>
+		</p>
+		<p class="line">
+			<button type="submit" name="do" class="su" id="su">立即提交</button>
+			<button type="reset" class="re">条件重置</button>
+		</p>
+	</form>
+<script language="javascript">
+$('#su').click(function() {
+	var proportion = $('#proportion').val();
+	var cpAllowance = $('#cpAllowance').val();
+	if (proportion == '' || cpAllowance == '') {
+		return confirm('cp分成或通道费尚未填写，确定要保存？');
+	}
+	
+});
+select();
+$("#payMethod").change(function(){
+    select();
+    return false;
+});
+function select(){
+   if(document.getElementById("payMethod").checked==false){
+        $('#weixin').show();  
+        $('#alipay').show();  
+        $('#wxApp').hide();    
+        $('#aliApp').hide();  
+    } else {
+        $('#weixin').hide();  
+        $('#alipay').hide();  
+        $('#wxApp').show();  
+        $('#aliApp').show();  
+	}
+}
+</script>
+{elseif $operation == 'view'}
+	<h3>
+		<span><a href="/index.php?m=sdkGame&a=game">返回列表</a></span>
+	</h3>
+	<form  class="searchbox">
+		<p>
+			<span>上级游戏名：</span>{$game.upperName}
+		</p>
+		<p>
+			<span>专服游戏名：</span>{$game.specialName}
+		</p>
+		<p>
+			<span>游戏名：</span>{$game.name}
+		</p>
+		<p>
+			<span>游戏別名：</span>{$game.alias}
+		</p>
+		<p>
+			<span>描述：</span>
+			<textarea style="width:400px; height:128px;" name="detail"disabled="disabled" >{$game.detail}</textarea>
+		</p>
+		<p>
+			<span>游戏包名：</span>{$game.packageName}
+		</p>
+        <p>
+			<span>兑换倍数：</span>{$game.scale}
+		</p>
+        <p>
+			<span>货币单位：</span>{$game.monetaryUnit}
+		</p>
+        <p>
+			<span>TOKEN：</span>{$game.token}
+		</p>
+        <p>
+			<span>SERVER KEY：</span>{$game.serverKey}
+		</p>
+		<p>
+			<span>充值回调：</span>{$game.callbackUrl}
+		</p>
+		<p>
+			<span>CP分成：</span>{$game.proportion}
+		</p>
+		<p>
+			<span>CP通道费：</span>{$game.cpAllowance}
+		</p>
+		<p>
+			<span>H5游戏链接:</span>{$game.h5Url}
+		</p>
+		<p>
+			<span>关联游戏:</span>{if $game.relateUpper}{$game.relateUpper} / {$game.relateSpecial} / {$game.relateName}{/if}
+		</p>
+	</form>
+{/if}
+<!--END 列表頁-->
+{/block}

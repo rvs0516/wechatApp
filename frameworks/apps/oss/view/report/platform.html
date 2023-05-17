@@ -1,0 +1,76 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3>平台综合數據</h3>
+<p class="fast">
+</p>
+<table border="0" cellpadding="0" cellspacing="0" class="list">
+{if $quarter neq 'NULL'}
+	<thead>
+        <th>日期</th>
+    {for $start=1 to 4}
+	    <th>第{$start}季度</th>
+    {/for}
+    	<th>總計</th>
+	</thead>	
+	<tbody>
+    {foreach key=y item=date from=$pubp}
+    {$total=0}
+    	<tr>
+    		<td><a href="?m=report&a=platform&year={$y}">{$y}</a></td>
+    	{for $start=1 to 4}
+	    	<td>{if $start|array_key_exists:$date}{$total=$total+$date[$start]}{$date[$start]}{else}0{/if}</td>
+    	{/for}
+    		<td>{if $date.total}{$total}{else}0{/if}</td>
+    	</tr>
+    {/foreach}
+	</tbody>
+{/if}
+{if $qym eq '1'}
+	<thead>
+		<th>{$years}年{if $day}{$month}月{else}度{/if}</th><th>充值金額</th><th>充值用戶</th><th>充值次數</th><th>ARPU</th><th>活躍用戶</th><th>新增用戶數</th><th>纍計註冊用戶數</th>
+	</thead>
+	<tbody>
+    {foreach $quarter as $quarters}
+    {$qtotal=$qMember}
+    	{for $start=1 to 4}
+    	<tr style="background:#FFD;">
+    		<td>第{$start}季度</td>
+	    	{if $start|array_key_exists:$quarters}
+	    	<td>{$quarters[$start].total}</td>
+	    	<td>{$quarters[$start].ruser}</td>
+	    	<td>{$quarters[$start].rnum}</td>
+	    	<td>{if $quarters[$start].ARPU}{$quarters[$start].ARPU}{else}0{/if}</td>
+	    	<td>{$quarters[$start].auser}</td>
+	    	<td>{$quarters[$start].member}</td>
+	    	<td>{$qtotal=$qtotal+$quarters[$start].member}{$qtotal}</td>		
+	    	{else}
+	    	<td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>{$qtotal}</td>
+	    	{/if}
+    	</tr>
+    	{/for}
+    {/foreach}
+    {foreach key=year item=data from=$ymData}
+    {$total=$preMember}
+    	{for $start=1 to $lastday}
+    	<tr>
+    		<td>{if $lastday eq 12}<a href="?m=report&a=platform&year={$year}&month={$start}">{strtotime('2012-'|cat:$start)|date_format:"%b"}</a>{else}{$start}{/if}</td>
+	    	{if $start|array_key_exists:$data}
+	    	<td>{$data[$start].total}</td>
+	    	<td>{$data[$start].ruser}</td>
+	    	<td>{$data[$start].rnum}</td>
+	    	<td>{if $data[$start].ARPU}{$data[$start].ARPU}{else}0{/if}</td>
+	    	<td>{$data[$start].auser}</td>
+	    	<td>{$data[$start].member}</td>
+	    	<td>{$total=$total+$data[$start].member}{$total}</td>
+	    	{else}
+	    	<td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>{$total}</td>
+	    	{/if}
+    	</tr>
+    	{/for}
+    {/foreach}
+	</tbody>
+{/if}
+</table>
+
+{/block}

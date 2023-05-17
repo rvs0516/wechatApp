@@ -1,0 +1,91 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+
+<link type="text/css" rel="stylesheet" href="/static/jquery-ui-1.8.21.custom.css"/>
+<h3><span><a href="#" class="filter"></a></span>遊戲日誌數據閱覽</h3>
+<!-- 根據遊戲類型進行檢索，檢索表單 -->
+
+<form class="searchbox" action="/index.php?m=report&a=lGameApiLog" method="post">
+ <table width="740" border="0">
+ <tr>
+	<td><input type="hidden" name="page" value="{$page}" id="page" />	
+    <p>
+		<span>遊戲:</span>
+				<select style="margin-left:-5px;" id="gameselect" name="game">
+					<option value="0">请选择游戏</option>
+					{foreach from=$games key=k item=v}
+					<option value="{$v.alias}" {if ($fgame==$v.alias)}selected="selected"{/if}>{$v.ename}</option>
+					{/foreach}
+				</select>
+    </p>
+    </td>
+</tr>
+<tr>		
+<td><p>
+    <span>時間:</span>
+    <input type="text"  class="date" id="starttime" name="starttime"  value="{$data.starttime}{$tbtime}" onclick="var endtime=$dp.$('endtime');WdatePicker({literal}{onpicked:function(){endtime.focus();},minDate:'#F{($dp.$D(\'endtime\',{y:-1,d:0}))}',maxDate:'#F{$dp.$D(\'endtime\')}'}{/literal})"/>
+			至
+	<input type="text"  class="date" id="endtime" name="endtime"  style="width:76px" value="{$data.endtime}{$tetime}" onclick="WdatePicker({literal}{minDate:'#F{($dp.$D(\'starttime\',{d:0,H:0}))}',maxDate:'#F{($dp.$D(\'starttime\',{y:1,d:7}))}'}{/literal} )"/>
+    </p>
+   </td> 
+   <tr><td>
+	<p class="inline">
+		&nbsp;<button type="submit" class="su">查詢</button>
+	</p>
+	</td>
+	</tr>
+
+</tr>
+</table>		
+</form>
+
+<table class="list">
+	
+	<thead>
+		<tr>
+			<th>編號</th><th>請求記錄</th><th>遊戲名</th><th>用戶名</th><th>Data數據</th><th>生成日期</th><th>hash_username</th>
+		</tr>
+	</thead>
+	
+	<tbody>
+	{foreach from=$log_list item=log}
+		<tr>
+			<td>{$log.id}</td>
+			<td>{$log.action}</td>
+			<td>{$log.game}</td>
+			<td>{$log.user}</td>
+			<td></td>			
+			<td>{date('Y-m-d',$log.addtime)}</td>
+			<td>{$log.hash_username}</td>
+		</tr>	
+	{/foreach}
+    		</tbody>
+</table>
+<br/>
+
+<center>{$warn}</center>
+<div id="pager">
+</div>
+<script src="js/pager.js"></script>
+<script>
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+
+function gotoNext(page,pagesize){
+    $('#page').val(page);
+    $('.searchbox').submit();
+}
+window.onload = function(){
+	
+    var pageStr = new Page('{$page}', '{$total}', 5, '{$offset}','gotoNext').GetText();
+    document.getElementById('pager').innerHTML = pageStr;
+}
+</script>
+
+<script src="/js/jquery-ui-1.8.21.custom.min.js"></script>
+<script src="/js/jquery.ui.datepicker-zh-CN.js"></script>
+<script src="js/DatePicker/WdatePicker.js"></script>
+<script src="/js/pop.js"></script>
+
+{/block}
+

@@ -1,0 +1,100 @@
+{extends file='layout/new.html'}asdfasdfdsasfdfds
+{block name=body}
+{if $operation == 'index'}
+	<h3>
+		<span><a href="/index.php?m=game&a=sdkAdvInfo&operation=add">新增推播广告</a></span>
+		推播列表
+	</h3>
+	<table class="list">
+		<tr style="background-color:#CCCCCC;">
+			<th>ID</th>
+			<th>类型</th>
+			<th>图像</th>
+			<th style="width: 200px;">名称</th>
+			<th>操作</th>
+		</tr>
+		{foreach from=$pushData item=push}
+		<tr>
+			<td>{$push.id}</td>
+			<td align="center">{if ($push.android_link neq "")}Android{/if} {if ($push.ios_link neq "")}iOS{/if}</td>
+			<td><img src="{$image_tri}{$push.image}" width="72"  /></td>
+			<td title="{$push.title}">{$push.title|truncate:40:"...":true}</td>
+			<td>
+				<a href="/index.php?m=game&a=sdkAdvInfo&operation=edit&id={$push.id}">編輯</a> | <a href="/index.php?m=game&a=sdkAdvInfo&operation=del&id={$push.id}" class="delete_confirm">刪除</a>
+			</td>
+		</tr>
+		{/foreach}
+	</table>
+{elseif $operation == 'add' || $operation == 'edit'}
+	<h3>
+		<span><a href="/index.php?m=game&a=sdkAdvInfo">返回列表</a></span>
+		{if $operation == 'add'}
+			新增文章
+		{else}
+			編輯文章
+		{/if}
+	</h3>
+	<form action="/index.php?m=game&a=sdkAdvInfo&operation=save" method="post" class="searchbox" enctype="multipart/form-data">
+		<input type="hidden" name="id" value="{$pushData.id}" />
+		<p>
+			<span>广告名称：</span>
+			<input type="text" name="title" value="{$pushData.title}" /><font color="#FF0000">&nbsp;*</font>
+		</p>
+		<p>
+			<span>推播游戏：</span>
+			{foreach $data as $key => $value}
+			<input type="checkbox" name="game[]" value="{$value.alias}" {if in_array($value.alias, $alias)}checked="checked"{/if}>{$value.name}
+			{/foreach}
+		</p>
+		{if !empty($pushData.image)}
+		<p style="margin-top: 30px;" class="gmaeicon">
+			<span>現图素：</span>
+			<img src="{$pushData.image}" style="width: 30px; height: 30px;" />
+		</p>
+		{/if}
+		<p class="gmaeicon">
+			<span>{if !empty($pushData.image)}更換{/if}图素：</span>
+			<input type="file" name="image[]" />
+		</p>
+		<p>
+			<span>类型：</span>
+			<input name="android_type" type="checkbox" id="android_type" value="" {if !($pushData.android_link eq "")}checked="checked"{/if} />Android
+			<input name="ios_type" type="checkbox" id="ios_type" value="" {if !($pushData.ios_link eq "")}checked="checked"{/if} />iOS
+		</p>
+		<p id="android_check" {if ($pushData.android_link eq "")} style="display:none" {/if}>
+			<span>Android 链接：</span>
+			<input type="text" name="android_link" value="{$pushData.android_link}" style="width: 300px;" />
+		</p>
+		<p id="ios_check" {if ($pushData.ios_link eq "")} style="display:none" {/if}>
+			<span>iOS 链接：</span>
+			<input type="text" name="ios_link" value="{$pushData.ios_link}" style="width: 300px;" />
+		</p>
+		<p>
+			<span>是否启用：</span>
+			<input type="checkbox" name="status" value="{$pushData.status}" {if ($pushData.status eq 1)}checked="checked"{/if} />
+		</p>
+		<p class="line">
+			<button type="submit" name="do" class="su">立即提交</button>
+			<button type="reset" class="re">條件重置</button>
+		</p>
+	</form>
+<script  type="text/javascript">
+$(document).ready(function() {
+	$('#android_type').bind('click',function(){
+		if($('#android_type').get(0).checked){
+			$('#android_check').show();
+		}else{
+			$('#android_check').hide();
+		}
+	});
+	$('#ios_type').bind('click',function(){
+		if($('#ios_type').get(0).checked){
+			$('#ios_check').show();
+		}else{
+			$('#ios_check').hide();
+		}
+	});
+});
+</script>
+{/if}
+{/block}

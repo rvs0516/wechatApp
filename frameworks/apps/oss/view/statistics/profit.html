@@ -1,0 +1,828 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+<script src="/js/pop.js"></script>
+<style>
+    .display_table_f{
+        display: none;
+    }
+    .showHide{ color:#3d203f; text-decoration:none; position:relative; left:0; top:0; z-index:10; color:green;}
+    .showHide p{ display:none;}
+    .showHide:hover{ display:block; text-decoration:none; height:100%; position:relative; z-index:1000 !important;}
+    .showHide:hover p{ display:block; color:#3d203f; background:#cff0fc; position:absolute; left:30px; top:30px; white-space:normal; width:500px;; padding:10px; box-shadow:1px 1px 10px #333; cursor:pointer;}
+</style>
+{if $checkRoot neq ''}
+<h3>
+    游戏利润
+    {if $uid == 'yangzhenwei' || $uid == 'chenjh' || $uid == 'heyongzhen' || $uid == 'guofengchi'}
+    <span><a  href="#" class="showbox">数据导入</a></span>
+    {/if}
+</h3>
+
+<form class="searchbox" action="/index.php?m=statistics&a=profit" method="post">
+    {if $gid eq 1 || $gid eq 20 || $gid eq 24}
+    <input type="hidden" name="operation" value="" id="operation" />
+    {/if}
+    <p>
+        <span>来自游戏：</span>
+            {if $gid eq 17 || $gid eq 15}
+            <input type="hidden" id="gameStr" value="{$gameStr}" />
+            <input type="hidden" id="gid" value="{$gid}" />
+            {/if}
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="game" id="game" style="width: 98px;">
+            <option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+                <option value="{$key1}" {if $game eq $key1}selected="selected"{/if}>{$name}</option>
+            {/foreach}
+        </select>
+        <span>渠道： </span>
+        <select name="channel" id="channel">
+         <option value="">请选择</option>
+            {foreach from=$channels key=key1 item=data}
+                <option value="{$key1}" {if ($channel == $key1)}selected="selected"{/if}>{$data}</option>
+            {/foreach}
+        </select>
+        <span>包号：</span>
+        <select name="apkNum" id="apkNum">
+            <option value="">请选择</option>
+            {foreach from=$committe_apknum key=key2 item=apk}
+                <option value="{$apk}" {if ($apkNum == $apk)}selected="selected"{/if}>{$apk}</option>
+            {/foreach}
+        </select>
+    </p>
+    <p>
+        <span>时间：</span>
+        <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})" style="width: 128px;"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )" style="width: 128px;">
+        <span>类型：</span>
+        <select name="type">
+            <option value="">请选择</option>
+            <option value="1" {if ($type == 1)}selected="selected"{/if}>联运</option>
+            <option value="2" {if ($type == 2)}selected="selected"{/if}>广告/投放</option>
+            <option value="3" {if ($type == 3)}selected="selected"{/if}>cps</option>
+        </select>
+    {if $gid eq 1}
+        <span>数据来源：</span>
+        <select name="source" id="source"  style="width: 200px;">
+            <option value="">请选择</option>
+            <option value="1" {if $source eq '1'}selected="selected"{/if}>导入数据</option>
+            <option value="2" {if $source eq '2'}selected="selected"{/if}>SDK数据</option>
+        </select>
+        {if $uid =='chenjh' || $uid == 'heyongzhen'}
+        <span>数据类型：</span>
+        <select name="status" id="status"  style="width: 200px;">
+            <option value="1" {if $status eq '1'}selected="selected"{/if}>常规数据</option>
+            <option value="2" {if $status eq '2'}selected="selected"{/if}>QA数据</option>
+        </select>
+        {/if}
+    {/if}
+    </p>
+    <p class="market">
+        <span>年份：</span>
+        <select name="years" id="years"  style="width: 200px;">
+            <option value="">请选择</option>
+            {foreach from=$yearArray item=item}
+                <option value="{$item}" {if $years eq $item}selected="selected"{/if}>{$item}</option>
+            {/foreach}
+        </select>
+    </p>
+    <table style="clear:both;margin-top:10px; float:right;width:100%;">
+        <tr>
+            <td align="left">
+                <button type="submit" class="su inline" style=" margin-left: 30px;" id="select">查询</button>
+                {if $gid eq 1 || $gid eq 20 || $gid eq 24}
+                <button type="submit" class="su inline" style=" margin-left: 30px;" id="report">导出</button>
+                {/if}
+            </td>
+        </tr>
+    </table>
+    <p style="margin-left: 10px; color: red;">*&nbsp;&nbsp;每天凌晨4点更新前一天统计的数据</p>
+</form>
+<table class="list">
+{if $refine eq 1}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <th {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            <th {if !in_array(300_2,$header_id) && $gid eq 17}class="display_table_f"{/if}>总流水</th>
+            {if $checkRoot eq 1}<th {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>真实充值</th>{/if}
+            {if $checkRoot neq 3}<th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>{/if}
+            {if $checkRoot neq 2}<th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>{/if}
+            {if $checkRoot eq 1}<th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>分成后流水</th>{/if}
+            <th {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>额外支出</th>
+            <th {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>投放支出</th>
+            <th {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>实际投放支出</th>
+            <th {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>GS收入</th>
+            {if $gid neq 17 || ($gid eq 17 && !$gameStr)}
+            <th {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}>项目支出</th>
+            {/if}
+            <th {if !in_array(300_12,$header_id) && $gid eq 17}class="display_table_f"{/if}>公司支出</th>
+            {if $checkRoot eq 1}
+            <th {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>净利润</th>
+            {else}
+            <th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>分成后流水</th>
+            {/if}
+            <th {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>利润率</th>
+        {else}
+            <th {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            <th {if !in_array(300_2,$header_id) && $gid eq 17}class="display_table_f"{/if}>总流水</th>
+            <th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>
+            <th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>
+        {/if}
+    </tr>
+    {if $profitList}
+    {foreach from=$profitList item=order}
+    <tr>
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(300_2,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profit}</td>{/if}
+            <td {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.exPay}</td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.adPay}</td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.income}</td>
+            {if $gid neq 17 || ($gid eq 17 && !$gameStr)}
+            <td {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.gamePay}</td>
+            {/if}
+            <td {if !in_array(300_12,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.coPay}</td>
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profitMargin}</td>
+        {else}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(300_2,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>
+        {/if}
+    </tr>
+    {/foreach}
+    {else}
+    <tr>
+        <td colspan="20">无相关数据</td>
+    </tr>
+    {/if}
+    {if $list_total != 0}
+    {foreach from=$summary item=sum}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_2,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profit}</td>{/if}
+            <td {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.exPay}</td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.adPay}</td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.income}</td>
+            {if $gid neq 17  || ($gid eq 17 && !$gameStr)}
+            <td {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.pay}</td>
+            {/if}
+            <td {if !in_array(300_12,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.coPay}</td>
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profitMargin}</td>
+        {else}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_2,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>
+        {/if}
+    </tr>
+    {/foreach}
+    {/if}
+{elseif $refine eq 2}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <th {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            <th {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            <th {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏流水</th>
+            {if $checkRoot eq 1}<th {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>真实充值</th>{/if}
+            {if $checkRoot neq 3}<th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>{/if}
+            {if $checkRoot neq 2}<th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>{/if}
+            {if $checkRoot eq 1}<th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>分成后流水</th>{/if}
+            <th {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>额外支出</th>
+            <th {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>投放支出</th>
+            <th {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>实际投放支出</th>
+            <th {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>GS收入</th>
+            {if $gid neq 17 || ($gid eq 17 && !$gameStr)}
+            <th {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}>项目支出</th>
+            {/if}
+            {if $checkRoot eq 1}
+            <th {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>净利润</th>
+            {else}
+            <th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>分成后流水</th>
+            {/if}
+            <th {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>利润率</th>
+        {else}
+            <th {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            <th {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            <th {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏流水</th>
+            <th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>
+            <th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>
+        {/if}
+    </tr>
+    {foreach from=$profitList item=order}
+    {if $years eq ''}
+        {if $order.pay && $checkRoot neq 4 }
+        <tr style="color:green;background-color:#eff2d0;">
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}><a class="showHide">项目支出:{$order.remark|truncate:10:"..":true}{if $order.remark}<p>{$order.remark}</p>{/if}</a></td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>{/if}
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>{/if}
+            <td {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.pay}</td>
+            {if $gid neq 17 || ($gid eq 17 && !$gameStr)}
+            <td {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            {/if}
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>利润率</td>
+        </tr>
+        {/if }
+    {/if}
+    <tr>
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.specialName}</td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profit}</td>{/if}
+            <td {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.exPay}</td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.adPay}</td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.income}</td>
+            {if $gid neq 17 || ($gid eq 17 && !$gameStr)}
+            <td {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            {/if}
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profitMargin}</td>
+        {else}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.specialName}</td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>
+        {/if}
+    </tr>
+    {foreachelse}
+    <tr>
+        <td colspan="20">无相关数据</td>
+    </tr>
+    {/foreach}
+    {if $list_total != 0}
+    {foreach from=$summary item=sum}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profit}</td>{/if}
+            <td {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.exPay}</td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.adPay}</td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.income}</td>
+            {if $gid neq 17 || ($gid eq 17 && !$gameStr)}
+            <td {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.pay}</td>
+            {/if}
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profitMargin}</td>
+        {else}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>
+        {/if}
+    </tr>
+    {/foreach}
+    {/if}
+{elseif $refine eq 3}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <th {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            <th {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            <th {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏流水</th>
+            {if $checkRoot eq 1}<th  {if !in_array(300_17,$header_id) && $gid eq 17}class="display_table_f"{/if}>真实流水</th>{/if}
+            {if $checkRoot neq 3}<th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>{/if}
+            {if $checkRoot neq 2}<th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>{/if}
+            {if $checkRoot eq 1}<th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>分成后流水</th>{/if}
+            <th {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>额外支出</th>
+            <th {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>投放支出</th>
+            <th {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>实际投放支出</th>
+            <th {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>GS收入</th>
+            {if $checkRoot eq 1}
+            <th {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>净利润</th>
+            {else}
+            <th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>分成后流水</th>
+            {/if}
+            <th {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>利润率</th>
+        {else}
+            <th {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            <th {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            <th {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏流水</th>
+            <th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>
+            <th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>
+        {/if}
+    </tr>
+    {foreach from=$profitList item=order}
+    <tr>
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.name}</td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_17,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profit}</td>{/if}
+            <td {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.exPay}</td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.adPay}</td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.income}</td>
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profitMargin}</td>
+        {else}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.name}</td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>
+        {/if}
+    </tr>
+    {foreachelse}
+    <tr>
+        <td colspan="20">无相关数据</td>
+    </tr>
+    {/foreach}
+    {if $list_total != 0}
+    {foreach from=$summary item=sum}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_17,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profit}</td>{/if}
+            <td {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.exPay}</td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.adPay}</td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.income}</td>
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profitMargin}</td>
+        {else}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>
+        {/if}
+    </tr>
+    {/foreach}
+    {/if}
+{elseif $refine eq 4}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <th {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            <th {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            {if $years eq ''}
+                <th {if !in_array(300_18,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道</th>
+                <th {if !in_array(300_19,$header_id) && $gid eq 17}class="display_table_f"{/if}>包号</th>
+            {/if}
+            <th {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏流水</th>
+            {if $checkRoot eq 1}<th {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>真实充值</th>{/if}
+            {if $checkRoot neq 3}<th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>{/if}
+            {if $checkRoot neq 2}<th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>{/if}
+            {if $checkRoot eq 1}<th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>分成后流水</th>{/if}
+            <th {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>额外支出</th>
+            <th {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>投放支出</th>
+            <th {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>实际投放支出</th>
+            <th {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>GS收入</th>
+            {if $checkRoot eq 1}
+            <th {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>净利润</th>
+            {else}
+            <th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}></th>分成后流水</th>
+            {/if}
+            <th {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>利润率</th>
+            {if $uid =='chenjh' || $uid == 'heyongzhen' || $uid == 'guofengchi'}
+                <th>操作</th>
+            {/if}
+        {else}
+            <th {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            <th {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            {if $years eq ''}
+                <th {if !in_array(300_18,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道</th>
+                <th {if !in_array(300_19,$header_id) && $gid eq 17}class="display_table_f"{/if}>包号</th>
+            {/if}
+            <th {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏流水</th>
+            <th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>
+            <th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>
+        {/if}
+    </tr>
+    {foreach from=$profitList item=order}
+    <tr>
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.gameName}</td>
+            {if $years eq ''}
+                <td {if !in_array(300_18,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelName}{if $order.type eq '2'}(投放){/if}</td>
+                <td {if !in_array(300_19,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.apkNum}</td>
+            {/if}
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td  {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profit}</td>{/if}
+            <td id="{$order.id}" {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.exPay}</td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if} {if ($uid eq 'guojian' || $uid eq 'yangzhenwei' || $uid eq 'wangyinping' ||  $uid eq 'chenjh' ||  $uid eq 'heyongzhen' || $gid eq 17)} class="change2" {/if} id="{$order.id}">{$order.adPay}</td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if} {if ($uid eq 'guojian' || $uid eq 'yangzhenwei' || $uid eq 'wangyinping' ||  $uid eq 'chenjh' ||  $uid eq 'heyongzhen' || $gid eq 17)} class="change" {/if} id="{$order.id}">{$order.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.income}</td>
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if} id="final_{$order.id}">{$order.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if} id="final_{$order.id}"></th>{$order.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profitMargin}</td>
+            {if $uid =='chenjh' || $uid == 'heyongzhen' || $uid == 'guofengchi'}
+                <td><a href="index.php?m=statistics&a=changeDataStatus&id={$order.id}&model=profit" id="qa">QA</a></td>
+            {/if}
+        {else}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.gameName}</td>
+            {if $years eq ''}
+                <td {if !in_array(300_18,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelName}{if $order.type eq '2'}(投放){/if}</td>
+                <td {if !in_array(300_19,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.apkNum}</td>
+            {/if}
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>
+        {/if}
+    </tr>
+    {foreachelse}
+    <tr>
+        <td colspan="20">无相关数据</td>
+    </tr>
+    {/foreach}
+    {if $list_total != 0}
+    {foreach from=$summary item=sum}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            {if $years eq ''}
+                <td {if !in_array(300_18,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+                <td {if !in_array(300_19,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            {/if}
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profit}</td>{/if}
+            <td id="sum_ex" {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.exPay}</td>
+            <td id="sum_ad" {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.adPay}</td>
+            <td id="sum_act" {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.income}</td>
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if} id="sum_final">{$sum.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if} id="sum_final"></th>{$sum.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profitMargin}</td>
+        {else}
+            <td {if !in_array(300_1,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            {if $years eq ''}
+                <td {if !in_array(300_18,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+                <td {if !in_array(300_19,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            {/if}
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>
+        {/if}
+    </tr>
+    {/foreach}
+    {/if}
+{elseif $refine eq 5}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <th {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            <th {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏流水</th>
+            {if $checkRoot eq 1}<th {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>真实充值</th>{/if}
+            {if $checkRoot neq 3}<th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>{/if}
+            {if $checkRoot neq 2}<th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>{/if}
+            {if $checkRoot eq 1}<th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>分成后流水</th>{/if}
+            <th {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>额外支出</th>
+            <th {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>投放支出</th>
+            <th {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>实际投放支出</th>
+            <th {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>GS收入</th>
+            {if $gid neq 17}
+            <th {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}>项目支出</th>
+            {/if}
+            {if $checkRoot eq 1}
+            <th {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>净利润</th>
+            {else}
+            <th {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>分成后流水</th>
+            {/if}
+            <th {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>利润率</th>
+        {else}
+            <th {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            <th {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏流水</th>
+            <th {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>CP分成</th>
+            <th {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道支出（含折扣）</th>
+        {/if}
+    </tr>
+    {foreach from=$profitList item=order}
+    <tr>
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.upperName}</td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profit}</td>{/if}
+            <td {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.exPay}</td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.adPay}</td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.income}</td>
+            {if $gid neq 17}
+            <td {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.pay}</td>
+            {/if}
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.profitMargin}</td>
+        {else}
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.upperName}</td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.cpAmount}(<font style="color:green;">{$order.cpRate}</font>)</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelAmount}(<font style="color:green;">{$order.channelRate}</font>)</td>
+        {/if}
+    </tr>
+    {foreachelse}
+    <tr>
+        <td colspan="20">无相关数据</td>
+    </tr>
+    {/foreach}
+    {if $list_total != 0}
+    {foreach from=$summary item=sum}
+    <tr style="background-color:#CCCCCC;">
+        {if $checkRoot neq 4}
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            {if $checkRoot eq 1}<td {if !in_array(300_3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.disAmount}</td>{/if}
+            {if $checkRoot neq 3}<td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>{/if}
+            {if $checkRoot neq 2}<td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>{/if}
+            {if $checkRoot eq 1}<td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profit}</td>{/if}
+            <td {if !in_array(300_7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.exPay}</td>
+            <td {if !in_array(300_8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.adPay}</td>
+            <td {if !in_array(300_9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.actualPay}</td>
+            <td {if !in_array(300_10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.income}</td>
+            {if $gid neq 17}
+            <td {if !in_array(300_11,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.pay}</td>
+            {/if}
+            {if $checkRoot eq 1}
+            <td {if !in_array(300_13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.final}</td>
+            {else}
+            <td {if !in_array(300_6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.final}</td>
+            {/if}
+            <td {if !in_array(300_14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.profitMargin}</td>
+        {else}
+            <td {if !in_array(300_15,$header_id) && $gid eq 17}class="display_table_f"{/if}></td>
+            <td {if !in_array(300_16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            <td {if !in_array(300_4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.cpAmount}</td>
+            <td {if !in_array(300_5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.channelAmount}</td>
+        {/if}
+    </tr>
+    {/foreach}
+    {/if}
+{/if}
+    <!--隐藏域 start-->
+    <div id="popbg"></div>
+    <div class="pop fastDopost">
+        <form action="/index.php?m=statistics&a=orderImport&target=profit" method="post" enctype="multipart/form-data">
+            <input name="cardid" id="thisComment" type="hidden" value="" />
+            <h3><span><a href="#" class="popclose">关闭</a></span>导入订单数据</h3>
+            <p ><input name="file[]" id="iconfile" type="file" style=" height:25px; line-height:25px; display:block; margin: 20px 0px 20px 25px;" /></p>
+            <p align="right"><button type="submit" class="su popsubmit">提交</button></p>
+        </form>
+    </div>
+    <!--隐藏域 end-->
+</table>
+{if $gid eq 17}
+    {if $refine == 1 && ( in_array(300_1,$header_id) || in_array(300_2,$header_id) || in_array(300_2,$header_id) || in_array(300_4,$header_id)  || in_array(300_5,$header_id)  || in_array(300_6,$header_id)  || in_array(300_7,$header_id)  || in_array(300_8,$header_id)  || in_array(300_9,$header_id)  || in_array(300_10,$header_id)  || in_array(300_11,$header_id)  || in_array(300_12,$header_id)  || in_array(300_13,$header_id)  || in_array(300_14,$header_id) ) }
+        <div id="pager"></div>
+    {elseif $refine == 2 && ( in_array(300_1,$header_id) || in_array(300_3,$header_id) || in_array(300_4,$header_id) || in_array(300_5,$header_id) || in_array(300_6,$header_id) || in_array(300_7,$header_id) || in_array(300_8,$header_id) || in_array(300_9,$header_id) || in_array(300_10,$header_id) || in_array(300_11,$header_id) || in_array(300_13,$header_id) || in_array(300_14,$header_id) || in_array(300_15,$header_id) || in_array(300_16,$header_id) ) }
+        <div id="pager"></div>
+    {elseif $refine == 3 && ( in_array(300_1,$header_id) || in_array(300_17,$header_id) || in_array(300_4,$header_id) || in_array(300_5,$header_id) || in_array(300_6,$header_id) || in_array(300_7,$header_id) || in_array(300_8,$header_id) || in_array(300_9,$header_id) || in_array(300_10,$header_id) || in_array(300_11,$header_id) || in_array(300_13,$header_id) || in_array(300_14,$header_id) || in_array(300_15,$header_id) || in_array(300_16,$header_id) || in_array(300_11,$header_id) ) }
+        <div id="pager"></div>
+    {elseif $refine == 4 && ( in_array(300_1,$header_id) || in_array(300_17,$header_id) || in_array(300_4,$header_id) || in_array(300_5,$header_id) || in_array(300_6,$header_id) || in_array(300_7,$header_id) || in_array(300_8,$header_id) || in_array(300_9,$header_id) || in_array(300_10,$header_id) || in_array(300_11,$header_id) || in_array(300_13,$header_id) || in_array(300_14,$header_id) || in_array(300_15,$header_id) || in_array(300_16,$header_id) || in_array(300_11,$header_id) || in_array(300_18,$header_id) || in_array(300_19,$header_id) ) }
+        <div id="pager"></div>
+    {elseif $refine == 5 && ( in_array(300_3,$header_id) || in_array(300_4,$header_id) || in_array(300_5,$header_id) || in_array(300_6,$header_id)  || in_array(300_7,$header_id)  || in_array(300_8,$header_id)  || in_array(300_9,$header_id)  || in_array(300_10,$header_id)  || in_array(300_13,$header_id)  || in_array(300_14,$header_id)  || in_array(300_15,$header_id)  || in_array(300_16,$header_id) ) }
+        <div id="pager"></div>
+    {/if}
+    <script src="js/pager.js"></script>
+{else}
+    <div id="pager"></div>
+    <script src="js/pager.js"></script>
+{/if}
+<script>
+$('#qa').click(function() {
+    return confirm('数据属性将修改，确定要执行？');
+});
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+function gotoNext(page,pagesize){
+    $('#page').val(page);
+    $('.searchbox').submit();
+}
+function gotoNext(page,pagesize){
+        window.location.href = "/index.php?m=statistics&a=profit&page=" + page+"&game={$game}&channel={$channel}&start_date={$start_date}&end_date={$end_date}&apkNum={$apkNum}&upperName={$upperName}&specialName={$specialName}&type={$type}&source={$source}&status={$status}";
+    }
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+{if $uid eq 'guojian' ||  $uid eq 'yangzhenwei' ||  $uid eq 'wangyinping' ||  $uid eq 'chenjh' ||  $uid eq 'heyongzhen' || $gid eq 17  || $gid eq 20 || $uid eq 'guofengchi'}
+<script>
+$(function() {
+
+    $("#report").click(function() {
+        var data = $("#start_date").val();
+        if(data == ''){
+            alert('请选择时间!');
+            return false;
+        }
+
+        $("#operation").val("report");
+        $('.searchbox').submit();
+    });
+
+    $("#select").click(function() {
+        $("#operation").val("");
+    });
+
+
+    $(".change").click(function() {
+        var td = $(this);
+        var txt = td.text();
+        var id = td.attr("id");
+        var final = document.getElementById("final_"+id);
+        var sum_final = document.getElementById("sum_final");
+        var sum_final_in = sum_final.innerText;
+        var sum_act = document.getElementById("sum_act");
+        var sum_act_in = sum_act.innerText;
+        var input = $("<input type='text'value='" + txt + "'/>");
+        td.html(input);
+        input.click(function() { return false; });
+        //获取焦点
+        input.trigger("focus");
+        input.blur(function() {
+        var newtxt = $(this).val();
+        if(isNaN(newtxt)){
+            alert('请填写数字');
+    　　　     return false; 
+        }else if(newtxt == ''){
+            newtxt = 0;
+        }
+        var final_in = final.innerText;
+        //判断文本有没有修改
+        if (newtxt != txt) {
+            $.ajax({
+                type: "POST",
+                url: "index.php?m=statistics&a=exPayChange",
+                data:"id=" + id + "&actualPay=" + newtxt,
+                success:function (result) {   
+                    var str = JSON.parse(result);
+                    if(str['status'] == "15"){
+                        td.html(newtxt);
+                        final.innerText = Number(final_in) + Number(txt) - Number(newtxt);
+                        sum_final.innerText = Number(sum_final_in) + Number(txt) - Number(newtxt);
+                        sum_ex.innerText = Number(sum_act_in) - Number(txt) + Number(newtxt);
+                    }
+                    else { 
+                        alert('没有对应的数据');
+                        td.html(txt);
+                    }
+                },
+                error:function () {            
+                    alert("系统出错了。。。");
+                },
+            });
+        }else{
+            td.html(newtxt);
+        }
+        });
+    });
+}); 
+$(function() {
+    $(".change2").click(function() {
+        var td = $(this);
+        var txt = td.text();
+        var id = td.attr("id");
+        var final = document.getElementById("final_"+id);
+        var sum_final = document.getElementById("sum_final");
+        var sum_final_in = sum_final.innerText;
+        var sum_ad = document.getElementById("sum_ad");
+        var sum_ad_in = sum_ad.innerText;
+        var input = $("<input type='text'value='" + txt + "'/>");
+        td.html(input);
+        input.click(function() { return false; });
+        //获取焦点
+        input.trigger("focus");
+        input.blur(function() {
+        var newtxt = $(this).val();
+        if(isNaN(newtxt)){
+            alert('请填写数字');
+    　　　     return false; 
+        }else if(newtxt == ''){
+            newtxt = 0;
+        }
+        var final_in = final.innerText;
+        //判断文本有没有修改
+        if (newtxt != txt) {
+            $.ajax({
+                type: "POST",
+                url: "index.php?m=statistics&a=exPayChange",
+                data:"id=" + id + "&adPay=" + newtxt,
+                success:function (result) {   
+                    var str = JSON.parse(result);
+                    if(str['status'] == "15"){
+                        td.html(newtxt);
+                        /*final.innerText = Number(final_in) + Number(txt) - Number(newtxt);
+                        sum_final.innerText = Number(sum_final_in) + Number(txt) - Number(newtxt);
+                        sum_ad.innerText = Number(sum_ad_in) - Number(txt) + Number(newtxt);*/
+                    }
+                    else { 
+                        alert('没有对应的数据');
+                        td.html(txt);
+                    }
+                },
+                error:function () {            
+                    alert("系统出错了。。。");
+                },
+            });
+        }else{
+            td.html(newtxt);
+        }
+        });
+    });
+}); 
+</script>
+{/if}
+{else}
+<div style="font-size: 20px; color:red; margin:5% 0 0 30%;">无权限查看相关数据</div>
+{/if}
+{/block}

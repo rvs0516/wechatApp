@@ -1,0 +1,83 @@
+{extends file='layout/new.html'}
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script>
+$(function(){
+	//重置表单
+	$("#start_date").val('');
+	$("#end_date").val('');
+	
+	$(".su").click(function(){
+		var start_date = $("#start_date").val();
+		var end_date = $("#end_date").val();		
+		var url = "/index.php?m=ac&a=dailycoins&isajax=1&start_date=" + start_date + "&end_date=" + end_date;
+		$.get(url, function(data){	
+			if(data.msg == undefined){
+				$('#normal').show();
+				$('#ajaxs').hide();	
+				alert('沒有找到任何數據');
+				return false;
+			}else if(data.msg != ''){ 
+				$('#normal').hide();
+				$('#ajaxs').show();				
+				$('#here').html(data.msg);
+				return false;
+			}else{
+				$('#normal').show();
+				$('#ajaxs').hide();	
+				alert('沒有找到任何數據..');
+				return false;
+			}
+		});
+	});	
+});
+</script>
+<link rel="stylesheet" type="text/css" href="/js/icon.css">
+    <div class="content">        
+         <h3>每日樂幣匯總</h3>                          
+         <p align="right" style='color:red; margin-right:30px; margin-top:10px;'>
+			<a href="/index.php?m=ac&a=coinshold">持有樂幣玩家</a>
+		 </p>  
+		 <div class="clear"></div>    
+		 <div>
+			<form name="form1" id="searchform" action="" method="GET" class="searchbox" style="margin:0;">
+				<input type="hidden" name="m" value="ac" />
+				<input type="hidden" name="a" value="dailycoins" />
+				<p>
+				<b style="margin:2px 10px;">时间：</b>
+				<input type="text" name="start_date" id="start_date" class="date" value="" onClick="WdatePicker()"/>
+				至 <input type="text" name="end_date" id="end_date" class="date" value="" onClick="WdatePicker()"/>
+				&nbsp;&nbsp;<input id="sub" type="button" value="查詢" class="su" style="width:80px;height:30px;"/>				
+				</p>
+			</form>
+			<div class="clear"></div>		 
+		 </div>
+	</div>	
+	
+	<table border="0" cellpadding="0" cellspacing="0" class="list" id="normal">
+	<thead>
+	    <th width="50%">日期</th>
+	    <th>剩余</th> 
+	</thead>
+	<tbody>
+	{foreach $xdata as $data}
+	<tr align="center">			
+		<td width="50%">{$data.day}</td>
+		<td>{$data.coins}</td>	
+	</tr>
+	{foreachelse}
+	<tr><td colspan="6" align="center" style="border: none; font-size: 12px; padding-top: 8px; color: red">没有数据</td></tr>
+	{/foreach}
+	</tbody>
+	</table>
+	
+	<table border="0" cellpadding="0" cellspacing="0" class="list" id="ajaxs" style="display:none;">
+	<thead>
+	    <th width="50%">日期</th>
+	    <th>剩余</th> 
+	</thead>
+	<tbody id="here">
+	<tbody>
+	</tbody>
+	</table>	
+{/block}

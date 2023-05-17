@@ -1,0 +1,56 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<!--START 列表頁-->
+{if $operation == 'index'}
+	<h3>
+		失敗訂單列表
+	</h3>
+	{foreach from=$order_list item=order}
+	<table class="list">
+		<tr>
+			<th style="width: 20%;">用戶帳號</th>
+			<td>{$order.username}</td>
+			<th style="width: 20%;">訂單號</th>
+			<td>{$order.oid}</td>
+		</tr>
+		<tr>
+			<th>遊戲</th>
+			<td>{$order.game}</td>
+			<th>伺服器</th>
+			<td>{$order.server}</td>
+		</tr>
+		<tr>
+			<th>角色</th>
+			<td>{$order.role}</td>
+			<th>儲值時間</th>
+			<td>{$order.time}</td>
+		</tr>
+		<tr>
+			<th>金額</th>
+			<td>{$order.money}</td>
+			<th>元寶</th>
+			<td>{$order.gold}</td>
+		</tr>
+		<tr>
+			<th>错误信息</th>
+			<td>{$order.error}</td>
+			<th>操作</th>
+			<td><a href="/index.php?m=ac&a=sdkOrdersFail&operation=update&oid={$order.oid}" class="update">设置为成功</a></td>
+		</tr>
+	</table>
+	{/foreach}
+<!--END 列表頁-->
+{literal}
+<script>
+	$('.list:odd').css({'backgroundColor': '#f5f5f5'});
+	$('.update').click(function() {
+		if(confirm('注意：此操作將更新訂單狀態，但不會通知遊戲發送元寶給玩家，并刪除失敗記錄\n\n請再三確定你已經手動為玩家發送了遊戲元寶')) {
+			window.location = this.href;
+		}
+		return false;
+	});
+</script>
+{/literal}
+{/if}
+{/block}

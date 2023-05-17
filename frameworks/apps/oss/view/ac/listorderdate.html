@@ -1,0 +1,99 @@
+{extends file='layout/new.html'}
+{block name=title}::充值对账-平台金流{/block}
+{block name=head}
+<style>
+<!--
+.box{
+	width: 100%;
+	height:auto;
+}
+.search{
+	float: right;
+	padding:5px 0;
+}
+.search ul li{
+	float: left;
+	margin:0 5px;
+}
+-->
+</style>
+<script>
+$().ready(function(){
+	$("#type").bind('change',function(){
+		var type = $(this).val();
+		$("#project option[id='defalut']").attr("selected","selected");
+		$("#project option").each(function () {
+			$(this).hide();
+		})
+		if(type != ''){
+			$("."+type).show();
+		}
+	})
+})
+</script>
+{/block}
+{block name=body}
+<div class="box">
+	<div>
+		<h3 style="float: left;">對賬时间列表</h3>
+		<div style="margin-left:20px;float: left;"><a href="?m=ac&a=editorderdate"><input type="button" value="添加对账时间" class="button1"/></a></div>
+		<form method="post">
+			<div class="search">
+				<ul>
+					<li>類型:
+						<select name="type" id="type">
+							<option value="">请選擇</option>
+							{foreach item=item key=key from=$acconfig}
+							{if $type && $type == $key}
+							<option value="{$key}" selected="selected">{$item.title}</option>
+							{else}
+							<option value="{$key}">{$item.title}</option>
+							{/if}
+							{/foreach}
+						</select>
+					</li>
+					<li>項目:
+						<select id="project" name="project">
+							<option id="defalut" value="">请选择</option>
+							{foreach item=item key=key from=$acconfig}
+								{foreach item=item1 key=key1 from=$item.project}
+									<option value="{$key1}" class="{$key}" {if $project && $project == $key}selected="selected"{/if} {if $type != $key}style="display: none;"{/if}>{$item1}</option>
+								{/foreach}
+							{/foreach}
+						</select>
+					</li>
+					<li><input type="submit" value="查询" style="width: 50px;height: 25px;"/></li>
+				</ul>
+			</div>
+		</form>
+		<div style="clear: both;">
+			<table class="list">
+				<thead>
+					<tr>
+					<th>類型</th>
+					<th>項目</th>
+					<th>對賬日</th>
+					<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{if $orderdateList && count($orderdateList)}
+					{foreach item=item key=key from=$orderdateList}
+					<tr>
+						<td>{$item.typetitle}</td>
+						<td>{$item.projecttitle}</td>
+						<td>{$item.orderdate}日</td>
+						<td><a href="?m=ac&a=editorderdate&odid={$item.id}">修改</a></td>
+					</tr>
+					{/foreach}
+					{else}
+					<tr>
+					    <td colspan="8">目前沒有資料 , <a href="?m=ac&a=editorderdate">请按此添加对账时间</a></td>
+					</tr>
+					{/if}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+{/block}

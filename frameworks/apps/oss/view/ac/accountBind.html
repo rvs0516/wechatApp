@@ -1,0 +1,94 @@
+{extends file='layout/new.html'}
+{block name=body}
+
+<h3>帐号绑定 请谨慎操作!!</h3>
+<form action="/index.php?m=ac&a=accountBind" method="post" class="searchbox"  enctype="multipart/form-data">
+    <p>
+        <span>關聯帳號：</span>
+        <input type="text" name="hash_username" id="hash_username" value="" /><font color="#FF0000">&nbsp;*</font><span class="comment">請填寫hash用戶名</span>
+    </p>
+    <p>
+        <span>綁定帳號：</span>
+        <input type="text" name="bind_username" id="bind_username" value="" /><font color="#FF0000">&nbsp;*</font>&nbsp;&nbsp;<font class="check-username-tip"></font>
+    </p>
+    <p>
+        <span>綁定密码：</span>
+        <input type="text" name="bind_password" id="bind_password" value="" /><font color="#FF0000">&nbsp;*</font>
+    </p>
+    <p>
+        <span>綁定郵箱：</span>
+        <input type="text" name="bind_email" id="bind_email" value="" /><font color="#FF0000">&nbsp;*</font>
+    </p>
+    <p class="line">
+        <button type="submit" name="do" class="su" id="su">提交</button>
+        <button type="reset" class="re">條件重置</button>
+    </p>
+</form>
+<script>
+    $('#bind_username').change(function() {
+        var $self = $(this);
+        $('.check-username-tip').removeClass('green').removeClass('red').html('正在檢查帳號信息...');
+        $.get('/index.php?m=ac&a=accountBind&type=checkuser&bind_username=' + $('#bind_username').val(), function(data) {
+            var $tip = $('.check-username-tip').removeClass('green').removeClass('red');
+            if(data.code == 1) {
+                $tip.addClass('green').html(data.message);
+            } else {
+                $tip.addClass('red').html(data.message);
+            }
+        }, 'json');
+    });
+    
+    var submiting = false;
+    $("form").submit(function() {
+        if(submiting) {
+            return false;
+        }
+        var hash_username = $('#hash_username').val(),
+            bind_username = $('#bind_username').val(),
+            bind_password = $('#bind_password').val(),
+            bind_email = $('#bind_email').val();
+        if(hash_username == "") {
+            misAlert('請填寫關聯帳號');
+            return false;
+        }
+        else if(bind_username == "") {
+            misAlert('請填寫綁定帳號');
+            return false;
+        }
+        else if(bind_password == "") {
+            misAlert('請填寫綁定密码');
+            return false;
+        }
+        else if(bind_email == "") {
+            misAlert('請填寫綁定郵箱');
+            return false;
+        }
+        
+        var info = "關聯帳號：" + hash_username +
+                "\n綁定帳號：" + bind_username + "\n綁定密码：" + bind_password + "\n綁定郵箱：" + bind_email;
+        var confirm_message = "确认提交：\n" + info;
+        submiting = true;
+        misConfirm(confirm_message, function(r) {
+            if(r) {
+                $('#su').html('提交中...');
+                var url = '/index.php?m=ac&a=accountBind&type=bind';
+                $.post(url, {
+                    hash_username: hash_username,
+                    bind_username: bind_username,
+                    bind_password: bind_password,
+                    bind_email: bind_email
+                }, function(data) {
+                    submiting = false;
+                    $('#su').html('提交');
+                    if(data.code == 1) {
+                        misAlert("綁定成功！請牢記信息：\n" + info, 300);
+                    } else {
+                        misAlert(data.message);
+                    }
+                }, 'json');
+            }
+        }, 350);
+        return false;
+    });
+</script>
+{/block}

@@ -1,0 +1,194 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+{if $gid neq 8}
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+{/if}
+<h3>
+    地区列表
+</h3>
+
+<form class="searchbox" action="/index.php?m=statistics&a=area" method="post">
+    <p>
+        <span>来自游戏：</span>
+        {if $gid neq 8}
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="game" id="game" style="width: 98px;">
+        {else}
+            <select name="game" id="game">
+        {/if}
+            <option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+                <option value="{$key1}" {if $game eq $key1}selected="selected"{/if}> {$key1|capitalize|truncate:1:"":true} — {$name}</option>
+            {/foreach}
+        </select>
+		<span>渠道： </span>
+		<select name="channel" id="channel">
+            <option value="">请选择</option>
+            {foreach from=$channels key=key1 item=data}
+                <option value="{$key1}" {if ($channel == $key1)}selected="selected"{/if}>{$data}</option>
+            {/foreach}
+        </select>
+        <span>包号：</span>
+        <select name="apkNum" id="apkNum" style="width: 180px;">
+            <option value="">请选择</option>
+            {foreach from=$committe_apknum key=key2 item=apk}
+                <option value="{$apk}" {if ($apkNum == $apk)}selected="selected"{/if}>{$apk}</option>
+            {/foreach}
+        </select>
+	</p>
+	<p>
+		<span>注册时间：</span>
+		<input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+		<span style="width: 192px;">输入省/市：</span>
+		<input type="text" value="{$keywords}" placeholder="请输入省/市" name="keywords" id="keywords" style="width: 185px;">
+		<span>范围选择：</span>
+        <select  name="area" style="width: 180px;">
+			<option value="">请选择</option>
+            <option value="1" {if $area == 1}selected="selected"{/if} >省份</option>
+			<option value="2" {if $area == 2}selected="selected"{/if} >城市</option>
+        </select>
+    </p>
+    <p>
+		&nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" class="su inline">查询</button>
+	</p>
+</form>
+<table class="list">
+{if $area eq 1}
+    <tr style="background-color:#CCCCCC;">
+        <th width="30%">游戏</th>
+        <th width="20%">渠道名/渠道号</th>
+        <th width="15%">包号</th>
+		<th width="20%">省份</th>
+		<th width="15%">注册数</th>
+    </tr>
+	{foreach from=$area_list item=order}
+	<tr>
+        <td>{if ($order.gameAlias)}{$order.gameName}{else}游戏汇总{/if}</td>
+        <td>{if ($order.channelId)}{$order.channelName}/<span style="color: red">{$order.channelId}</span>{else}渠道汇总{/if}</td>
+        <td>{$order.apkNum}</td>
+        <td>{if ($order.province)}{$order.province}省{else}未知{/if}</td>
+		<td><font color="red">{$order.total}</font></td>
+    </tr>
+	{foreachelse}
+    <tr>
+        <td colspan="6">无数据</td>
+    </tr>
+	{/foreach}
+{/if}
+{if $area neq 1}
+    <tr style="background-color:#CCCCCC;">
+        <th width="25%">游戏</th>
+        <th width="20%">渠道名/渠道号</th>
+        <th width="10%">包号</th>
+		<th width="15%">省份</th>
+		<th width="15%">城市</th>
+		<th width="15%">注册数</th>
+    </tr>
+	{foreach from=$area_list item=order}
+	<tr>
+        <td>{if ($order.gameAlias)}{$order.gameName}{else}游戏汇总{/if}</td>
+        <td>{if ($order.channelId)}{$order.channelName}/<span style="color: red">{$order.channelId}</span>{else}渠道汇总{/if}</td>
+        <td>{$order.apkNum}</td>
+        <td>{if ($order.province)}{$order.province}省{else}未知{/if}</td>
+		<td>{if ($order.city)}{$order.city}市{else}未知{/if}</td>
+		<td><font color="red">{$order.total}</font></td>
+    </tr>
+	{foreachelse}
+    <tr>
+        <td colspan="6">无数据</td>
+    </tr>
+	{/foreach}
+{/if}
+</table>
+
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+function gotoNext(page,pagesize){
+    $('#page').val(page);
+    $('.searchbox').submit();
+}
+function gotoNext(page,pagesize){
+	window.location.href = "/index.php?m=statistics&a=area&page=" + page+"&game={$game}&channel={$channel}&keywords={$keywords}&area={$area}&start_date={$start_date}&end_date={$end_date}&apkNum={$apkNum}&upperName={$upperName}&specialName={$specialName}";
+}
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+{if $gid eq 8}
+<script>
+$(function() {
+	get_servers();
+	$("#game").change(function(){
+		get_servers();
+		return false;
+	});
+    get_apkNum();
+    $("#channel").change(function(){
+        get_apkNum();
+        return false;
+    });
+
+	function get_servers() {
+		var game = $('#game').val();
+        var channel = $('#channel').val();
+		if(game == ''){
+			$("#channel option[text!='']").remove();
+			$("#channel").append('<option value="">请选择</option>').change();
+			return false;
+		}
+
+		$.ajax({
+			type: "POST",
+			url: "/?m=sdkChannel&a=getGameChannels",
+			data: "game="+game+"&channelId="+channel,
+			dataType: 'text',
+
+			success: function(result){
+				$("#channel option[text!='0']").remove();
+				$("#channel").append(result);
+			}
+		});
+		return false;
+	}
+    function get_apkNum() {
+        var game = $('#game').val();
+        var channel = $('#channel').val();
+        var apkNum = $('#apkNum').val();
+        if(channel == ''){
+            $("#apkNum option[text!='']").remove();
+            $("#apkNum").append('<option value="">请选择</option>').change();
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/?m=statistics&a=getApkNum",
+            data: "game="+game+"&channelId="+channel+"&apkNum="+apkNum,
+            dataType: 'text',
+
+            success: function(result){
+                $("#apkNum option[text!='0']").remove();
+                $("#apkNum").append(result);
+            }
+        });
+        return false;
+    }
+});
+</script>
+{/if}
+{/block}

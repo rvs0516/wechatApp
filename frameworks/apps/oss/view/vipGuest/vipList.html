@@ -1,0 +1,539 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+<h3>
+    VIP列表
+</h3>
+<body id="app">
+    <div class="image_large" onclick="hideImg();" hidden >
+    </div>
+    <form class="searchbox" action="/index.php?m=vipGuest&a=vipList" method="post">
+        <p>
+            <input type="hidden" id="gid" value="{$gid}" />
+            <input type="hidden" id="gameStr" value="{$gameStr}" />
+            <input type="hidden" id="refine" value="{$refine}" />
+            <input type="hidden" name="operation" value="" id="operation" />
+            <span style="width: 125px;">最后登录的游戏：</span>
+                <select name="upperName" id="upperName" style="width: 98px;">
+                    <option value="">请选择</option>
+                    {foreach from=$UpperList item=name key=key1}
+                        <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                    {/foreach}
+                </select>
+                <select name="specialName" id="specialName" style="width: 98px;">
+                    <option value="">请选择</option>
+                    {foreach from=$specialList item=name key=key1}
+                        <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                    {/foreach}
+                </select>
+                <select name="game" id="game" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$games item=name key=key1}
+                    <option value="{$key1}" {if $game eq $key1}selected="selected"{/if}>{$name}</option>
+                {/foreach}
+            </select>
+            <span >排序：</span>
+            <select name="sort" id="sort"  style="width: 170px;">
+                <option value="">请选择</option>
+                <option value="1" {if $sort eq 1}selected="selected"{/if}>累计充值金额</option>
+                <option value="2" {if $sort eq 2}selected="selected"{/if}>最后登录时间</option>
+                <option value="3" {if $sort eq 3}selected="selected"{/if}>注册时间</option>
+            </select>
+            <span >审核状态</span>
+            <select name="examine" id="examine"  style="width: 170px;">
+                <option value="" {if $examine eq ''}selected="selected"{/if}>全部</option>
+                <option value="1" {if $examine eq 1}selected="selected"{/if}>待审核</option>
+                <option value="2" {if $examine eq 2}selected="selected"{/if}>审核通过</option>
+                <option value="-1" {if $examine eq -1}selected="selected"{/if}>审核未通过</option>
+                <option value="3" {if $examine eq 3}selected="selected"{/if}>待认证</option>
+            </select>
+            <span >vip来源</span>
+            <select name="source" id="source"  style="width: 170px;">
+                <option value="" {if $source eq ''}selected="selected"{/if}>请选择</option>
+                <option value="1" {if $source eq 1 }selected="selected"{/if}>玩家列表</option>
+                <option value="2" {if $source eq 2 }selected="selected"{/if}>付费</option>
+            </select>
+            <span >专员账号</span>
+            <select name="majorperson" id="majorperson"  style="width: 170px;">
+                <option value="" {if $majorperson eq ''}selected="selected"{/if}>请选择</option>
+                {foreach from=$majorpersonList item=name key=key1}
+                    <option value="{$name.uid}" {if $majorperson eq $name.uid}selected="selected"{/if}>{$name.uid}</option>
+                {/foreach}
+            </select>
+        </p>
+        <p>
+            <span style="width: 125px;">最后登录时间：</span>
+            <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+            <span>账号：</span>
+            <input style="width: 186px;" type="text" value="{$userName}" name="userName" id="userName" placeholder="请输入需要搜索的账号" />
+        </p>
+        <p style="width: 950px;">
+            &nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" class="su inline" id="sub">查询</button>
+            <button type="submit" class="su" value="report" id="report">导出</button>
+            {if $gid == 21 || $gid == 1 || $gid ==23 || $gid == 24}
+            <button type="button" class="su" onclick="fun()">批量审核</button>
+            {/if}
+        </p>
+    </form>
+    <table class="list">
+        <tr style="background-color:#CCCCCC;">
+            {if ($gid == 21 || $gid == 1 || $gid ==23 || $gid == 24) && $item.status != 1}
+            <th style="width:30px"><input type="checkbox" onclick="swapCheck()" /></th>
+            {/if}
+            <th>账号</th>
+            <th>渠道</th>
+            <th>
+                累充金额
+                <span class="question—relationFirstRecharge">
+                    <em class="question-content" style="height: 30px;">累充金额是指该玩家审核通过后累计充值金额</em>
+                </span>
+            </th>
+            <th>
+                首充金额
+                <span class="question—relationPlusRecharge">
+                    <em class="question-content" style="height: 30px;">首充金额是指该玩家审核通过后首次充值金额</em>
+                </span>
+            </th>
+            <th style="width: 80px;">最后登录游戏</th>
+            <th style="width: 100px;">注册时间</th>
+            <th>停充天数</th>
+            <th style="width: 100px;">最后付费时间</th>
+            <th>停登天数</th>
+            <th style="width: 100px;">最后登录时间</th>
+            <th>是否曾关联</th>
+            <th style="line-height: 20px;width: 100px;">
+                关联账号最后登录时间
+                <span class="question—relationLoginTime">
+                    <em class="question-content" style="height: 30px;">当前关联账号是指玩家登录所使用账号</em>
+                </span>
+            </th>
+            <th style="line-height: 20px;width: 100px;">
+                最后登录关联账号
+                <span class="question—relationUserName">
+                    <em class="question-content" style="height: 30px;">当前关联账号是指玩家登录所使用账号</em>
+                </span>
+            </th>
+            <th style="width: 120px;">回访图片</th>
+            <th>审核状态</th>
+            <th>专员</th>
+            <th>联系方式</th>
+            <th style="line-height: 20px;width: 100px;">上次回访时间</th>
+            {if $gid eq 21 || $gid eq 22 || $gid eq 1}
+            <th style="width: 70px;">操作</th>
+            {/if}
+        </tr>
+        {if $vipGuestList}
+        {foreach from=$vipGuestList item=item key=key}
+        <tr style="height: 100px;">
+            {if ($gid == 21 || $gid == 1 || $gid ==23 || $gid == 24)}
+                {if $item.status != 1}
+                <td><input type="checkbox" name="id" {if $item.status != 1} value="{$item.id}" {/if} /></td>
+                {else}
+                <td><input type="checkbox" disabled /></td>
+                {/if}
+            {/if}
+            <td>{$item.userName}</td>
+            <td>{$item.channelName}</td>
+            <td style="color:green;">{if $item.sumMoney}{$item.sumMoney}{else}0{/if}</td>
+            <td style="color:#c7c725;">{if $item.firstCharge}{$item.firstCharge}{else}0{/if}</td>
+            <td>{$item.lastGameName}</td>
+            <td style="width: 100px;">
+                {if $item.joinTime}
+                {date('Y-m-d',$item.joinTime)}
+                {date('H:i',$item.joinTime)}
+                {/if}
+            </td>
+            <td>{if $item.end_recharge_day neq -1}{$item.end_recharge_day}天{/if}</td>
+            <td style="width: 100px;">
+                {if $item.lastPayTime}
+                {date('Y-m-d',$item.lastPayTime)}
+                {date('H:i',$item.lastPayTime)}
+                {/if}
+            </td>
+            <td>{if $item.end_login_day neq -1}{$item.end_login_day}天{/if}</td>
+            <td style="width: 100px;">
+                {if $item.loginTime}
+                {date('Y-m-d',$item.loginTime)}
+                {date('H:i',$item.loginTime)}
+                {/if}
+            </td>
+            <td>{if $item.relationStatus eq 1}是{else}否{/if}</td>
+            <td style="width: 100px;">
+                {if $item.relationLoginTime}
+                {date('Y-m-d',$item.relationLoginTime)}
+                {date('H:i',$item.relationLoginTime)}
+                {/if}
+            </td>
+            <td>{$item.relationUserName}</td>
+            <td class="row img-{$key}" id="video" style="line-height: 0px;">
+                {if {$item.returnImg}}
+                <div class="image">
+                    <img src='{$route}{$item.returnImg}' onclick="imgshow('{$route}{$item.returnImg}');" style="width: 109px;height: 100px;margin: 5px;"/>
+                </div>
+                {/if}
+            </td>
+            {if $item.status eq 1}
+            <td style="color: green;">审核通过</td>
+            {elseif $item.status eq -1}
+            <td style="color: red;">
+                审核未通过
+                <br>
+                <span style="color: black;">
+                    {if $item.examineRemark eq 1}
+                    不是vip用户
+                    {elseif $item.examineRemark eq 2}
+                    回访信息不合格
+                    {/if}
+                </span>
+            </td>
+            {elseif $item.status eq 2}
+            <td style="color: #FFA500;">待认证</td>
+            {else}
+            <td style="color: blue;">待审核</td>
+            {/if}
+            <td>
+                {if $item.uid}
+                    {$item.uid}
+                {/if}
+            </td>
+            <td>
+                {if $item.phoneNum}电话：{$item.phoneNum}{/if}
+                <br>
+                {if $item.weixin}微信：{$item.weixin}{/if}
+                <br>
+                {if $item.qq}Q Q：{$item.qq}{/if}
+                <br>
+                {if $item.birthday}生日：{date('Y-m-d',$item.birthday)}{/if}
+            </td>
+            <td style="width: 100px;">
+                {if $item.revisitTime != 0}
+                {date('Y-m-d',$item.revisitTime)}
+                {date('H:i',$item.revisitTime)}
+                {/if}
+            </td>
+            {if $gid eq 21 || $gid eq 22 || $gid eq 1}
+            <td style="width: 70px;">
+                {if $gid eq 21 || $gid eq 1}
+                <a onclick="Examine('{$item.id}')" {if $item.status neq 0} style="pointer-events: none;color: #ccc;"{/if}>审核</a>
+                {/if}
+                {if $gid eq 1 || $gid eq 21 || $gid eq 24 }
+                <a onclick="RetVisit('{$item.id}')" {if $item.revisitStatus eq 0 || $item.status eq 0 || ($item.status eq -1 && $item.examineRemark eq 1 ) } style="pointer-events: none;color: #ccc;"{/if}>回访</a>
+                {elseif $gid eq 22 && $item.uid == $uid}
+                <a onclick="RetVisit('{$item.id}')" {if $item.revisitStatus eq 0 || $item.status eq 0 || ($item.status eq -1 && $item.examineRemark eq 1 ) } style="pointer-events: none;color: #ccc;"{/if}>回访</a>
+                {/if}
+            </td>
+            {/if}
+        </tr>
+        {/foreach}
+        {else}
+        <tr>
+            <td colspan="23">无相关数据</td>
+        </tr>
+        {/if}
+    </table>
+    <div id="pager"></div>
+</body>
+<form class="retVisit_from" action="/index.php?m=vipGuest&a=vipList&RetVisit" method="post"  enctype="multipart/form-data">
+    <input type="hidden" name="form[uid]" value="" id="uid">
+    <div>
+        <div class="add_from_title">回访</div>
+        <div class="add_from_box">
+            <div class="box_q">
+                <label>QQ：</label>
+                <input name="form[qq]">
+            </div>
+            <div class="box_q">
+                <label>微信：</label>
+                <input name="form[wx]">
+            </div>
+            <div class="box_q">
+                <label>电话：</label>
+                <input name="form[phone]">
+            </div>
+            <div class="box_q">
+                <label>维护号：</label>
+                <input name="form[wid]">
+            </div>
+            <div class="box_q">
+                <label>认证图</label>
+                <input type="file" name="file" οnchange="changeSrc(this)" id="btn_file">
+                <span style="color: red;">限制1M</span>
+            </div>
+        </div>
+        <div style="margin-top: 30px;text-align: center;">
+            <button style="width: 80px;" type="button" class="getSub">提交</button>
+            <button style="margin-left: 15px;width: 80px;" id="cancel" type="button">取消</button>
+        </div>
+    </div>
+</form>
+<form class="examine_from" action="/index.php?m=vipGuest&a=vipList&Examine" method="post">
+    <input type="hidden" name="form[uid]" value="" id="userid">
+    <div>
+        <div class="add_from_title">审核</div>
+        <div style="text-align: center;margin-top: 10px;">
+            <input style="margin-left: 25px;" type="radio" name="form[status]" value="1" checked="checked">通过
+            <input style="margin-left: 25px;" type="radio" name="form[status]" value="-1" >不通过<br>
+            <div class="select" style="display: none;">
+                <label>原因：</label>
+                <select name="form[examineRemark]" id="examineRemark"  style="width: 170px;margin-top: 15px;">
+                    <option value="1">不是vip用户</option>
+                    <option value="2">回访信息不合格</option>
+                </select>
+            </div>
+            <br>
+            <button style="margin-left: 25px;margin-top: 20px;" class="getExe" type="button">提交</button>
+            <button style="margin-left: 25px;margin-top: 20px;" class="getExit" type="button">取消</button>
+        </div>
+    </div>
+</form>
+<style>
+    .retVisit_from{
+        display: none;
+        width: 400px;
+        height: 380px;
+        background-color: #fff;
+        position: fixed;
+	    top: 30%;
+	    left: 40%;
+	    z-index: 12;
+        border: 1px solid black;
+    }
+    .examine_from{
+        display: none;
+        width: 370px;
+        height: 170px;
+        background-color: #fff;
+        position: fixed;
+	    top: 30%;
+	    left: 40%;
+	    z-index: 12;
+        border: 1px solid black;
+    }
+    .add_from input{
+        font-size: 15px;
+    }
+    .add_from_title{
+        height: 35px;
+        line-height: 35px;
+        width: 100%;
+        text-align: center;
+        background-color: beige;
+    }
+    .add_from_box{
+        font-size: 15px;
+        margin: 25px 25px 25px 25px;
+    }
+    .box_q{
+        width: 80px;
+    }
+    /* 问题图标CSS */
+    .list tr th span{
+        position: relative;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: url('static/question_black.png');
+        background-size: 100%;
+    }
+    .list tr th span:hover{
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: url('static/question_blue.png');
+        background-size: 100%;
+    }
+    .question—relationLoginTime .question-content{
+        width: 210px;
+        background: #d1dee4;
+        position: absolute;
+        top: -50px;
+        right: -40px;
+        border-radius: 10px;
+        color: #224f72;
+        display: none;
+        text-align: left;
+    }
+    .question—relationUserName .question-content{
+        width: 210px;
+        background: #d1dee4;
+        position: absolute;
+        top: -50px;
+        right: -90px;
+        border-radius: 10px;
+        color: #224f72;
+        display: none;
+        text-align: left;
+    }
+    .question—relationFirstRecharge .question-content{
+        width: 246px;
+        background: #d1dee4;
+        position: absolute;
+        top: -39px;
+        right: -120px;
+        border-radius: 10px;
+        color: #224f72;
+        display: none;
+        text-align: left;
+    }
+    .question—relationPlusRecharge  .question-content{
+        width: 246px;
+        background: #d1dee4;
+        position: absolute;
+        top: -39px;
+        right: -165px;
+        border-radius: 10px;
+        color: #224f72;
+        display: none; 
+        text-align: left;
+    }
+    table.list td{
+        padding: 2px 2px;
+    }
+</style>
+<!-- 图片预览 开始 -->
+<script>
+    var login=document.getElementById("login");
+    function imgshow(src){
+        var large_image = '<img src= '+ src +'></img>';
+        $('.image_large').show();
+        $('.image_large').html($(large_image).attr("style","display:block;height:65%;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;box-shadow: 0 0 5px 5px #33FFFF ;"));
+    }
+    function hideImg() {
+        $('.image_large').hide();
+    }
+    function bg() {
+        $('.image_large').hide();
+    }
+    var isCheckAll = false; 
+    function swapCheck() { 
+        if (isCheckAll) { 
+            $("input[type='checkbox']").each(function() { 
+                this.checked = false; 
+            }); 
+            isCheckAll = false; 
+        } else { 
+            $("input[type='checkbox']").each(function() {
+                this.disabled ? this.checked = false :this.checked = true; 
+            }); 
+            isCheckAll = true; 
+        } 
+    } 
+    function fun(){
+        obj = document.getElementsByName("id");
+        check_val = [];
+        for(k in obj){
+            if(obj[k].checked)
+                check_val.push(obj[k].value);
+        }
+        var r = confirm('你正在执行一键审核操作，信息是否核实无误');
+        if (r == true) {
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "index.php?m=vipGuest&a=vipList&format=examine&t="+Math.random(),
+                data:"id="+check_val,
+                success:function (result) {
+                    var str = JSON.parse(result);
+                    if (!str.code) {
+                        alert(str.msg)
+                        location=location 
+                        return false
+                    }else{
+                        alert(str.msg)
+                        return false
+                    }
+                },
+                error:function () {   
+                    alert('系统出错了。。。')
+                }
+            });
+        }
+    }
+</script>
+<script src="js/pager.js"></script>
+<!-- 图片预览 结束 -->
+<!-- 回访弹窗 开始-->
+<script>
+    function RetVisit(uid){
+        $('#uid').val(uid)
+        $('.retVisit_from').show()
+    }
+    function Examine(uid) {
+        $('#userid').val(uid)
+        $('.examine_from').show()
+    }
+    $('.getExe').on('click',function(){
+        var r = confirm('信息是否核对无误？');
+        if (r == true) {
+            $('.examine_from').submit();
+        }
+    })
+    $('.getExit').on('click',function(){
+        $('.examine_from').hide()
+    })
+    
+    $('#cancel').on('click',function(){
+        $('.retVisit_from').hide()
+    })
+    $('.getSub').on('click',function(){
+        // 提交表单
+        var file = document.getElementById('btn_file').files[0];
+        if (file) {
+            if (file.size > 1048576) {
+                alert("上传的图片大小不能超过1M");
+            }else{
+                var r = confirm('信息是否核对无误？');
+                if (r == true) {
+                    $('.retVisit_from').submit();
+                }
+            }
+        }else{
+            alert("请上传图片");
+        }
+    })
+    $('input[type=radio][name=form[status]]').change(function () {
+        var myvalue = $(this).val();
+        if (myvalue == 1) {
+            $('.select').hide()
+        }else{
+            $('.select').show()
+        }
+    });
+    // 页码
+    var upperName = $('#upperName').val();
+    var specialName = $('#specialName').val();
+    var game = $('#game').val();
+    var sort = $('#sort').val();
+    var examine = $('#examine').val();
+    var source = $('#source').val();
+    var start_date = $('#start_date').val();
+    var end_date = $('#end_date').val();
+    var userName = $('#userName').val();
+    function gotoNext(page,pagesize){
+         window.location.href = "/index.php?m=vipGuest&a=vipList&page=" + page+"&upperName="+upperName+"&specialName="+specialName+"&game="+game+"&sort="+sort+"&examine="+examine+"&source="+source+"&start_date="+start_date+"&end_date="+end_date+"&userName="+userName;
+    }
+    var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+    document.getElementById('pager').innerHTML = pageStr;
+    // 鼠标经过问题图标显示提示或者取消提示
+    $('.list tr th span').mouseenter(function(){
+            var current_class = $(this).attr('class');
+            $('.'+current_class).find(".question-content").css('display','block');
+        })
+    $('.list tr th span').mouseleave(function(){
+        var current_class = $(this).attr('class');
+        $('.'+current_class).find(".question-content").css('display','none');
+    })
+
+    $("#sub").click(function() {
+        $("#operation").val("");
+    });
+    $("#report").click(function() {
+        $("#operation").val("report");
+        $('.searchbox').submit();
+    });
+
+</script>
+{/block}

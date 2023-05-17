@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+{include file="css.js.html"}
+<script src="/js/highcharts.js"></script>
+<script src="/js/channel.js"></script>
+<script src="/js/platform.js"></script>
+<script>
+doCharts('?m=chart&a=getChannel');	
+//doCharts('?m=chart&a=getChannel&date=h');	
+drawPies('?m=chart&a=getChannelPie');
+doCharts('?m=chart&a=getPlatform&q=u');
+//doCharts('?m=chart&a=getPlatform&q=u&date=h');
+
+doCharts('?m=chart&a=getRecharge');
+//doCharts('?m=chart&a=getRecharge&date=h');	
+drawPies('?m=chart&a=getRechargePie');
+doCharts('?m=chart&a=getPlatform&q=p');
+//doCharts('?m=chart&a=getPlatform&q=p&date=h');
+</script>
+</head>
+
+<body>
+	<div id="container">
+		{include file="over_header.html"}
+        <div id="wrapper">
+            <div id="content">
+				{include file="user_info.html"}
+				<div class="clear"></div>
+				{include file="user_trans.html"}
+				<div class="clear"></div>
+				{include file="user_payment.html"}
+				<div id="channel" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+				<div id="channelpie" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+				<div id="u_platform" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+				
+				<div id="recharge" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+				<div id="rechargepie" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+				<div id="p_platform" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+				<!--<div id="infowrap">
+				<div id="infobox">
+					<h3>Sales for July</h3>
+					<p><img src="img/graph.jpg" width="360" height="266" /></p>            
+				  </div>
+				  <div id="infobox" class="margin-left">
+					<h3>Traffic for July</h3> 
+					<p><img src="img/graph2.jpg" alt="a" width="359" height="266" /></p>
+				  </div>
+				  <div id="infobox">
+					<h3>Last 5 Orders</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>Customer</th>
+								<th>Items</th>
+								<th>Grand Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><a href="#">Jennifer Kyrnin</a></td>
+								<td>1</td>
+								<td>14.95 €</td>
+							</tr>
+							<tr>
+								<td><a href="#">Mark Kyrnin</a></td>
+								<td>2</td>
+								<td>34.27 €</td>
+							</tr>
+							<tr>
+								<td><a href="#">Virgílio Cezar</a></td>
+								<td>2</td>
+								<td>61.39 €</td>
+							</tr>
+							<tr>
+								<td><a href="#">Todd Simonides</a></td>
+								<td>5</td>
+								<td>1472.56 €</td>
+							</tr>
+							<tr>
+								<td><a href="#">Carol Elihu</a></td>
+								<td>1</td>
+								<td>9.95 €</td>
+							</tr>
+						</tbody>
+					</table>            
+				  </div>
+				  <div id="infobox" class="margin-left">
+					<h3>Bestsellers</h3> 
+					<table>
+						<thead>
+							<tr>
+								<th>Product Name</th>
+								<th>Price</th>
+								<th>Orders</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><a href="#">Apple iPhone 3G 8GB</a></td>
+								<td>199.00 €</td>
+								<td>24</td>
+							</tr>
+							<tr>
+								<td><a href="#">Fuji FinePix S5800</a></td>
+								<td>365.24 €</td>
+								<td>19</td>
+							</tr>
+							<tr>
+								<td><a href="#">Canon PIXMA MP140</a></td>
+								<td>59.50 €</td>
+								<td>12</td>
+							</tr>
+							<tr>
+								<td><a href="#">Apple iPhone 3G 16GB</a></td>
+								<td>199.00 €</td>
+								<td>10</td>
+							</tr>
+							<tr>
+								<td><a href="#">Prenosnik HP 530 1,6GHz</a></td>
+								<td>499.00 €</td>
+								<td>6</td>
+							</tr>
+						</tbody>
+					</table>
+				  </div>
+				  <div id="infobox">
+					<h3>New Customers</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>Customer</th>
+								<th>Orders</th>
+								<th>Average</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><a href="#">Jennifer Kyrnin</a></td>
+								<td>1</td>
+								<td>5.6€</td>
+								<td>14.95 €</td>
+							</tr>
+							<tr>
+								<td><a href="#">Mark Kyrnin</a></td>
+								<td>2</td>
+								<td>14.97€</td>
+								<td>34.27 €</td>
+							</tr>
+							<tr>
+								<td><a href="#">Virgílio Cezar</a></td>
+								<td>2</td>
+								<td>15.31€</td>
+								<td>61.39 €</td>
+							</tr>
+							<tr>
+								<td><a href="#">Todd Simonides</a></td>
+								<td>5</td>
+								<td>502.61€</td>
+								<td>1472.56 €</td>
+							</tr>
+							<tr>
+								<td><a href="#">Carol Elihu</a></td>
+								<td>1</td>
+								<td>5.1€</td>
+								<td>9.95 €</td>
+							</tr>
+						</tbody>
+					</table>                 
+				  </div>
+				  <div id="infobox" class="margin-left">
+					<h3>Last 5 Reviews</h3> 
+					<table>
+						<thead>
+							<tr>
+								<th>Reviewer</th>
+								<th>Product</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><a href="#">Jennifer Kyrnin</a></td>
+								<td><a href="#">Apple iPhone 3G 8GB</a></td>
+								<td><a href="#"><img src="img/icons/page_white_link.png" /></a><a href="#"><img src="img/icons/page_white_edit.png" /></a><a href="#"><img src="img/icons/page_white_delete.png" /></a></td>
+							</tr>
+							<tr>
+								<td><a href="#">Mark Kyrnin</a></td>
+								<td><a href="#">Prenosnik HP 530 1,6GHz</a></td>
+								<td><a href="#"><img src="img/icons/page_white_link.png" /></a><a href="#"><img src="img/icons/page_white_edit.png" /></a><a href="#"><img src="img/icons/page_white_delete.png" /></a></td>
+							</tr>
+							<tr>
+								<td><a href="#">Virgílio Cezar</a></td>
+								<td><a href="#">Fuji FinePix S5800</a></td>
+								<td><a href="#"><img src="img/icons/page_white_link.png" /></a><a href="#"><img src="img/icons/page_white_edit.png" /></a><a href="#"><img src="img/icons/page_white_delete.png" /></a></td>
+							</tr>
+							<tr>
+								<td><a href="#">Todd Simonides</a></td>
+								<td><a href="#">Canon PIXMA MP140</a></td>
+								<td><a href="#"><img src="img/icons/page_white_link.png" /></a><a href="#"><img src="img/icons/page_white_edit.png" /></a><a href="#"><img src="img/icons/page_white_delete.png" /></a></td>
+							</tr>
+							<tr>
+								<td><a href="#">Carol Elihu</a></td>
+								<td><a href="#">Prenosnik HP 530 1,6GHz</a></td>
+								<td><a href="#"><img src="img/icons/page_white_link.png" /></a><a href="#"><img src="img/icons/page_white_edit.png" /></a><a href="#"><img src="img/icons/page_white_delete.png" /></a></td>
+							</tr>
+						</tbody>
+					</table>
+				  </div>
+				</div>-->
+            </div>
+            {include file="column_left.html"}
+      </div>
+	  {include file="over_footer.html"}
+</div>
+</body>
+</html>

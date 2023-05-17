@@ -1,0 +1,94 @@
+{extends file='layout/new.html'}
+
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+
+<h3><a href="index.php?m=adv&a=index"><font size="3">廣告數據查詢</font></a></h3>
+
+<div id="content">
+<form name="form1" action="" method="post" class="searchbox" style="margin:0;">
+	<input type="hidden" name="m" value="ac" />
+	<input type="hidden" name="a" value="advTotal" />
+    <input type="hidden" name="page" value="{$page}" id="page" />
+	<p>
+	<b style="margin:2px 10px;">素材：</b>
+	<select name="material" id="material" style="width:180px;font-size:12px;" onchange="upselect('material')">
+		<option value="">全部素材</option>
+	{foreach $material as $materials}
+		<option value="{$materials.id}" {if $search.material eq $materials.id}selected="selected"{/if}>[{$materials.game}] — {$materials.material}_{$materials.start|date_format:'%m%d'}~{$materials.end|date_format:'%m%d'}</option>
+	{/foreach}
+	</select>
+	</p>
+    <br /> 
+    <p>
+		<b style="margin:2px 10px;">起始時間：</b>
+		<input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})" style="width:120px;"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )" style="width:120px">&nbsp;&nbsp;<input id="sub" type="submit" value="查詢" class="su" style="width:80px;height:30px;"/>
+	</p>
+</form>
+<div class="clear"></div>
+</div>
+
+<table border="0" cellpadding="0" cellspacing="0" class="list" width="100%">
+<thead>
+	     <tr>
+    <td  rowspan="2">日  期</td>
+    <td  rowspan="2">點擊數</td>
+    <td  rowspan="2">安裝數</td>
+    <td colspan="3">新增註冊數</td>
+    <td colspan="3">登入用戶</td>
+    <td  rowspan="2">創角數</td>
+    <td  colspan="3">消費</td>
+  </tr>
+  <tr>
+    <td >總註冊數</td>
+    <td >7725</td>
+    <td >外部賬號</td>
+    <td >總用戶</td>
+    <td >7725</td>
+    <td >外部賬號</td>
+    <td >不重複</td>
+    <td >單數</td>
+    <td >總金額</td>
+    </tr> 
+	</thead>
+	<tbody>
+	{foreach $list as $data}
+	<tr align="center" id='{$data.id}'>
+		<td>{$data.day}</td>	
+		<td>{$data.hits}</td>
+		<td>{$data.installations}</td>	
+		<td>{$data.registration}</td>	
+		<td>{$data.reg}</td>		
+		<td>{$data.oreg}</td>
+		<td>{$data.tlogin + $data.ologin}</td>
+		<td>{$data.tlogin}</td>
+        <td>{$data.ologin}</td>
+		<td>{$data.createRole}</td>
+        <td>{$data.bcf}</td>
+		<td>{$data.ds}</td>
+        <td>{$data.totalmoney}</td>
+        
+	</tr>
+    {foreachelse}
+		<tr>
+			<td colspan="12">无相关记录</td>
+		</tr>
+    {/foreach}
+    </tbody>
+</table>
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+function gotoNext(page,pagesize){
+    $('#page').val(page);
+    $('.searchbox').submit();
+}
+window.onload = function(){
+    var pageStr = new Page('{$page}', '{$total}', 5, '{$offset}','gotoNext').GetText();
+    document.getElementById('pager').innerHTML = pageStr;
+}
+</script>
+{/block}

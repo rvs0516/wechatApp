@@ -1,0 +1,71 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<link type="text/css" rel="stylesheet" href="/static/jquery-ui-1.8.21.custom.css"/>
+<h3><span><a href="#" class="filter"></a></span>遊戲日誌數據導入數據庫</h3>
+<!-- 根據遊戲類型進行檢索，檢索表單 -->
+<form  method="post" name="search" action="?m=report&a=mgameapilog&do=search" class="searchbox">
+	<p>	   
+  <table width="740" border="0">
+		  <tr>
+			<td><p>
+				<span>遊戲:</span>
+				<select style="margin-left:-5px;" id="gameselect" name="game">
+					<option value="0">请选择</option>
+					{foreach from=$games key=k item=v}
+					<option value="{$v.alias}" {if ($fgame==$v.alias)}selected="selected"{/if}>{$v.ename}</option>
+					{/foreach}
+				</select></p>			
+			</td>
+			
+		  </tr>
+		  <tr>
+			
+			<td><p><span>時間:</span><input type="text"  class="date" id="starttime" name="starttime"  value="{$data.starttime}{$btime}{$today}" onclick="var endtime=$dp.$('endtime');WdatePicker({literal}{onpicked:function(){endtime.focus();},minDate:'#F{($dp.$D(\'endtime\',{y:-1,d:0}))}',maxDate:'#F{$dp.$D(\'endtime\')}'}{/literal})"/>
+			至
+			<input type="text"  class="date" id="endtime" name="endtime"  style="width:76px" value="{$data.endtime}{$etime}{$weeklater}" onclick="WdatePicker({literal}{minDate:'#F{($dp.$D(\'starttime\',{d:0,H:0}))}',maxDate:'#F{($dp.$D(\'starttime\',{y:0,d:7}))}'}{/literal} )"/></td>
+		  </tr>
+		  
+		  <tr>		
+			<td align="right">
+				<table width="10%" align="right" border="0">
+				  <tr>
+				    <td width="23%"></td>					
+					<td><input type="submit" class="su" value="导入" /></td>
+				  </tr>
+				</table>
+			</td>
+		  </tr>
+		</table>
+	</p>
+</form>
+
+<table class="list">
+	
+	<thead>
+		<tr>
+			<th>編號</th><th>遊戲日誌</th><th>遊戲名</th><th>狀態</th>
+		</tr>
+	</thead>
+	
+	<tbody>
+	{foreach $files as $item}
+		<tr>
+			<td>{$item.gid}</td>
+			<td>{$item.filename}</td>
+			<td>{$item.game}</td>
+			<td>√</td>
+		</tr>	
+	{/foreach}
+
+    		</tbody>
+</table>
+
+
+<script src="/js/jquery-ui-1.8.21.custom.min.js"></script>
+<script src="/js/jquery.ui.datepicker-zh-CN.js"></script>
+<script src="js/DatePicker/WdatePicker.js"></script>
+<script src="/js/pop.js"></script>
+
+{/block}
+

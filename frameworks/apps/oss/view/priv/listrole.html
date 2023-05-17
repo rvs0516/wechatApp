@@ -1,0 +1,99 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<div id="popbg"></div>
+<div class="pop" style="display:none">
+    <p class="popclose"><a href="#"></a></p>
+    <p class="popcontent">
+    <div style="padding:5px;"> <span style="font-size:12px;width:80px;">用戶组名称:</span> <span>
+            <input type="text" id="name" />
+        </span> </div>
+    <div style="padding:5px;"> <span style="font-size:12px;width:80px; display:block;float:left">是否可見:</span> <span style="font-size:12px;width:80px; display:block;float:left">
+            <select id="display">
+                <option value="1">是</option>
+                <option value="0">否</option>
+            </select>
+        </span> </div>
+    <div style="text-align:center;clear:both;padding:5px;">
+        <input type="button" value="提交" id="btn1" />
+    </div>
+</p>
+</div>
+<h3><span><a href="index.php?m=priv&a=addrole&op=add">添加角色</a></span>角色列表</h3>
+    <form class="searchbox" action="/index.php?m=priv&a=listrole" method="post">
+        <p>
+            <span>角色组：</span>
+            <select name="gid">
+                <option value="">请选择</option>
+                {foreach from=$grouplist item=name key=key1}
+                    <option value="{$name.id}" {if $gid eq $name.id}selected="selected"{/if}>{$name.name}</option>
+                {/foreach}
+            </select>
+            <span>角色名：</span>
+            <input type="text" placeholder="请输入角色名" name="ruid" value="{$ruid}"/>
+            <span>创建者：</span>
+            <input type="text" placeholder="请输入创建者" name="author" value="{$author}"/>
+            <span>创建时间：</span>
+        <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})" style="width: 128px;"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )" style="width: 128px;">
+        </p>
+        <table style="clear:both;margin-top:10px; float:right;width:100%;">
+            <tr>
+                <td align="left"><button type="submit" class="su inline" style=" margin-left: 30px;">查询</button>
+            </tr>
+        </table>
+    </form>
+<table class="list">
+	<thead>
+        <th>角色名</th>
+        <th>角色组</th>
+        <th>创建者</th>
+        <th>创建时间</th>
+        <th>最后登录时间</th>
+        <th>最后登录IP</th>
+        <th>操作</th>
+    </thead>
+    {foreach from=$rolelist key=k item=v}
+    <tr>
+        <td>{$v.uid}</td>
+        <td>{$v.name}</td>
+        <td>{$v.author}</td>
+        <td>{$v.addtime}</td>
+        <td>{$v.lastlogintime}</td>
+        <td>{$v.lastloginip}</td>
+        <td><a style="cursor:pointer" href="index.php?m=priv&a=delrole&uid={$v.uid}" class="delete">刪除</a>&nbsp;<a href="index.php?m=priv&a=addrole&uid={$v.uid}&menuid={$menuid}&op=edit">修改</a></td>
+    </tr>
+    {/foreach}
+</table>
+</td>
+</tr>
+</table>
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+    function gotoNext(page,pagesize){
+        window.location.href="index.php?m=priv&a=listrole&page="+page+'&gid='+$('[name="gid"]').val();
+    }
+    $(function(){
+		$(".delete").click(function(){
+				return confirm("確定刪除？");
+			})
+        var pageStr = new Page('{$page}', '{$rowcount}',5,'{$offset}','gotoNext').GetText();
+        $('#pager').html('');
+        $('#pager').html(pageStr);
+        $('#btn1').click(function(){
+            var name=$('#name').val();
+            var display=$('#display').val();
+            $.post('index.php?m=ajax&a=addaroup','name='+encodeURIComponent(name)+'&display='+display,function(data){
+                var o=eval('('+data+')');
+                if(o.status){
+                    alert('操作成功！');
+                    location.href="index.php?m=priv&a=listgroup";
+                } else {
+                    alert(o.msg);
+                }
+            });
+        });
+    });
+</script> 
+{/block} 

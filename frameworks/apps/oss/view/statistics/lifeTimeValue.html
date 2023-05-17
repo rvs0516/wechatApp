@@ -1,0 +1,247 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+{if $gid neq 8}
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+{/if}
+{if $gid !== 10}
+<h3>玩家LTV</h3>
+<p align="right" style="color:red; margin-right:30px; margin-top:10px;">
+	快速导出&nbsp;
+	<a href="javascript:void(0);" class="quick_query" data-time="today">今日</a>
+	<a href="javascript:void(0);" class="quick_query" data-time="last_week">上周</a>
+	<a href="javascript:void(0);" class="quick_query" data-time="current_week">本周</a>
+	<a href="javascript:void(0);" class="quick_query" data-time="last_month">上月</a>
+	<a href="javascript:void(0);" class="quick_query" data-time="current_month">本月</a>
+</p>
+<div class="clear"></div>
+<form class="searchbox" action="/index.php?m=statistics&a=lifeTimeValue" method="post">
+    <input type="hidden" name="page" value="1" id="page" />
+    <input type="hidden" name="operation" value="" id="operation" />
+    <p>
+        {if  $gid eq 2 || $gid eq 11 || $gid eq 13 || $gid eq 15 || $gid eq 17 || $gid eq 22}
+            <input type="hidden" id="gameStr" value="{$gameStr}" />
+            <input type="hidden" id="gid" value="{$gid}" />
+        {/if}
+
+        {if $gid eq 13}
+            <input type="hidden" value="{$uid}" name="uid" id="uid">
+        {/if}
+		<span style="width: 80px;">来自游戏：</span>
+		{if $gid neq 8}
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="game" id="game" style="width: 98px;">
+        {else}
+            <input type="hidden" value="{$uid}" name="uid" id="uid">
+            <select name="game" id="game">
+        {/if}
+			<option value="">请选择</option>
+        	{foreach from=$games item=name key=key1}
+			<option value="{$key1}" {if $game eq $key1}selected="selected"{/if}> {$key1|capitalize|truncate:1:"":true} — {$name}</option>
+       		{/foreach}
+		</select>
+        <span>渠道： </span>
+        <select name="channel" id="channel">
+        <option value="">请选择</option>
+            {foreach from=$channels item=name key=key1}
+            <option value="{$key1}" {if $channel eq $key1}selected="selected"{/if}>{$name}</option>
+            {/foreach}
+        </select>
+        <span>包号：</span>
+        <select name="apkNum" id="apkNum">
+            <option value="">请选择</option>
+            {foreach from=$committe_apknum key=key2 item=apk}
+                <option value="{$apk}" {if ($apkNum == $apk)}selected="selected"{/if}>{$apk}</option>
+            {/foreach}
+        </select>
+    </p>
+    <P>
+		<span style="width: 80px;">起始时间：</span>
+		<input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+    </p>
+    <P>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" class="su" value="list" id="list">查询</button>
+		<button type="submit" class="su" value="report" id="report">导出</button>
+	</p>
+    <!--<p style="margin-left: 10px; color: red;">*&nbsp;&nbsp;目前只支持第三级游戏名查询</p>-->
+</form>
+{else if}
+<div style="font-size: 20px; color:red; margin:5% 0 0 30%;">无权限查看相关数据</div>
+{/if}
+{if $operation == 'list'}
+<div class="auto-layout-table">
+    <table class="list" style="width: 90%;">
+        <tr style="background-color:#CCCCCC;">
+            <th>日期</th>
+            <th>新增用户数</th>
+            <th>一日LTV</th>
+            <th>二日LTV</th>
+            <th>三日LTV</th>
+            <th>四日LTV</th>
+            <th>五日LTV</th>
+            <th>六日LTV</th>
+            <th>七日LTV</th>
+            <th>双周LTV</th>
+            <th>月LTV</th>
+            <th>双月LTV</th>
+            <th>三月LTV</th>
+        </tr>
+        {foreach from=$data item=row key=key1}
+        <tr {if ($key1+1)%5 eq 0}style="background-color:#ecffe5;"{/if}>
+            <td>{$row.date}</td>
+            <td>{$row.total}</td>
+            <td>{$row.admix_0}</td>
+            <td>{$row.admix_1}</td>
+            <td>{$row.admix_2}</td>
+            <td>{$row.admix_3}</td>
+            <td>{$row.admix_4}</td>
+            <td>{$row.admix_5}</td>
+            <td>{$row.admix_6}</td>
+            <td>{$row.admix_13}</td>
+            <td>{$row.admix_29}</td>
+            <td>{$row.admix_59}</td>
+            <td>{$row.admix_89}</td>
+        </tr>
+        {/foreach}
+        {if $total_data}
+        <tr style="background-color:#CCCCCC;">
+            <td>数据汇总</td>
+            <td>{$sumRegTotal}</td>
+            {foreach from=$total_data key=key1 item=row}
+            <td>
+                {if $row}{($row/$sumRegTotal)|string_format:"%.2f"}{/if}
+            </td>
+            {/foreach}
+           <!-- {if $page < 2}
+            {if $count_data <= 7}
+            {for $foo=$count_data to 9}
+            <td>&nbsp;</td>
+            {/for}
+            {elseif $count_data <= 14}            
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            {elseif $count_data <= 30}  
+            <td>&nbsp;</td>
+            <td>&nbsp;</td> 
+            {elseif $count_data <= 60}  
+            <td>&nbsp;</td>
+            {else}
+            {/if}
+            {/if}-->
+        </tr>
+        {/if}
+    </table>
+</div>
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+$("#list").click(function() {
+	$("#operation").val("list");
+	$('.searchbox').submit();
+});
+$("#report").click(function() {
+	$("#operation").val("report");
+	$('.searchbox').submit();
+});
+
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+function gotoNext(page,pagesize){
+	$('#page').val(page);
+	$("#list").click();
+}
+window.onload = function(){
+	var pageStr = new Page('{$page}', '{$total}', 5, '{$limit}','gotoNext').GetText();
+	document.getElementById('pager').innerHTML = pageStr;
+}
+</script>
+{/if}
+<script>
+$(function() {
+    $('.quick_query').click(function() {
+        var date = getDate( $(this).attr('data-time') );
+        $('#start_date').val( date.start );
+        $('#end_date').val( date.end );
+        $("#list").click();
+        return false;
+    });
+});
+</script>
+{if $gid eq 8 || $gid eq 13}
+<script>
+$(function() {
+    get_servers();
+    $("#game").change(function(){
+        get_servers();
+        return false;
+    });
+    get_apkNum();
+    $("#channel").change(function(){
+        get_apkNum();
+        return false;
+    });
+
+    function get_servers() {
+        var game = $('#game').val();
+        var channel = $('#channel').val();
+        var uid = $('#uid').val();
+        if(game == ''){
+            $("#channel option[text!='']").remove();
+            $("#channel").append('<option value="">请选择</option>').change();
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/?m=sdkChannel&a=getGameChannels",
+            data: "game="+game+"&channelId="+channel+"&uid="+uid,
+            dataType: 'text',
+
+            success: function(result){
+                $("#channel option[text!='0']").remove();
+                $("#channel").append(result);
+            }
+        });
+        return false;
+    }
+    function get_apkNum() {
+        var game = $('#game').val();
+        var channel = $('#channel').val();
+        var apkNum = $('#apkNum').val();
+        if(channel == ''){
+            $("#apkNum option[text!='']").remove();
+            $("#apkNum").append('<option value="">请选择</option>').change();
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/?m=statistics&a=getApkNum",
+            data: "game="+game+"&channelId="+channel+"&apkNum="+apkNum,
+            dataType: 'text',
+
+            success: function(result){
+                $("#apkNum option[text!='0']").remove();
+                $("#apkNum").append(result);
+            }
+        });
+        return false;
+    }
+});
+</script>
+{/if}
+{/block}

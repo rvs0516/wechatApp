@@ -1,0 +1,63 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<div id="popbg"></div>
+<div class="pop searchbox" style="display:none">
+  <h3><span><a href="#" class="popclose">關閉</a></span>添加组</h3>
+  <p><span>角色组名称:</span><input type="text" id="name" /></p>
+  <p class="inline" style="padding-top:3px;"><input type="button" value="提交" id="btn1" class="su"/></p>
+</div>
+<h3><span><a href="index.php?m=priv&a=listgroup">返回角色组列表</a></span>修改角色组</h3>
+<form action="index.php?m=priv&a=addgroup" method="post" class="searchbox">
+<p>&nbsp;&nbsp;&nbsp;用戶组:
+    <select id="gid"   name="form[name]">
+    <option value="0">请选择用戶组:</option>
+    {foreach from=$grouplist key=k2 item=v2}
+    <option  {if $v2.iscurrent}selected="selected"{/if}  value="{$v2.name}">{$v2.name}</option>
+    {/foreach}
+    </select>
+    &nbsp;
+    <input type="button" value="增加组" class="showbox su" />
+    </p>
+    {foreach from=$modulelist key=k item=v}
+    <h3>{$v.name}</h3><p style="margin-left:5px;">
+    {foreach from=$v.list key=k1 item=v1 name=name}
+    	<span style="min-width:160px; text-align:left; margin:3px 15px 0px 0px;"><input type="checkbox" name="form[aid][]" {if $v1.hasperm}checked="checked"{/if} value="{$v1.id}"/>{$v1.aname}</span>
+    {/foreach}
+    </p>
+    {/foreach}
+    <p>&nbsp;&nbsp;是否显示：<select type="text" name="form[display]">
+	    <option value="1" {if $grouprow.display eq 1}selected="selected"{/if}>是</option>
+	    <option value="0" {if $grouprow.display eq 0}selected="selected"{/if}>否</option>
+    </select></p>
+    <p><button type="submit" name="do" class="su" style="margin-left:68px;">立即提交</button></p>
+</form>
+<script src="/js/pop.js"></script>
+<script>
+$(function(){
+$('#search').click(function(){
+	var uid = $('#uid').val();
+	location.href="index.php?m=priv&a=addrole&uid="+uid;
+
+});
+$('#gid').change(function(){
+	var gname = $("#gid option:selected").text();
+	location.href="index.php?m=priv&a=addgroup&name="+encodeURIComponent(gname);
+
+});
+	$('#btn1').click(function(){
+		var name=$('#name').val();
+		
+		$.post('index.php?m=ajax&a=addgroup','name='+encodeURIComponent(name),function(data){
+			var o=eval('('+data+')');
+			if(o.status){
+				alert('操作成功！');
+				location.href="index.php?m=priv&a=addgroup&name="+encodeURIComponent(name);
+			} else {
+				alert(o.msg);
+			}
+			});
+		});
+});
+</script>
+{/block}

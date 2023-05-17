@@ -1,0 +1,142 @@
+{extends file='layout/new.html'}
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+	<style>
+		.list td{ padding:10px 0;}
+		.show{ display:block; color:#3d203f; text-decoration:none; width:110px; position:relative; left:0; top:0; z-index:10; float:left;}
+		.show p{ display:none;}
+		.show:hover{ display:block; text-decoration:none; height:100%; position:relative; z-index:1000 !important;}
+		.show:hover p{ display:block; color:#3d203f; background:#cff0fc; position:absolute; left:-10px; top:-10px; white-space:normal; width:700px;; padding:10px; box-shadow:1px 1px 10px #333; cursor:pointer;}
+	</style>
+<!--START 列表頁-->
+{if $operation == 'index'}
+	<h3>
+		<span><a href="/index.php?m=sdkGame&a=isolate&operation=add">新增隔离项</a></span>
+		渠道隔离
+	</h3>
+	<form class="searchbox" action="/index.php?m=sdkGame&a=isolate" method="post">
+        <p>
+        <span>来自游戏：</span>
+        <select name="upperName" id="upperName" style="width: 98px;">
+            <option value="">请选择</option>
+            {foreach from=$UpperList item=name key=key1}
+                <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+            {/foreach}
+        </select>
+        <select name="specialName" id="specialName" style="width: 98px;">
+            <option value="">请选择</option>
+            {foreach from=$specialList item=name key=key1}
+                <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+            {/foreach}
+        </select>
+        <select name="game" id="game" style="width: 98px;"><option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+                <option value="{$key1}" {if $gameAlias eq $key1}selected="selected"{/if}> {$key1|capitalize|truncate:1:"":true} — {$name}</option>
+            {/foreach}
+        </select>
+		<span>状态：</span>
+		<select name="status">
+            <option value="">请选择</option>
+            <option value="1" {if $status == 1}selected="selected"{/if}>开启</option>
+            <option value="2" {if $status == 2}selected="selected"{/if}>结束</option>
+        </select>
+        <button type="submit" class="su inline">查询</button>
+	</p>
+	</form>
+	<table class="list">
+		<tr style="background-color:#CCCCCC;">
+			<th>项目游戏名</th>
+			<th>专服游戏名</th>
+			<th>游戏名称</th>
+			<th>不限制的渠道</th>
+			<th>操作</th>
+		</tr>
+		{foreach from=$isList item=game}
+		<tr>
+			<td>{$game.upperName}</td>
+			<td>{if $game.specialName}{$game.specialName}{else}-{/if}</td>
+			<td>{if $game.gameName}{$game.gameName}{else}-{/if}</td>
+			<td>{$game.barringChannelName}</td>
+			<td style="width:160px"><a href="/index.php?m=sdkGame&a=isolate&operation=edit&id={$game.id}">{if $game.status eq 1}<font color="green">关闭</font>{else}<font color="red">开启</font>{/if}</a> | <a href="/index.php?m=sdkGame&a=isolate&operation=del&id={$game.id}" class="delete_confirm">刪除</a></td>
+		</tr>
+		    {foreachelse}
+		<tr>
+		    <td colspan="21">无相关数据</td>
+		</tr>
+		{/foreach}
+	</table>
+	<div id="pager"></div>
+
+<script src="js/pager.js"></script>
+<script>
+$('.delete_confirm').click(function() {
+	return confirm('數據不可恢復，你確定要刪除嗎？');
+});
+
+function gotoNext(page,pagesize){
+	window.location.href = "/index.php?m=sdkGame&a=isolate&page=" + page+ "&start_date={$start_date}&end_date={$end_date}&upperName={$upperName}&specialName={$specialName}&game={$gameAlias}&channel={$channel}&apkNum={$apkNum}&module={$module}&type={$type}";
+}
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+
+
+{elseif $operation == 'add' || $operation == 'edit'}
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+
+	<h3>
+		<span><a href="/index.php?m=sdkGame&a=isolate">返回列表</a></span>
+		新增隔离项
+	</h3>
+	<form action="/index.php?m=sdkGame&a=isolate&operation=save" method="post" class="searchbox" enctype="multipart/form-data">
+		<input type="hidden" name="id" value="{$gameList.id}" />
+
+		<p>
+			<span>项目游戏名：</span>
+            <select name="upperName" id="upperName">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $gameList.upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+		</p>
+		<p>
+			<span>专服游戏名：</span>
+            <select name="specialName" id="specialName">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $gameList.specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+        </p>
+        <p>
+			<span>游戏：</span>
+            <select name="game" id="game">
+	            <option value="">请选择</option>
+	            {foreach from=$games item=name key=key1}
+	                <option value="{$key1}" {if $gameList.gameAlias eq $key1}selected="selected"{/if}>{$name}</option>
+	            {/foreach}
+	        </select>
+		</p>
+		<p>
+			<span>不限制的渠道：</span>
+			{foreach from=$channels item=name key=key1}
+			<label><input type="checkbox" name="channels[]" value="{$key1}" {if in_array($key1, $openChannel)}checked="checked"{/if}/>{$name}</label>
+			{/foreach}
+		</p>
+		<p>
+			<span>是否开启：</span>
+			<select name="status">
+				<option value="1">开</option>
+				<option value="0">关</option>
+	        </select>
+		</p>
+		<p class="line">
+			<button type="submit" name="do" class="su">立即提交</button>
+			<button type="reset" class="re">条件重置</button>
+		</p>
+	</form>
+
+{/if}
+
+{/block}

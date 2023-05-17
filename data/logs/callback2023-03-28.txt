@@ -1,0 +1,8 @@
+
+[2023-03-28 12:14:47]
+test.wechat.app.2y9y.com/api/callback?msg_signature=7e782f55ecaba78d2ee8bfaea7153b2d1603cc6c&timestamp=1679976885&nonce=1680746765
+{"m":"index","a":"callback","msg_signature":"7e782f55ecaba78d2ee8bfaea7153b2d1603cc6c","timestamp":"1679976885","nonce":"1680746765"}
+<xml><ToUserName><![CDATA[wwe6ce267036e47037]]></ToUserName><Encrypt><![CDATA[04aC1utKKv8XNXgTfPdrdM9n87QAKJiOQz8ki1K8sAo22CGu2+zqFFFJ3heVrK3XRFbE+hIWWtNsuGx4Y0wrYGNrN2eZ/Hno2wg81IU8N3hCQeTO+7AArZ0jISqrvk2a515VssOhCjug25HncsLO6ePAiVShv1odc6Yyp+G0pTSZCL9tyPLETp6SEUMSmB2Dhjwz98wqTQ22yodjgj48I1pUfNX5a+v3yGYiBJ4uQ/DUNUMSbcmvdisHmzxkX6MTInQm4QVGNhryAtClxv17ES3Wymjwdz7l9B5UhcsWdmr83LWDFZrrcM5QdU3O3JDrC++rYBkVThTMXVnihmR59MaK0hrdYUFyxhqO9bhSTRNUXTDOS5bAdfsWLdBSYn6YEAH0x81nJBzSACsSiP/SNLr7V4/T+6mJSwVwlu+dlLo=]]></Encrypt><AgentID><![CDATA[1000004]]></AgentID></xml>
+结果代码：0
+结果：{"ToUserName":"wwe6ce267036e47037","FromUserName":"cr7","CreateTime":"1679976885","MsgType":"event","AgentID":"1000004","Event":"enter_agent","EventKey":[]}
+

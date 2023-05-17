@@ -1,0 +1,371 @@
+{extends file='layout/new.html'}
+{block name=body}
+<style>
+[data-tooltip] { position: relative; z-index: 2; cursor: help;}
+[data-tooltip]:before,
+[data-tooltip]:after { visibility: hidden; opacity: 0; pointer-events: none; display: inline-table; white-space: pre-line;}
+[data-tooltip]:before { content: attr(data-tooltip); position: absolute; width: 500px; padding: 10px; border-radius: 3px; background-color: black; background-color: rgba(51, 51, 51, 0.9); color: white; text-align: left; font-size: 12px; bottom: calc(100% + 4px); left: 50%; -webkit-transform: translate(-50%, -3px); transform: translate(-50%, -3px);}
+[data-tooltip]:after { position: absolute; bottom: calc(100% + 3px); left: 50%; margin-left: -5px; width: 0; border-top: 5px solid black; border-top: 5px solid rgba(51, 51, 51, 0.9); border-right: 5px solid transparent; border-left: 5px solid transparent; content: " "; font-size: 0; line-height: 0;}
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after { visibility: visible; opacity: 1;}
+</style>
+<!--START 列表頁-->
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+<script type="text/javascript" type="text/javascript" src="js/jquery.select.js"></script>
+
+	<h3>
+		<span><a href="/index.php?m=sdkChannel&a=listChannel">返回列表</a></span>
+		{if $operation == 'add'}
+			新增渠道
+		{else}
+			编辑渠道
+		{/if}
+	</h3>
+	<form action="/index.php?m=sdkChannel&a=saveChannel" method="post" class="searchbox" enctype="multipart/form-data">
+		{if $operation == 'edit'}
+		<input type="hidden" name="id" value="{$channel.id}" />
+        <input type="hidden" name="is_new" value="0" />
+        <input type="hidden" name="change" value="{$change}" />
+        {else}
+        <input type="hidden" name="is_new" value="1" />
+		{/if}
+		{if  $gid eq 2 || $gid eq 11 || $gid eq 13 || $gid eq 14 || $gid eq 15 || $gid eq 17}
+        <input type="hidden" id="gameStr" value="{$gameStr}" />
+        <input type="hidden" id="gid" value="{$gid}" />
+    	{/if}
+		{if $gid == 1 || ($operation == 'add' && $gid == 15) || $gid == 24}
+		<p>
+			<span>上级游戏名：</span>
+			<select name="upperName" id="upperName">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $channel.upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+        </p>
+        <p>
+			<span>专服游戏名：</span>
+            <select name="specialName" id="specialName">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $channel.specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+        </p>
+        <p>
+			<span>游戏：</span>
+            <select name="game" id="game">
+                <option value="0">请选择</option>
+				{foreach from=$game item=data}
+				<option value="{$data.alias}" {if $data.alias === $channel.gameAlias}selected="selected"{/if}>{$data.name}</option>
+				{/foreach}
+			</select>
+		</p>
+		<p>
+			<span>备注：</span>
+			<input type="text" name="remarks"  placeholder="字数控制在6个以内" value="{$channel.remarks}"/> 
+		</p>
+		<p>
+			<span>渠道：</span>
+			<select name="channel" id="channelList">
+                <option value="0">请选择</option>
+				{foreach from=$channels key=key item=data}
+				<option value="{$key}" {if ($key == $channel.channelId)}selected="selected"{/if}>{$data}</option>
+				{/foreach}
+			</select>
+		</p>
+		<p>
+			<span>包号：</span>
+			<!-- <select name="apkNum">
+				{foreach from=$committe_apknum key=key item=data}
+				<option value="{$data}" {if ($data == $channel.apkNum)}selected="selected"{/if}>{$data}</option>
+				{/foreach}
+			</select> -->
+			<input id="inputData" type="text" name="apkNum" value="{$channel.apkNum}"/>
+		</p>
+		<p>
+			<span>发行主体：</span>
+			<input id="mainPart" type="text" name="mainPart" value="{$channel.mainPart}"/>
+		</p>
+		<p>
+			<span>渠道包名：</span>
+			<input type="text" name="pkgName" value="{$channel.pkgName}"/>
+		</p>
+		<p>
+			<span>渠道appId：</span>
+			<input type="text" name="appid" value="{$channel.appId}" /> 
+			<a style="color: red;">&nbsp;&nbsp;注意应用宝appId填写用分隔符分隔，示例：QQ的appId|微信的appId</a>
+		</p>
+		<p>
+			<span>渠道appKey：</span>
+			<input type="text" name="appkey" value="{$channel.appKey}"/>
+			<a style="color: red;">&nbsp;&nbsp;注意应用宝appKey填写用分隔符分隔，示例：QQ的appKey|微信的appKey</a>
+		</p>
+		<p>
+			<span>拓展参数1：</span>
+			<input type="text" name="ext1" value="{$channel.ext1}"/> 
+			<a style="color: red;">&nbsp;&nbsp;注意: bilibili渠道填写merchant_id商户ID</a>
+		</p>
+		<p>
+			<span>拓展参数2：</span>
+			<input type="text" name="ext2" value="{$channel.ext2}"/> 
+			<a style="color: red;">&nbsp;&nbsp;注意应用宝填写格式为appid|广告主id|sign_key;新版广点通参数配置为：应用id|应用secret|账户id|user_action_set_id|new;bilibili渠道填写secret_key</a>
+		</p>
+		<p>
+			<span>广告商：</span>
+			<select name="adsChannel" style="width: 156px;">
+                <option value="">请选择</option>
+                {foreach from=$adsChannels key=key item=data}
+				<option value="{$key}" {if ($key == $channel.adsChannel)}selected="selected"{/if}>{$data}</option>
+				{/foreach}
+			</select>
+			</select>
+            <a style="color: red;">&nbsp;&nbsp;此处不选同时“拓展参数2”有填写参数默认为广点通</a>
+		</p>
+		<p>
+			<span>广告商参数：</span>
+			<input type="text" name="adsParam" value="{$channel.adsParam}" placeholder="state|clientId|clientSecret|srcId" style="width: 200px;"/> 
+			<a style="color: red;">&nbsp;&nbsp;注意填写格式为state|clientId|clientSecret|srcId, 表示账号ID|应用ID|应用密钥|数据源</a>
+		</p>
+		<p>
+			<span>日志：</span>
+			<input type="checkbox" name="checkBlog" id="checkBlog"  value="1" {if $channel['checkBlog'] == 1} checked="checked"{/if} /><font style="color: red;">&nbsp;&nbsp;勾选即启用日志</font>
+		</p>
+		<p>
+			<span>额外属性：</span>
+			<label><input type="checkbox" value="1" name="qyLg" id="qyLg" {if $channel.qyLg}checked="checked"{/if} />登入</label>
+			<label>
+				<input type="checkbox" value="1" name="qyPy" id="qyPy" {if $channel.qyPy}checked="checked"{/if} />支付
+				<input type="text" name="qypy_amount" id="qypy_amount" value="{$channel.qypyAmount}" placeholder="金额" style="width:82px; display:none;"/>
+			</label>
+		</p>
+		<p>
+			<span>排序：</span>
+			<input type="text" name="sort" value="{$channel.sort}"/>
+		</p>
+		<p>
+			<span>versionCode：</span>
+			<input type="text" name="versionCode" value="{$channel.versionCode}"/>
+			<a style="color: red;">&nbsp;&nbsp;若需强更包体，此处填写目标包体的versionCode</a>
+		</p>
+		<p>
+			<span>更新链接：</span>
+			<input type="text" name="updateUri" value="{$channel.updateUri}"/>
+			<a style="color: red;">&nbsp;&nbsp;若需强更包体，此处填写目标包体完整的下载链接，需要带http://</a>
+		</p>
+		{if $checkRoot eq 1}
+		<p>
+			<span>渠道分成：</span>
+			<input type="text" name="exProportion" value="{$channel.exProportion}"  {if $change eq 1}disabled="disabled"{/if}  id="exProportion"/>
+			<font color="#FF0000">&nbsp;*&nbsp;乾游渠道（金克丝包除外，因情况复杂需技术配合填写）、心玩、鲸天互娱、IOS渠道填写折扣</font>
+			<span data-tooltip="若渠道分成所得为20%，即填0.2
+			不填即使用后台对应的默认渠道比例
+			心玩填写折扣
+			耀玩游戏、大咖玩渠道分成应为1-cp分成，即cp分成为0.2，渠道分成则为0.8" style="text-align: center;"><img src="img/icons/qmark.png"></span>
+		</p>
+		<p>
+			<span>渠道通道费：</span>
+			<input type="text" name="channelAllowance" value="{$channel.channelAllowance}" id="channelAllowance"/>
+			<font color="#FF0000">&nbsp;*&nbsp;填写方式为‘通道费,GS渠道分成’；例如 0.05,0.4</font>
+			<span data-tooltip="若通道费为5%，即填0.05，5+7渠道有默认通道费，如不需要通道费填-1
+			若心玩、IOS、鲸天互娱、乾游GS渠道分成非默认值，填写方式为‘通道费,GS渠道分成’
+			示：GS渠道分成为40% --> 0.05,0.4" style="text-align: center;"><img src="img/icons/qmark.png"></span>
+		</p>
+		<p>
+			<span>结算方式：</span>
+			<label><input type="radio" name="settlement" value="0" {if $channel.settlement == '0'} checked="checked"{/if}  />原价结算</label>
+			<label><input type="radio" name="settlement" value="2" {if $channel.settlement == '2'} checked="checked"{/if}  />折后结算</label>
+			<font color="#FF0000">&nbsp;*&nbsp;仅限乾游渠道使用</font>
+		</p>
+		{/if}
+		<p>
+			<span>限制属性：</span>
+			<label><input type="checkbox" value="1" name="banRegs" id="banRegs" {if $channel.banRegs}checked="checked"{/if} />注册</label>
+			<label><input type="checkbox" value="1" name="banLogin" id="banLogin" {if $channel.banLogin}checked="checked"{/if} />登入</label>
+			<label><input type="checkbox" value="1" name="banPay" id="banPay" {if $channel.banPay}checked="checked"{/if} />支付</label>
+		</p>
+		<p>
+			<span>限制地区：</span>
+			<select id="province" runat="server" onchange="selectprovince(this);" style=" width:95px;"></select>
+			<select id="city" runat="server" style=" width:95px;"></select>
+			<a id='add'>添加</a>
+		</p>
+		<p>
+			<span></span>
+			<input type="text" name="banArea" id="banArea" value="{$banArea}"/><font style="color: red;">&nbsp;&nbsp;若只选省份，则该省份所有城市将被限制</font>
+		</p>
+		<p>
+			<span>角色升级记录：</span>
+			<input type="checkbox" name="upGradeMark" id="upGradeMark"  value="1" {if $channel['upGradeMark'] == 1} checked="checked"{/if} /><font style="color: red;">&nbsp;&nbsp;勾选即记录角色等级</font>
+		</p>
+		<p>
+			<span>是否测试：</span>
+			<input type="checkbox" name="isTest" id="isTest"  value="1" {if $channel['isTest'] == 1} checked="checked"{/if} /><font style="color: red;">&nbsp;&nbsp;勾选即允许渠道测试账号充值到账，订单记录为渠道虚拟支付，反之不到账且订单归为QA订单；目前支持测试渠道为Quick、九尊、风腾；</font>
+		</p>
+		<p>
+			<span>模拟器限制：</span>
+			<input type="checkbox" name="simulator" id="simulator"  value="1" {if ($simulator || $channel['simulator']) == 1} checked="checked"{/if} /><font style="color: red;">&nbsp;&nbsp;勾选即不允许在模拟器登录</font>
+		</p>
+		<p>
+			<span>游戏公钥：</span>
+			<textarea style="margin: 8px 0 -10px 0; width: 400px; height: 150px;" name="gamePubKey">{$gamePubKey}</textarea>
+		</p>
+		<p>
+			<span>支付公钥：</span>
+			<textarea style="margin: 8px 0 -10px 0; width: 400px; height: 150px;" name="payPubKey">{$payPubKey}</textarea>
+		</p>
+		<p id="channelText">
+			<span>游戏私钥：</span>
+			<textarea style="margin-top: 8px; width: 400px; height: 150px;"  name="gamePrivateKey">{$gamePrivateKey}</textarea>
+		</p>
+		{/if}
+		<p>
+			<span>清除测试数据：</span>
+			<input type="text" name="clearStart" value="{$clearStart}" onclick="WdatePicker({ maxDate: '9999-12-30', readOnly: true });"  />
+			<input type="text" name="clearEnd" value="{$clearEnd}" onclick="WdatePicker({ maxDate: '9999-12-30', readOnly: true });"  />
+			<font color="#FF0000">&nbsp;*清除该时间段内的付费相关数据（含所填写的时间），翌日凌晨执行此选项</font>
+		</p>
+		<p>
+			<span>加载页：</span>
+			<input type="text" name="loadInfoDate" value="{$loadInfoDate}" onclick="WdatePicker({ maxDate: '9999-12-30', readOnly: true });"  />
+			<select name="loadInfoType">
+                <option value="1" {if $loadInfoType == 1}selected="selected"{/if}>有资质信息</option>
+				<option value="2" {if $loadInfoType == 2}selected="selected"{/if}>无资质信息</option>
+			</select>
+			<font color="#FF0000">&nbsp;*当前时间超过选中时间即显示选中项，反之显示相反项，不填时间即一直显示选中项</font>
+		</p>
+		<p>
+			<span>双端互通：</span>
+			{if !$channel}
+			<select name="interflow">
+                <option value="0">不互通</option>
+				<option value="1" {if $channel.interflow == 1}disabled="disabled"{/if}>互通</option>
+			</select>
+			{else}
+			<input type="text" name="alias" value="{if $channel.interflow == 0 }不互通{elseif $channel.interflow == 1 }互通{/if}" disabled="disabled"/>
+			{/if}
+			<font color="#FF0000">&nbsp;*该选项确定后不能修改，一旦开启互通后转端、关联账号等有可能失效，请慎重选择</font>
+		</p>
+		<p>
+			<span>包名白名单：</span>
+			<textarea style="margin: 8px 0 -10px 0; width: 400px; height: 150px;" name="packageName">{$packageName}</textarea><font color="#FF0000">&nbsp;*留空即不对游戏包名限制，非空即只允许对应填写的包名的游戏登录,多个包名用|分开</font>
+		</p>
+		<p>
+			<span>协议开关：</span>
+			<input type="checkbox" name="initTips" id="initTips"  value="2" {if $initTips == 2} checked="checked"{/if} /><font style="color: red;">&nbsp;&nbsp;勾选即记开启</font>
+		</p>
+		<p>
+			<span>隐私政策id：</span>
+			<select name="privacy" style="width: 156px;">
+                <option value="">请选择</option>
+                {foreach from=$privacyArchives key=key item=data}
+				<option value="{$data.id}" {if ($data.id == $privacy)}selected="selected"{/if}>{$data.id}-{$data.title}</option>
+				{/foreach}
+			</select>
+		</p>
+		<p>
+			<span>用户协议id：</span>
+			<select name="agreement" style="width: 156px;">
+                <option value="">请选择</option>
+                {foreach from=$agreementArchives key=key item=data}
+				<option value="{$data.id}" {if ($data.id == $agreement)}selected="selected"{/if}>{$data.id}-{$data.title}</option>
+				{/foreach}
+			</select>
+		</p>
+		<p class="line">
+			<button type="submit" name="do" class="su" id="su">立即提交</button>
+			<button type="reset" class="re">條件重置</button>
+		</p>
+	</form>
+<!--END 列表頁-->
+
+<script language="javascript" type="text/javascript" src="/js/info.js"></script>
+<script>
+$('#su').click(function() {
+	var exProportion = $('#exProportion').val();
+	var channelAllowance = $('#channelAllowance').val();
+	if (exProportion == '' || channelAllowance == '') {
+		return confirm('渠道分成或通道费尚未填写，确定要保存？');
+	}
+	
+});
+$(function() {
+	qypy_amount();
+	$('#qyPy').click(function() {
+		qypy_amount();
+	});
+	function qypy_amount() {
+		if($('#qyPy').is(':checked')) {
+			$('#qypy_amount').show();
+		}else {
+			$('#qypy_amount').hide();
+		}
+	}
+	$(function(){
+		$("#channelList").change(function(){
+			var channel = $(this).val();
+			if((channel == '500001')){
+				$('#channelText').show();
+			}else{
+				$('#channelText').hide();
+			}
+		})
+	});
+
+    $("#add").click(function(){
+        get_servers();
+        return false;
+    });
+
+    function get_servers() {
+        var province = $('#province').val();
+		var city = $('#city').val();
+		var data = '';
+		var banArea = document.getElementById("banArea").value;
+		if(city == '全部'){
+			 data = province+',';
+		}else{
+			 data = city+',';
+		}
+		if(banArea != ''){
+			 data = banArea+','+data;
+		}
+		$("#banArea").attr("value",data.substring(0,data.length-1));
+        return false;
+    }
+
+	// 包号参数下拉框插件
+	var datas =[
+				{foreach from=$committe_apknum key=key item=data}
+					{ "id":"{$key}","text":"{$data}"}, 
+				{/foreach}
+				];
+	$.selectSuggest('inputData',datas);
+	
+	// 发行主体下拉框插件
+	var mainPartDatas =[
+					{ "id":"1", "text":"乾游" }, 
+					{ "id":"2", "text":"义耀" }, 
+					{ "id":"3", "text":"凡点" }, 
+					{ "id":"4", "text":"炎游" }, 
+					{ "id":"5", "text":"杰游" }, 
+					{ "id":"6", "text":"快冲游" }, 
+					{ "id":"7", "text":"点乐美" }, 
+					{ "id":"8", "text":"飞拓" }, 
+					{ "id":"9", "text":"双子" }, 
+					{ "id":"10", "text":"金克丝" }, 
+					{ "id":"11", "text":"风云万象" }, 
+					{ "id":"12", "text":"年喜" }, 
+					{ "id":"13", "text":"指乐" }, 
+					{ "id":"14", "text":"炫游" }, 
+					{ "id":"15", "text":"游雁" }, 
+					{ "id":"15", "text":"君道" }, 
+					{ "id":"15", "text":"天易" }, 
+				];
+	$.selectSuggest( 'mainPart', mainPartDatas );
+
+});
+</script>
+{/block}

@@ -1,0 +1,128 @@
+{extends file='layout/new.html'}
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<!--START 列表頁-->
+	<h3>
+		广告数据列表
+	</h3>
+        <form class="searchbox" action="index.php?m=ads&a=advertising" method="post">
+	    <input type="hidden" name="operation" value="" id="operation" />
+        <p>
+            <span>渠道：</span>
+			<select name="channel" id="channel">
+                <option value="0">请选择</option>
+                {if $gid eq 18}
+                <option value="{$adsChannel}" {if $channel eq $adsChannel} selected="selected" {/if}>{$channelName}</option>
+                {else}
+                <option value="000368" {if $channel eq '000368'} selected="selected" {/if}>VIVO</option>
+                <option value="000020" {if $channel eq '000020'} selected="selected" {/if}>OPPO</option>
+                <option value="500001" {if $channel eq '500001'} selected="selected" {/if}>华为</option>
+                <option value="160136" {if $channel eq '160136'} selected="selected" {/if}>应用宝</option>
+                {/if}
+			</select>
+            <span>账号：</span>
+            <select name="account" id="account">
+                <option value="">请选择</option>
+                {foreach from=$accountList item=name key=key1}
+                    <option value="{$name.account}" {if $account eq $name.account}selected="selected"{/if}>{$name.account}</option>
+                {/foreach}
+            </select>
+            <span>API版本：</span>
+            <select name="version">
+                <option value="2.0" {if $version eq '2.0'} selected="selected" {/if}>2.0</option>
+                <option value="3.0" {if $version eq '3.0'} selected="selected" {/if}>3.0</option>
+            </select>
+		</p>
+        <p>
+            <span>计划类型：</span>
+            <select name="mediaType">
+                <option value="">所有类型</option>
+                <option value="0" {if $mediaType eq '0'} selected="selected" {/if}>商店</option>
+                <option value="1" {if $mediaType eq '1'} selected="selected" {/if}>非商店</option>
+                <option value="2" {if $mediaType eq '2'} selected="selected" {/if}>联盟</option>
+            </select>
+            <span>计划ID：</span>
+			<input style="width: 186px;" type="text" value="{$campaignId}" name="campaignId"  placeholder="计划ID"/>
+            <span>包名：</span>
+			<input style="width: 184px;" type="text" value="{$appPackage}" name="appPackage"  placeholder="示例：com.game.test.vivo"/>
+        </p>
+		<p>
+            <span>广告名称：</span>
+			<input style="width: 186px;" type="text" value="{$advertisementName}" name="advertisementName"  placeholder="广告名称"/>
+            <span>创意ID：</span>
+			<input style="width: 184px;" type="text" value="{$creativeId}" name="creativeId"  placeholder="创意ID"/>
+            <span style="width:150px">广告ID/智能分包渠道号：</span>
+            <input style="width: 186px;" type="text" value="{$planId}" name="planId"  placeholder="广告id"/>
+		</p>
+        <p>
+            <span>统计粒度：</span>
+			<select name="formType">
+                <option value="1" {if $formType eq "1"}selected="selected"{/if}>小时</option>
+                <option value="2" {if $formType eq "2"}selected="selected"{/if}>天数</option>
+                <option value="3" {if $formType eq "3"}selected="selected"{/if}>汇总</option>
+			</select>
+			<span>起始时间：</span>
+        	<input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})" style="width: 115px;"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )" style="width: 115px;">
+        </p>
+		<p>
+			<input type="submit" class="su" value="查询" id="check" style="margin-left: 30px;" />
+            <input type="submit" class="su" value="导出" id="report">
+		</p>
+        </form>
+    {if $channel}
+        {include file="./advertising/{$channel}table.html"}
+        <div id="pager"></div>
+    {/if}
+
+<script src="js/pager.js"></script>
+<script>
+$("#check").click(function() {
+    $("#operation").val("");
+});
+$("#report").click(function() {
+    $("#operation").val("report");
+    $('.searchbox').submit();
+});
+function gotoNext(page,pagesize){
+	window.location.href = "/index.php?m=ads&a=advertising&page=" + page + "&channel={$channel}&account={$account}&formType={$formType}&start_date={$start_date}&end_date={$end_date}&planId={$planId}&version={$version}&campaignId={$campaignId}&advertisementName={$advertisementName}&creativeId={$creativeId}&appPackage={$appPackage}&mediaType={$mediaType}";
+}
+var pageStr = new Page('{$page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+<script>
+$(function() {
+    getChannelAccount();
+    $("#channel").change(function(){
+        getChannelAccount();
+        return false;
+    });
+
+
+    function getChannelAccount() {
+            var channel = $('#channel').val();
+            var account = $('#account').val();
+            if(channel == ''){
+                $("#account option[text!='']").remove();
+                $("#account").append('<option value="">请选择</option>').change();
+                return false;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/?m=ads&a=getChannelAccount",
+                data: "channel="+channel+"&account="+account,
+                dataType: 'text',
+
+                success: function(result){
+                    $("#account option[text!='0']").remove();
+                    $("#account").append(result);
+                }
+            });
+            return false;
+        }
+
+});
+</script> 
+<!--END 列表頁-->
+{/block}

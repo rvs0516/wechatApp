@@ -1,0 +1,273 @@
+{extends file='layout/new.html'}
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+{if $operation == 'index'}
+	<h3>
+		<span><a href="/index.php?m=sdkGame&a=specialList&operation=add">添加处理</a></span>
+		账号特殊处理
+	</h3>
+	<form class="searchbox" action="/index.php?m=sdkGame&a=specialList" method="post">
+    {if  $gid eq 2 || $gid eq 11 || $gid eq 13 || $gid eq 14 || $gid eq 15 || $gid eq 17}
+    <input type="hidden" id="gameStr" value="{$gameStr}" />
+    <input type="hidden" id="gid" value="{$gid}" />
+    {/if}
+	<input type="hidden" name="operation" value="" id="operation" />
+    <p>
+        <span>来自游戏：</span>
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="rgame" id="game" style="width: 98px;">
+            <option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+                <option value="{$key1}" {if $rgame eq $key1}selected="selected"{/if}>{$name}</option>
+            {/foreach}
+        </select>
+        <span>处理属性：</span>
+		<select  name="type">
+            <option value="">请选择</option>
+            <option value="allBan" {if $type eq 'allBan'}selected="selected"{/if}>全游戏封禁</option>
+            <option value="singleBan" {if $type eq 'singleBan'}selected="selected"{/if}>单游戏封禁</option>
+            <option value="whiteList" {if $type eq 'whiteList'}selected="selected"{/if}>单游戏白名单</option>
+        </select>
+        <span>用户账号：</span>
+		<input style="width: 180px;" type="text" value="{$userName}" name="userName" id="userName" placeholder="请输入账号">
+    </p>
+    <p>
+        <button type="submit" name="do" class="su">查询</button>
+    </p>
+	</form>
+	<table class="list">
+		<tr style="background-color:#CCCCCC;">
+			<th style="width: 10%">用户账号</th>
+			<th style="width: 10%">上级游戏</th>
+			<th style="width: 10%">游戏</th>
+			<th style="width: 10%">添加时间</th>
+			<th style="width: 10%">类型</th>
+			<th style="width: 10%">关联游戏</th>
+			<th style="width: 10%">操作用户来源</th>
+			<th style="width: 10%">操作</th>
+		</tr>
+		{foreach from=$sList item=game}
+		<tr>
+			<td>{$game.userName}</td>
+			<td>{if $game.upperName}{$game.upperName}{else}全部游戏{/if}</td>
+			<td>{if $game.gameName}{$game.gameName}{else}全部游戏{/if}</td>
+			<td>{$game.time|date_format:"%y-%m-%d %H:%M"}</td>
+			<td>{if $game.type eq 'allBan'}<font color="red">全游戏封禁</font>{elseif $game.type eq 'singleBan'}<font color="blue">单游戏封禁</font>{elseif $game.type eq 'whiteList'}<font color="green">单游戏白名单</font>{/if}</td>
+			<td>{$game.relateGame}</td>
+			<td>{$game.uid}</td>
+			<td style="width:160px"><a href="/index.php?m=sdkGame&a=specialList&operation=del&id={$game.id}" class="delete_confirm">刪除</a> </td>
+		</tr>
+		{foreachelse}
+            <td colspan="8" ><font color="red">暂无该用户数据</font></td>
+		{/foreach}
+	</table>
+	<div id="pager"></div>
+
+<script src="js/pager.js"></script>
+<script>
+$("#checked").click(function() {
+	$("#operation").val("");
+	$('.searchbox').submit();
+});
+$('.delete_confirm').click(function() {
+    return confirm('删除数据不可恢复，是否继续');
+});
+function gotoNext(page,pagesize){
+	window.location.href = "/index.php?m=sdkGame&a=specialList&page=" + page+ "&userName={$userName}&upperName={$upperName}&specialName={$specialName}&rgame={$rgame}&type={$type}";
+}
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+
+{elseif $operation == 'add'}
+	<h3>
+		<span><a href="/index.php?m=sdkGame&a=specialList">返回列表</a></span>
+		添加处理
+	</h3>
+	<form action="/index.php?m=sdkGame&a=specialList&operation=save" method="post" class="searchbox" enctype="multipart/form-data">
+		<p>
+			<span>是否全游戏：</span>
+			<label><input type="checkbox" name="all" value="1" id="all" /></label>
+		</p>
+		<p id="gameList">
+			<span>来自游戏：</span>
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}">{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+            </select>
+            <select name="game" id="game" style="width: 98px;">
+            <option value="">请选择</option>
+    		</select>
+		</p>
+		<p>
+			<span>处理属性：</span>
+			<select  name="type" style="width: 150px;" id="type">
+	            <option value="ban">封禁</option>
+	            <option value="whiteList">白名单</option>
+	        </select>
+			<font color="#FF0000">&nbsp;*&nbsp;白名单不能选择全游戏处理</font>
+		</p>
+
+        <p id="whiteType">
+			<span>白名单类型：</span>
+			<select  name="whiteType" style="width: 150px;" id="whiteTypeSelect">
+	            <option value="">请选择</option>
+	            <option value="simulator">允许模拟器登录</option>
+	        </select>
+		</p>
+        
+		<!--<p>
+			<span>批量处理：</span>
+			<label><input type="checkbox" name="batch" value="1" id="batch" /></label>
+		</p>-->
+		<p>
+			<span>用户账号：</span>
+			<!--<input style="width: 180px;" type="text" value="" name="userName" id="userName" placeholder="请输入账号">-->
+			<textarea style="width:800px; height:60px;"  name="userNameStr" id="userNameStr" placeholder="单次处理条数不能超过100条"></textarea>
+		</p>
+		<p id="whiteGameList">
+			<span>关联游戏：</span>
+            <select name="whiteUpper" id="whiteUpper" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}">{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="whiteSpecial" id="whiteSpecial" style="width: 98px;">
+                <option value="">请选择</option>
+            </select>
+            <select name="whiteGame" id="whiteGame" style="width: 98px;">
+            <option value="">请选择</option>
+    		</select>
+    		<font color="#FF0000">&nbsp;*&nbsp;该游戏选项即为跳转游戏</font>
+		</p>
+		<p>
+	        <button type="submit" name="do" class="su" id="submit">提交</button>
+	    </p>
+	</form>
+<script>
+$('#submit').click(function() {
+    return confirm('将对账号进行特殊处理，是否继续');
+});
+$('#all').change(function() {
+    var dd = document.getElementById("all").checked;
+	if (dd) {
+		$('#gameList').hide();
+	}else{
+		$('#gameList').show();
+	}
+});
+
+/*$('#userNameStr').hide();
+$('#batch').change(function() {
+    var dd = document.getElementById("batch").checked;
+	if (dd) {
+		$('#userNameStr').show();
+		$('#userName').hide();
+	}else{
+		$('#userNameStr').hide();
+		$('#userName').show();
+	}
+});*/
+$('#whiteGameList').hide();
+$('#whiteType').hide();
+$('#type').change(function() {
+    var typer = $(this).val();
+	if (typer == 'whiteList') {
+        $('#whiteGameList').show();
+		$('#whiteType').show();
+	}else{
+		$('#whiteGameList').hide();
+		$('#whiteType').hide();
+	}
+});
+
+$('#whiteType').change(function() {
+    var whiteType = $('#whiteTypeSelect').val();
+	if (whiteType == 'simulator') {
+        $('#whiteGameList').hide();
+    }else{
+        $('#whiteGameList').show();
+    }
+});
+
+$(function() {
+    get_w_specialName();
+    $("#whiteUpper").change(function(){
+        $("#whiteSpecial option[text!='']").remove();
+        $("#whiteSpecial").append('<option value="">请选择</option>').change();
+        get_w_specialName();
+        return false;
+    });
+    get_w_games();
+    $("#whiteSpecial").change(function(){
+        get_w_games();
+        return false;
+    });
+
+    function get_w_specialName() {
+        var whiteUpper = $('#whiteUpper').val();
+        var whiteSpecial = $('#whiteSpecial').val();
+        if(whiteUpper == ''){
+            $("#whiteSpecial option[text!='']").remove();
+            $("#whiteSpecial").append('<option value="">请选择</option>').change();
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/?m=sdkGame&a=getSpecialName",
+            data: "upperName="+whiteUpper+"&specialName="+whiteSpecial,
+            dataType: 'text',
+
+            success: function(result){
+                $("#whiteSpecial option[text!='0']").remove();
+                $("#whiteSpecial").append(result);
+            }
+        });
+        return false;
+    }
+
+    function get_w_games() {
+            var whiteUpper = $('#whiteUpper').val();
+            var whiteSpecial = $('#whiteSpecial').val();
+            var whiteGame = $('#whiteGame').val();
+            if(whiteSpecial == ''){
+                $("#whiteGame option[text!='']").remove();
+                $("#whiteGame").append('<option value="">请选择</option>').change();
+                return false;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/?m=sdkGame&a=getGameName",
+                data: "upperName="+whiteUpper+"&specialName="+whiteSpecial+"&game="+whiteGame,
+                dataType: 'text',
+
+                success: function(result){
+                    $("#whiteGame option[text!='0']").remove();
+                    $("#whiteGame").append(result);
+                }
+            });
+            return false;
+        }
+});
+</script>
+{/if}
+{/block}

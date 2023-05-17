@@ -1,0 +1,92 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+
+<h3>
+    訂單列表
+</h3>
+<form class="searchbox" action="/index.php?m=ac&a=orderList" method="post">
+    <input type="hidden" name="page" value="{$page}" id="page" />
+    <p>
+		<span>遊戲：</span>
+        {foreach from=$game item=name}
+        <label><input type="checkbox" name="game[]" value="{$name}" {if in_array($name, $game_array)}checked="checked"{/if} />{$name}{if $game_config['key'][ $name ]['test']}（测试）{/if}</label>&nbsp;&nbsp;
+        {/foreach}
+    </p>
+    <p>
+		<span>儲值來源：</span>
+        {foreach from=$channel item=name}
+        <label><input type="checkbox" name="channel[]" value="{$name}" {if in_array($name, $channel_array)}checked="checked"{/if} />{if $name=='7725'}7725(GASH){else}{$name}{/if}</label>&nbsp;&nbsp;
+        {/foreach}
+    </p>
+	<p>
+		<span>起始時間：</span>
+		<input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+	</p>
+    <p>
+        <span>訂單狀態：</span>
+        <select name="status">
+            <option value="1" {if $status==1}selected="selected"{/if}>成功</option>
+            <option value="0" {if $status==0}selected="selected"{/if}>未完成或失敗</option>
+        </select>
+    </p>
+	<p class="inline">
+		&nbsp;<button type="submit" class="su">查詢</button>
+	</p>
+</form>
+{foreach from=$order_list item=order}
+<table class="list">
+    <tr>
+        <th style="width: 20%;">用戶帳號</th>
+        <td style="width: 25%;">{$order.username}</td>
+        <th style="width: 15%;">訂單號</th>
+        <td style="width: 40%;">{$order.oid}</td>
+    </tr>
+    <tr>
+        <th>遊戲</th>
+        <td>{$order.game}</td>
+        <th>伺服器</th>
+        <td>{$order.server}</td>
+    </tr>
+    <tr>
+        <th>角色</th>
+        <td>{$order.role}</td>
+        <th>儲值時間</th>
+        <td>{$order.time|date_format:"%Y-%m-%d %H:%M"}</td>
+    </tr>
+    <tr>
+        <th>金額</th>
+        <td><font color='red'>{$order.money}</font>({$order.currency})</td>
+        <th>元寶</th>
+        <td>{$order.gold}</td>
+    </tr>
+    <tr>
+        <th>交易状态</th>
+        <td>{if $order.status == 1}成功{else}失敗{/if}</td>
+        <th>儲值來源</th>
+        <td>{$order.channel}|{$order.paycode}</td>
+    </tr>
+    <tr>
+        <th>遊戲服務器回饋信息</th>
+        <td title="{$order.pay_message}">{$order.pay_message|truncate:25:'...'}</td>
+        <th>遊戲關聯賬號</th>
+        <td>{$order.hash_username}</td>
+    </tr>
+</table>
+{/foreach}
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+function gotoNext(page,pagesize){
+    $('#page').val(page);
+    $('.searchbox').submit();
+}
+window.onload = function(){
+    var pageStr = new Page('{$page}', '{$total}', 5, '{$offset}','gotoNext').GetText();
+    document.getElementById('pager').innerHTML = pageStr;
+}
+</script>
+{/block}

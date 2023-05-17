@@ -1,0 +1,63 @@
+@CHARSET "UTF-8";
+.table_th_tips {
+    background: url("../img/icons/layout.png") no-repeat scroll 0 -322px transparent;
+    cursor: help;
+    display: inline-block;
+    height: 15px;
+    top: 0;
+    vertical-align: text-top;
+    width: 15px;
+}
+
+.box { width:600px;margin-left:60px;vertical-align: middle;text-align:left;}
+.box ul{ margin: 0 auto; width:500px; list-style:none;}
+.box li {float:left; margin:5px 5px 0 5px; display:inline; width:100px; line-height:22px;height:22px;}
+
+.choose {
+	clear:both;
+	margin:10px 0 5px 54px;
+	width:150px;	
+}
+
+.nav {
+	display:inline;
+	float:right;
+	font-size:12px;
+}
+
+.Wdate {
+	width:80px;
+	text-align:center;	
+}
+
+.query {
+	margin:5px 0 32px 0;	
+}
+.query ul li { 
+	display:inline;
+	line-height:24px;
+	height:26px;
+	margin-left:3px;
+	font-size:14px;
+	vertical-align:middle;
+}
+
+.qd ul {
+	list-style:none;	
+}
+.qd ul li {
+	display:block;	
+}
+.shijian { 
+	width:70px;
+	vertical-align:middle;
+}
+
+.search {
+	width:60px;
+	vertical-align:middle;
+	cursor: pointer;
+	background:url("../img/form_blue.gif") repeat-x scroll left top #FFFFFF;
+	border:1px solid #D9E6F0;
+}
+

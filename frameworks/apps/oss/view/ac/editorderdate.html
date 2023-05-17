@@ -1,0 +1,46 @@
+{extends file='layout/new.html'}
+{block name=title}充值对账-不同游戏{/block}
+{block name=head}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script>
+$().ready(function(){
+	$("#type").bind('change',function(){
+		var type = $(this).val();
+		$("#project option[id='defalut']").attr("selected","selected");
+		$("#project option").each(function () {
+			$(this).hide();
+		})
+		if(type != '' && type != '请选择'){
+			$("."+type).show();
+		}
+	})
+})
+</script>
+{/block}
+{block name=body}
+<h3><span><a href="index.php?m=ac&a=listorderdate">返回菜单列表</a></span>添加菜单</h3>
+<form method="post" class="searchbox" enctype="multipart/form-data">
+	<p>
+		<span>类型:</span>
+		<select name="type" id="type"/>
+			<option>请选择</option>
+	    	{foreach item=item key=key from=$acconfig}<option value="{$key}" {if $key == $orderdate.type}selected="selected"{/if}>{$item.title}</option>{/foreach}
+		</select>
+	</p>
+	<p>
+		<span>项目:</span>
+		<select name="project" id="project"/>
+		<option id="defalut">请选择</option>
+		{foreach item=item key=key from=$acconfig}
+		{foreach item=item1 key=key1 from=$item.project}
+		<option value="{$key1}" class="{$key}" {if $key != $orderdate.type}style="display: none;"{/if} {if $key1 == $orderdate.project}selected="selected"{/if}>{$item1}</option>
+		{/foreach}
+		{/foreach}
+		</select>
+	</p>
+	<p><span>对账日:</span><input type="text" name="orderdate" style="width: 20px;" value="{$orderdate.orderdate}"/>日</p>
+	<br>
+	<p class="inline"><button type="submit" name="do" class="su"/>立即提交</button><button type="reset" class="su">條件重置</button></p>
+</form>
+<div style="color: red;clear:both;font-size: 14px;">注：默认对账时间为每月1日。</div>
+{/block}

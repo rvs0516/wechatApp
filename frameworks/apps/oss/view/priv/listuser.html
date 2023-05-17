@@ -1,0 +1,72 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<div id="popbg"></div>
+<div class="pop" style="display:none">
+<p class="popclose"><a href="#">關閉</a></p>
+<p class="popcontent">
+<div> <span style="font-size:12px">模块名称:</span> <span>
+<input type="text" id="name" />
+</span> </div>
+<div style="margin-top:5px;"> <span style="font-size:12px">模块标识:</span> <span>
+<input type="text" id="module" />
+</span> </div>
+<div style="margin-top:5px;"> <span style="font-size:12px">排序:&nbsp;&nbsp;&nbsp;&nbsp;</span> <span>
+<input type="text" id="sort" />
+</span> </div>
+<div style="text-align:center;margin-top:5px;">
+<button type="submit" value="提交" id="btn1" class="su">提交</button>
+</div>
+</p>
+</div>
+<h3><span><a href="index.php?m=priv&a=adduser">添加後台用戶</a></span>後台用戶列表</h3></td>
+<table class="list">
+  <thead>
+    <th>ID</th>
+      <th>用戶帳號</th>
+      <th>創建時間</th>
+      <th>創建者</th>
+      <th>操作</th>
+  </thead>
+{foreach from=$list key=k item=v}
+    <tr>
+      <td>{$v.id}</td>
+      <td>{$v.uid}</td>
+      <td>{$v.addtime}</td>
+      <td>{$v.author}</td>
+      <td><a href="index.php?m=priv&a=deluser&id={$v.id}" class="delete">刪除</a>&nbsp;<a href="index.php?m=priv&a=edituser&id={$v.id}">修改</a></td>
+    </tr>
+{/foreach}
+</table>
+<div id="pager"></div>
+<script src="/js/pager.js"></script>
+<script src="/js/pop.js"></script>
+<script>
+function gotoNext(page,pagesize){
+	window.location.href="index.php?m=priv&a=listuser&page="+page;
+}
+$(function(){
+	$('.delete').click(function(){
+			return confirm("是否刪除？");
+		})
+	var pageStr = new Page('{$page}', '{$rowcount}',5,'{$offset}','gotoNext').GetText();
+	$('#pager').html('');
+	$('#pager').html(pageStr);
+	$('#btn1').click(function(){
+		var name=$('#name').val();
+		var module=$('#module').val();
+		var ssort=$('#sort').val();
+		$.post('index.php?m=ajax&a=addmodule','name='+name+'&module='+module+'&sort='+ssort,function(data){
+			alert();
+			var o=eval('('+data+')');
+			if(o.status){
+				alert('操作成功！');
+				location.reload();
+			} else {
+				alert(o.msg);
+			}
+		});
+	});
+});
+</script>
+{/block} 

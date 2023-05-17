@@ -1,0 +1,109 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script language="javascript" type="text/javascript" src="/js/jquery.easyui.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/easyui.css">
+<link rel="stylesheet" type="text/css" href="/css/icon.css">
+<script type="text/javascript">
+$(function(){
+	$(".filter").click(function(){
+		if($(".filter").text() == "條件篩選[折疊]"){
+			$(".filter").text("條件篩選[展開]");
+		}else{
+			$(".filter").text("條件篩選[折疊]");
+		}
+		$(".searchbox").slideToggle("slow");
+	})
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#exportA").click(exportDate);
+	function exportDate() {
+		var start_date	= $('#start_date').val();	
+		var end_date	= $('#end_date').val();		
+		var alias 		= $('#alias').val();	
+		var money 		= $('#money').val();		
+		var level 		= $('#level').val();		
+		var user 		= $('#user').val();
+		var url			= "/index.php?m=index&a=users&do=export&start_date="+start_date+"&end_date="+end_date+"&alias="+alias+"&money="+money+"&level="+level+"&user="+user;
+		top.location=url;
+		return false;		
+	}	
+});
+
+function showandhide(contentid, divid) {	
+	var value= "隱藏";
+	var key = $("#"+contentid).html();	
+	if(key == value){		
+		$("#"+divid).hide("normal");
+		$("#"+contentid).html("打開");
+	}else{
+		$("#"+divid).show("normal");
+		$("#"+contentid).html("隱藏");
+	}
+	return false;
+}
+
+
+</script>
+
+<div class="content">
+    	<h3><span>{if $smarty.get.a && $userdata}<a href="javascript:void(0)" id="exportA">導出</a>{/if} | <a class="filter">條件篩選[折疊]</a></span>會員詳細數據</h3>
+        
+        <form class="searchbox"  id="form1" action="?m=index&a=users" method="post">
+            <p><span>註冊時間：</span><input type="text" name="start_date" id="start_date" class="date" value="{if $start_date neq 'NULL'}{$start_date}{/if}" onClick="var end_date=$dp.$('end_date');WdatePicker({literal}{onpicked:function(){end_date.focus();},minDate:'#F{($dp.$D(\'end_date\',{y:-1,d:0}))}',maxDate:'#F{$dp.$D(\'end_date\')}'}{/literal})"/> 至 <input type="text" name="end_date" id="end_date" class="date" value="{if $start_date neq 'NULL'}{$end_date}{/if}" onClick="WdatePicker({literal}{minDate:'#F{($dp.$D(\'start_date\',{d:0,H:0}))}',maxDate:'#F{($dp.$D(\'start_date\',{y:1,d:0}))}'}{/literal} )"/></p>
+            <p><span>渠道：</span><select name="alias" id="alias">
+				<option value="">全部渠道</option>
+				{foreach from=$aliasdata key=k item=alias}
+				<option value="{$k}" {if ($falias==$k)}selected="selected"{/if}>{$alias}</option>
+				{/foreach}
+            </select></p>
+            <p><span>按金幣：</span><select name="money" id="money">
+				<option value="">请选择</option>
+				<option value="1" {if ($money=='1')}selected="selected"{/if}>有</option>
+				<option value="2" {if ($money=='2')}selected="selected"{/if}>無</option>
+            </select></p>
+            <p><span>等級： </span><select name="level" id="level">
+				<option value="">请选择</option>
+				<option value="1" {if ($level=='1')}selected="selected"{/if}>VIP會員</option>
+				<option value="2" {if ($level=='2')}selected="selected"{/if}>普通會員</option>
+            </select></p>            
+            <p><span>帳號 / 暱稱：</span><input name="user" id="user" type="text" value="{$user}" class="text" placeholder="賬號、昵稱、關聯賬號或郵箱"/></p>
+            <p class="inline">
+                <button type="submit" class="su">立即提交</button>
+                <button type="reset" class="su">條件重置</button>
+            </p>
+        </form>
+        
+		<p class="fast">
+			快速查看：
+			<a href="#" onclick="quicksettime(0, 'day')">今日</a>
+			<a href="#" onclick="quicksettime(1, 'day')">昨日</a>
+			<a href="#" onclick="quicksettime(2, 'day')">前日</a>
+			<a href="#" onclick="quicksettime(0, 'week')">本周</a>
+			<a href="#" onclick="quicksettime(0, 'month')">本月</a>
+			<a href="#" onclick="quicksettime(1, 'month')">前一個月</a>
+		</p>
+</div>
+{include file="index/user_info.html"}
+<div class="pager">{$pager}</div>	
+<script>
+$(function() {
+	var $form = $('#form1');
+	var support = (function(input) {
+		return function(attr) { 
+			return attr in input 
+		}
+	})(document.createElement('input'));	
+	$('.text', $form).placeholder({ hideOnFocus: false })
+	var hasFailureMsg = !!$('#summary li').length;
+	if (!hasFailureMsg) {
+		$('#user').focus()
+	}
+})
+</script>
+
+{/block}

@@ -1,0 +1,44 @@
+    <table class="list">
+        <tr style="background-color:#CCCCCC;">
+            {if $formType neq "3"}<th>日期</th>{/if}
+            <th>智能分包名称</th>
+            <th>智能分包渠道号</th>
+            <th>新增注册</th>
+            <th>新增充值</th>
+            {if $formType neq "1"}<th>新增充值人数</th>{/if}
+            <th>活跃充值</th>
+            {if $formType neq "1"}<th>充值人数</th>{/if}
+        </tr>
+        {foreach from=$list item=game}
+        <tr align="center">
+            {if $formType neq "3"}<td>{$game.day} {$game.hour}</td>{/if}
+             <td>{$game.account}</td>
+            <td>{$game.adid}</td>
+            <td>{$game.newRegist}</td>
+            <td>{$game.newAmount}</td>
+            {if $formType neq "1"}<td>{$game.newPayUser}</td>{/if}
+            <td>{$game.amount}</td>
+            {if $formType neq "1"}<td>{$game.payUser}</td>{/if}
+        </tr>
+        {foreachelse}
+                <td colspan="8" ><font color="red">暂无数据</font></td>
+        {/foreach}
+        {if $sum}
+        <tr align="center" style="background-color:#CCCCCC;">
+            {if $formType neq "3"}
+            <td>
+                {if $formType eq 2}
+                汇总
+                {/if}
+            </td>
+            {/if}
+            <td>{if $formType eq 3}汇总{/if}</td>
+            <td></td>
+            <td>{$sum.newRegist}</td>
+            <td>{$sum.newAmount}</td>
+            {if $formType neq "1"}<td>{$sum.newPayUser}</td>{/if}
+            <td>{$sum.amount}</td>
+            {if $formType neq "1"}<td>{$sum.payUser}</td>{/if}
+        </tr>
+        {/if}
+    </table>

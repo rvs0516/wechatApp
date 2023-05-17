@@ -1,0 +1,96 @@
+<script>
+var usersite=null;
+function completeUrl(intval,type,elementid){
+	var href = $("#"+elementid).attr("href");
+	var channelsites = new Array();
+	channelsites['Forgame']='ff';
+	channelsites['Facebook']='fb';
+	channelsites['Yahoo']='fy';
+	channelsites['Yahoo-tw']='fyt';
+	channelsites['Gamer']='fh';
+	channelsites['Gamebase']='fe';
+	channelsites['2000Fun']='fu';
+	channelsites['Google']='fg';
+	channelsites['Msn']='fm';
+	channelsites['Twitter']='ft';	                                  
+	channelsites['Pchome']='fp';	
+	var channelsite =channelsites[usersite] ;	
+	if(type != ''){		
+		var timearr =new Array(); 
+		timearr =getTime(intval,type);
+		var now = new Date();	
+		href += "start=" + timearr[0]+ "&end=" + timearr[1] + "&channel=" + channelsite;	    	
+	}else{	
+		href +=  "channel=" + channelsite;
+	}
+	$("#"+elementid).attr("href",href); 
+}
+
+$(function() {	
+		$(".channels").click(function() {			
+			var position1 = $(this).offset();	
+			usersite=$(this).html();			
+			$('#showchannel').menu('show', {
+				left : position1.left - 80,
+				top : position1.top + 15
+			});
+		});			
+});
+</script>
+<br/><br/>
+<table border="0" cellpadding="0" cellspacing="0" class="list">
+	<thead>
+		<tr>
+			<th>帳號</th>
+			<!--<th>昵稱</th>-->
+			<th>會員點數</th>
+			<th>註冊時間</th>
+            <th>關聯賬號</th>
+			<th>openuid</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+		{foreach $userdata as $user}
+		<tr align="center">
+			<td>
+				{$user.userid|truncate:15:"..."}{if $user.rank eq 200}&nbsp;&nbsp;(<font color="#FF0000">VIP</font>){/if}
+			</td>
+			<!--<td>{$user.nickname}</td>-->
+			<td>{$user.money}</td>
+			<td>{$user.jointime|date_format:'%y-%m-%d %H:%M'}</td>
+            <td>{$user.hash_username}</td>
+			<td>{$user.username}</td>
+			<td><a href="?m=index&a=readUser&userid={$user.userid}">查看</a> | <a href="?m=index&a=editUser&userid={$user.userid}">修改</a></td>
+		</tr>
+		{foreachelse}
+		<tr>
+			<td colspan="8" align="center"
+				style="border: none; font-size: 12px; padding-top: 8px; color: red">
+			<label>沒有記錄</label></td>
+		</tr>
+		{/foreach}
+		<!--
+		<div id="showchannel" class="easyui-menu" style="width: 170px;">
+		    <div style="font-size: 12px; font-weight: bold; width: 180px;">
+		      <a href="/index.php?m=chart&a=channelRegist&" target="_blank" id="all" onClick="completeUrl(0,'','all')">渠道會員注冊總走勢查詢</a>
+		    </div>
+			<div><a	href="/index.php?m=chart&a=channelRegist&"	target="_blank" id="weekid" onClick="completeUrl(0,'week','weekid')">本周會員注冊走勢查詢</a></div>
+			<div><a	href="/index.php?m=chart&a=channelRegist&"	target="_blank" id="weekid1" onClick="completeUrl(1,'week','weekid1')">上周會員注冊走勢查詢</a></div>
+			<div><a	href="/index.php?m=chart&a=channelRegist&"	target="_blank" id="monthid" onClick="completeUrl(0,'month','monthid')">本月會員注冊走勢查詢</a></div>
+			<div><a	href="/index.php?m=chart&a=channelRegist&"	target="_blank" id="monthid1" onClick="completeUrl(1,'month','monthid1')">上月會員注冊走勢查詢</a></div>
+			<div><span> <a	href="/index.php?m=chart&a=channelRegist&"	target="_blank" id="seasonid" onClick="completeUrl(0,'season','seasonid')">本季度會員注冊走勢查詢</a> </span>
+		     	<div style="width: 170px;">
+		        	 <div><a href="/index.php?m=chart&a=channelRegist&" target="_blank" id="season_monthid1" onClick="completeUrl(1,'season_month','season_monthid1')">本季度一月注冊走勢查詢</a></div>
+		        	 <div><a href="/index.php?m=chart&a=channelRegist&" target="_blank" id="season_monthid2" onClick="completeUrl(2,'season_month','season_monthid2')">本季度二月注冊走勢查詢</a></div>
+		         	<div><a href="/index.php?m=chart&a=channelRegist&" target="_blank" id="season_monthid3" onClick="completeUrl(3,'season_month','season_monthid3')">本季度三月注冊走勢查詢</a></div>
+		     	</div>
+			</div>
+		</div>
+		  -->
+	</tbody>
+</table>
+
+
+
+		

@@ -1,0 +1,13 @@
+
+    	<div id="header">
+        	<h2 style="display:block; float:left; width:600px;">Forgame</h2>
+            <span style="color:#FFF; display:block; float:left; width:66px; padding-top:5px;">歡迎您<b>{$uid}</b></span>
+                  <span style="color:#FFF; display:block; float:left; width:100px; cursor:pointer; padding-top:5px;" onclick="location.href='?m=priv&a=logout'"><b>退出系統</b></span>
+    		<div id="topmenu">
+            	<ul>
+                    {foreach from=$topmenus key=k item=v}
+                	<li {if $menuid==$v.id}class="current"{/if}><a href="/{if empty($v.link)}index.php?m={$v.module}&a={$v.action}{else}{$v.link}{/if}">{$v.name}</a></li>
+                        {/foreach}
+              	</ul>
+          	</div>
+      	</div>

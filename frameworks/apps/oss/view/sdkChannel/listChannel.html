@@ -1,0 +1,159 @@
+{extends file='layout/new.html'}
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+<!--START 列表頁-->
+	<h3>
+		{if  $gid eq 1 || $gid eq 24}
+		<span><a href="/index.php?m=sdkChannel&a=addChannel">新增渠道</a></span>
+		{/if}
+		渠道列表
+	</h3>
+        <form class="searchbox" action="index.php?m=sdkChannel&a=listChannel" method="post">
+		{if  $gid eq 2 || $gid eq 11 || $gid eq 13 || $gid eq 14 || $gid eq 15 || $gid eq 17}
+        <input type="hidden" id="gameStr" value="{$gameStr}" />
+        <input type="hidden" id="gid" value="{$gid}" />
+    	{/if}
+	    <input type="hidden" name="batchesChannelId" value="" id="batchesChannelId" />
+	    <input type="hidden" name="operation" value="" id="operation" />
+	    <input type="hidden" name="status" value="" id="status" />
+        <p>
+            <span style="width: 50px;">游戏：</span>
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="game" id="game" style="width: 98px;">
+                <option value="0">请选择</option>
+                {foreach from=$game item=data}
+                <option value="{$data}" {if $data === $gameAlias}selected="selected"{/if}>{$data}</option>
+                {/foreach}
+            </select>
+            <span>渠道：</span>
+			<select name="channelId">
+                <option value="0">请选择</option>
+				{foreach from=$channels key=key item=data}
+				<option value="{$key}" {if ($key == $channelId)}selected="selected"{/if}>{$data}</option>
+				{/foreach}
+			</select>
+            <!--<span>广告商：</span>
+            <select name="adsChannel" style="width: 156px;">
+                <option value="">请选择</option>
+                <option value="gdt">广点通</option>
+                {foreach from=$adsChannels key=key item=data}
+				<option value="{$key}" {if ($key == $adsChannel)}selected="selected"{/if}>{$data}</option>
+				{/foreach}
+			</select>-->
+			<span>备注信息：</span>
+            <input type="text" name="remarks" value="{$remarks}"/> 
+			<span>升级记录：</span>
+            <select name="upGradeMark" style="width: 156px;">
+                <option value="">请选择</option>
+                <option value="1" {if ($upGradeMark == 1)}selected="selected"{/if}>开启</option>
+                <option value="2" {if ($upGradeMark == 2)}selected="selected"{/if}>关闭</option>
+			</select>
+			<input type="submit" class="su" value="查询" style="margin-left: 30px;" />
+			{if $editor == 1}
+			<p>
+				<span>升级记录控制：</span>
+				<button type="submit" class="su" onclick="fun(1)" id="switch">开启</button>
+				<button type="submit" class="su" onclick="fun(0)" id="switch">关闭</button>
+			</p>
+			{/if}
+        </form>
+	<table class="list">
+		<tr style="background-color:#CCCCCC;">
+			{if $editor == 1}<th><input type="checkbox" onclick="swapCheck()" /></th>{/if}
+			<!--<th>游戏别名</th>-->
+			<th>游戏名称</th>
+			<th width="7%">备注</th>
+			<th>渠道appKey</th>
+			<th>渠道代号</th>
+			<th>渠道名称</th>
+			<th>包号</th>
+			<th>广告商</th>
+			<th>回调参数</th>
+			<th>H5链接</th>
+			<th>等级记录</th>
+			<th>双端互通</th>
+			<th>操作</th>
+		</tr>
+		{foreach from=$game_list item=game}
+		<tr align="center" {if $game.appid}style="background-color:#f7fbfe"{/if}>
+			{if $editor == 1}<td><input type="checkbox" name="id" value="{$game.id}" /></td>{/if}
+			<!--<td>{$game.gameAlias|truncate:15:"..":true}</td>-->
+			<td>{$game.gameName|truncate:10:"..":true}</td>
+			<td>{$game.remarks|truncate:10:"..":true}</td>
+			<td>{$game.appKey|truncate:25:"..":true}</td>
+			<td>{$game.channelId}</td>
+			<td>{$game.channelName}</td>
+			<td>{$game.apkNum}</td>
+			<td>{if $game.adsName}{$game.adsName}{/if}</td>
+			<td>{$callbackUrl}{if $game.channelId < 600000}callback/{else}webCallback/{/if}{$game.channelId}</td>
+			<td>{if $game.channelId >= 600000}{$callbackUrl}web/{$game.channelId}/{$game.id}{/if}</td>
+			<td>{if $game.upGradeMark eq 1}<font color="#FF0000">开启</font>{else}<font>关闭</font>{/if}</td>
+			<td>{if $game.interflow == 0 }不互通{elseif $game.interflow == 1 }<font color="#FF0000">互通<font>{/if}</td>
+			<td><a href="/index.php?m=sdkChannel&a=editChannel&id={$game.id}&do=view" target="_blank">查看</a>
+			{if ($gid eq 1 && $editor eq 1) || $gid eq 15 || $gid eq 24}
+			 | <a href="/index.php?m=sdkChannel&a=editChannel&id={$game.id}&upperName={$game.upperName}&specialName={$game.specialName}" target="_blank">编辑</a>
+			{/if}
+			{if ($gid eq 1 && $editor eq 1) || $gid eq 24}
+			 | <a href="/index.php?m=sdkChannel&a=delChannel&&id={$game.id}" class="delete_confirm">刪除</a>
+			{/if}
+			</td>
+		</tr>
+                {foreachelse}
+                <td colspan="8" ><font color="red">暂无数据</font></td>
+		{/foreach}
+	</table>
+	<div id="pager"></div>
+
+<script src="js/pager.js"></script>
+<script>
+$('.delete_confirm').click(function() {
+	return confirm('數據不可恢復，你確定要刪除嗎？');
+});
+$('#switch').click(function() {
+	return confirm('确定修改选中项的升级记录状态？');
+});
+function gotoNext(page,pagesize){
+	window.location.href = "/index.php?m=sdkChannel&a=listChannel&page=" + page + "&game={$gameAlias}&upperName={$upperName}&specialName={$specialName}&upGradeMark={$upGradeMark}&remarks={$remarks}&channelId={$channelId}";
+}
+var pageStr = new Page('{$page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+
+var isCheckAll = false; 
+function swapCheck() { 
+    if (isCheckAll) { 
+        $("input[type='checkbox']").each(function() { 
+            this.checked = false; 
+        }); 
+        isCheckAll = false; 
+    } else { 
+        $("input[type='checkbox']").each(function() { 
+            this.checked = true; 
+        }); 
+        isCheckAll = true; 
+    } 
+} 
+function fun(status){
+    obj = document.getElementsByName("id");
+    check_val = [];
+    for(k in obj){
+        if(obj[k].checked)
+            check_val.push(obj[k].value);
+    }
+    $("#operation").val("upGradeMark");
+    $("#batchesChannelId").val(check_val);
+    $("#status").val(status);
+}
+</script>
+<!--END 列表頁-->
+{/block}

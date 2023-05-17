@@ -1,0 +1,23 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+
+##//------
+#callback
+RewriteRule ^callback\/([0-9]+)$				api\/index\.php\?m=index&a=callback&pb_channel=$1 [L,QSA]
+RewriteRule ^payBack\/([0-9a-zA-Z_]+)\/([0-9a-zA-Z_]+)$						yysqp\/index\.php\?a=payBack&provider=$1&mainPart=$2 [L,QSA]
+RewriteRule ^notifyBack\/([0-9a-zA-Z_]+)\/([0-9a-zA-Z_]+)$					yysqp\/index\.php\?a=notifyBack&provider=$1&mainPart=$2 [L,QSA]
+RewriteRule ^transferApi\/([0-9a-zA-Z_]+)\/([0-9a-zA-Z_]+)$				api\/index\.php\?m=index&a=transferApi&pb_channel=$1&pb_game=$2 [L,QSA]
+RewriteRule ^plfPay\/([0-9a-zA-Z_]+)\/([0-9a-zA-Z_]+)\/([0-9a-zA-Z_]+)$				api\/index\.php\?m=index&a=plfPay&pb_channel=$1&game=$2&os=$3 [L,QSA]
+
+#H5SDK
+RewriteRule ^webmain\/([0-9a-zA-Z_]+)$				webmain\/index\.php\?m=index&a=$1 [L,QSA]
+RewriteRule ^web\/([0-9a-zA-Z_]+)\/([0-9a-zA-Z_]+)$				webmain\/index\.php\?m=index&a=index&qyChannel=$1&qcid=$2  [L,QSA]
+RewriteRule ^webCallback\/([0-9]+)$				api\/index\.php\?m=index&a=webCallback&pb_channel=$1 [L,QSA]
+
+#api
+RewriteRule ^marketingApi\/([0-9a-zA-Z_]+)$ api\/index\.php?m=index&a=marketingApi&api=$1 [L,QSA]
+
+</IfModule>

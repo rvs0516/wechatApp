@@ -1,0 +1,64 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<div id="popbg"></div>
+<div class="pop searchbox">
+	<h3><span><a href="#" class="popclose">關閉</a></span>添加模块</h3>
+    <p><span>模块名称：</span><input type="text" id="name"/></p>
+    <p><span>模块标识：</span><input type="text" id="module"/></p>
+    <p><span>排序：</span><input type="text" id="sort"/></p>
+    <p class="inline"><button type="submit" class="su popsubmit" style="margin-top:2px;">立即提交</button></p>
+</div>
+<h3><span><a href="#" class="showbox">添加主模块</a></span>主模块列表</h3></td>
+<table class="list">
+  <thead>
+      <th>模块名称</th>
+      <th>模块标识</th>
+      <th>操作</th>
+  </thead>
+{foreach from=$list key=k item=v}
+    <tr>
+      <td>{$v.name}</td>
+      <td>{$v.module}</td>
+      <td><a href="index.php?m=priv&a=delmastermodule&module={$v.module}" class="delete">刪除</a>&nbsp;<a href="index.php?m=priv&a=editmastermodule&module={$v.module}">修改</a></td>
+    </tr>
+{/foreach}
+</table>
+<div id="pager"></div>
+<script src="/js/pager.js"></script>
+<script src="/js/pop.js"></script>
+<script>
+function gotoNext(page,pagesize){
+	window.location.href="index.php?m=priv&a=listmastermodule&page="+page;
+}
+$(function(){
+	$('.delete').click(function(){
+			return confirm("是否刪除？");
+		})
+	var pageStr = new Page('{$page}', '{$rowcount}',5,'{$offset}','gotoNext').GetText();
+	$('#pager').html('');
+	$('#pager').html(pageStr);
+	$('.popsubmit').click(function(){
+		if($("#name").val() == ''){
+		alert("模块名称不能為空！");
+		return false;
+		}else if($("#module").val() == ''){
+			alert("模块名称不能為空！");
+			return false;
+		}
+		var name=$('#name').val();
+		var module=$('#module').val();
+		var ssort=$('#sort').val();
+		$.post('index.php?m=ajax&a=addmodule','name='+name+'&module='+module+'&sort='+ssort,function(data){
+			var o=eval('('+data+')');
+			if(o.status){
+				alert('操作成功！');
+				location.reload();
+			} else {
+				alert(o.msg);
+			}
+		});
+	});
+});
+</script>
+{/block} 

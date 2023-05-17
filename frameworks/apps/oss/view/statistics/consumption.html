@@ -1,0 +1,618 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+
+<link href="/plugins/fSelect/fSelect.css" rel="stylesheet" type="text/css">
+<script language="javascript" type="text/javascript" src="/js/jquery-1.7.2.min.js"></script>
+<script language="javascript" type="text/javascript" src="/plugins/fSelect/fSelect.js"></script>
+<script>
+    $(function() {
+        // 加载多选下拉框插件
+        $('.fSelect').fSelect();
+
+        // 控制专服筛选框是否显示
+        var source = $('#source').val()
+        if(source == 3){
+            $('.container').css('display','block');
+        }else{
+            $('.container').css('display','none');
+        }
+        $('#source').change(function(){
+            var source = $(this).val()
+            if(source == 3){
+                $('.container').css('display','block');
+            }else{
+                $('.container').css('display','none');
+            }
+        })
+
+        // 点击查询 赋值name为resertSpecialName的input
+        $('#sub').click(function(){
+            var resertSpecialName = $('.fSelect').val();
+            $('.resertSpecialName').val(resertSpecialName);
+        })
+
+        // 在选择框展示已经选择的专服名称
+        var specialName = $('.resertSpecialName').val();
+        if(specialName){
+            $('.fs-label').text(specialName);
+        }
+
+        // 已经选择的专服名称保持勾选状态
+        specialNameArray = specialName.split(",");
+        for(var i=0;i<specialNameArray.length;i++){
+            // 获取指定自定义属性的div
+            var selector = '[data-value="'+specialNameArray[i]+'"]';
+            $(selector).addClass('selected')
+        }
+
+        // 鼠标经过问题图标显示提示或者取消提示
+        $('.list tr th span').mouseenter(function(){
+            var current_class = $(this).attr('class');
+            $('.'+current_class).find(".question-content").css('display','block');
+        })
+        $('.list tr th span').mouseleave(function(){
+            var current_class = $(this).attr('class');
+            $('.'+current_class).find(".question-content").css('display','none');
+        })
+
+    });
+</script>
+<style>
+    .display_table_f{
+        display: none;
+    }
+    .fs-label-wrap .fs-label{
+        padding-top: 12px;
+    }
+
+    /* 问题图标CSS */
+    .list tr th span{
+        position: relative;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: url('static/question_black.png');
+        background-size: 100%;
+    }
+    .list tr th span:hover{
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: url('static/question_blue.png');
+        background-size: 100%;
+    }
+    .list tr th span .question-content{
+        width: 140px;
+        height: 70px;
+        background: #d1dee4;
+        position: absolute;
+        top: -75px;
+        right: -40px;
+        border-radius: 10px;
+        color: #224f72;
+        display: none;
+        text-align: left;
+    }
+</style>
+	
+
+{if $gid neq 8}
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+<script src="/js/pop.js"></script>
+{/if}
+
+<h3>
+    用户综合数据
+    {if $uid == 'yangzhenwei' || $uid == 'chenjh' || $uid == 'guofengchi'}
+    <span><a  href="#" class="showbox">数据导入</a></span>
+    {/if}
+</h3>
+<p align="right" style="color:red; margin-right:30px; margin-top:10px;">
+    快速查询&nbsp;
+    <a href="javascript:void(0);" class="quick_query" data-time="yesterday">昨日</a>
+    <a href="javascript:void(0);" class="quick_query" data-time="today">今日</a>
+    <a href="javascript:void(0);" class="quick_query" data-time="last_week">上周</a>
+    <a href="javascript:void(0);" class="quick_query" data-time="current_week">本周</a>
+    <a href="javascript:void(0);" class="quick_query" data-time="last_month">上月</a>
+    <a href="javascript:void(0);" class="quick_query" data-time="current_month">本月</a>
+</p>
+<form class="searchbox" action="/index.php?m=statistics&a=consumption" method="post">
+    <!-- 专服筛选 -->
+    <input type="hidden" name="resertSpecialName" class="resertSpecialName" value="{$resertSpecialName}">
+    <p>
+        {if  $gid eq 2 || $gid eq 11 || $gid eq 13 || $gid eq 14 || $gid eq 17 || $gid eq 15 || $gid eq 22}
+            <input type="hidden" id="gameStr" value="{$gameStr}" />
+        {/if}
+            <input type="hidden" id="gid" value="{$gid}" />
+            <input type="hidden" id="refine" value="{$refine}" />
+        {if $gid eq 13}
+            <input type="hidden" value="{$uid}" name="uid" id="uid">
+        {/if}
+        <span>来自游戏：</span>
+        {if $gid neq 8 }
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="game" id="game" style="width: 98px;">
+        {else}
+            <input type="hidden" value="{$uid}" name="uid" id="uid">
+            <select name="game" id="game" style="width: 205px;">
+        {/if}
+            <option value="">请选择</option>
+            {foreach from=$games item=name key=key1}
+            <option value="{$key1}" {if $game eq $key1}selected="selected"{/if}> {$key1|capitalize|truncate:1:"":true} — {$name}</option>
+            {/foreach}
+        </select>
+        <span style="width: 60px;" id="channelTitle">渠道： </span>
+        <select name="channel" id="channel" style="width: 170px;">
+            <option value="">请选择</option>
+            {foreach from=$channels key=key1 item=data}
+            <option value="{$key1}" {if ($channel eq $key1)} selected="selected" {/if}>{$data}</option>
+            {/foreach}
+        </select>
+        <span id="apkNumTitle">包号：</span>
+        <select name="apkNum" id="apkNum" style="width: 160px;">
+            <option value="">请选择</option>
+            {foreach from=$committe_apknum key=key2 item=apk}
+                <option value="{$apk}" {if ($apkNum == $apk)}selected="selected"{/if}>{$apk}</option>
+            {/foreach}
+        </select>
+    </p>
+    <p>
+        <span>起始时间：</span>
+        <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+        <span style="margin-left: 70px;">排序：</span>
+        <select name="sort" id="sort"  style="width: 170px;">
+            <option value="">请选择</option>
+            <option value="date" {if $sort eq 'date'}selected="selected"{/if}>日期</option>
+            <option value="amount" {if $sort eq 'amount'}selected="selected"{/if}>付费金额</option>
+            <option value="activeUser" {if $sort eq 'activeUser'}selected="selected"{/if}>活跃用户</option>
+            <option value="newUser" {if $sort eq 'newUser'}selected="selected"{/if}>新用户</option>
+        </select>
+        <span>显示模式：</span>
+        <select name="displayMode" id="displayMode"  style="width: 170px;">
+            <option value="sum" {if $displayMode eq 'sum'}selected="selected"{/if}>汇总</option>
+            <option value="details" {if $displayMode eq 'details'}selected="selected"{/if}>详情</option>
+        </select>
+    </p>
+    {if $gid eq 1 || $gid eq 17 || $gid eq 23 || $gid eq 24}
+    <p>
+        <span>数据来源：</span>
+        <select name="source" id="source"  style="width: 200px;">
+            <option value="">请选择</option>
+            <option value="1" {if $source eq '1'}selected="selected"{/if}>导入数据</option>
+            <option value="2" {if $source eq '2'}selected="selected"{/if}>SDK数据</option>
+            <option value="3" {if $source eq '3'}selected="selected"{/if}>市场数据</option>
+        </select>
+        {if $uid =='chenjh' || $uid == 'heyongzhen'}
+        <span>数据类型：</span>
+        <select name="status" id="status"  style="width: 200px;">
+            <option value="1" {if $status eq '1'}selected="selected"{/if}>常规数据</option>
+            <option value="2" {if $status eq '2'}selected="selected"{/if}>QA数据</option>
+        </select>
+        {/if}
+    </p>
+    {/if}
+    <p class="market">
+        <span>年份：</span>
+        <select name="years" id="years"  style="width: 200px;">
+            <option value="">请选择</option>
+            {foreach from=$yearArray item=item}
+                <option value="{$item}" {if $years eq $item}selected="selected"{/if}>{$item}</option>
+            {/foreach}
+        </select>
+    </p>
+    <p style="width: 950px;">
+        &nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" class="su inline" id="sub">查询</button>
+        {if in_array($gid,$ability_group)}
+        &nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" class="su inline" name="report" value="report">导出</button>
+        {/if}
+    </p>
+    <p style="margin-left: 10px; color: red;">*&nbsp;&nbsp;该页面显示的用户数为角色数</p>
+</form>
+
+<!-- 专服筛选 -->
+<div class="container" style="margin:20px 0;display: none;">
+    <span style="color: #36588a;">专服筛选：</span>
+    <select class="fSelect" multiple="multiple">
+        {foreach from=$specialNameArray item=value key=key}
+        <optgroup label="{$key}">
+            {foreach from=$value item=item key=key}
+            <option value="{$item}" >{$item}</option>
+            {/foreach}
+        </optgroup>
+        {/foreach}
+    </select><font color="red">&nbsp;*&nbsp;注意：勾选后的专服数据将不进行展示</font>
+</div>
+
+<table class="list">
+
+    <tr style="background-color:#CCCCCC;">
+        {if $refine != 7}
+            {if ($refine != 1 && $displayMode == 'sum') || $refine == 6}
+            <th style="line-height: 18px;" {if !in_array(25,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            {/if}
+            <th style="line-height: 18px;" {if !in_array(1,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            {if $displayMode == 'details' && $refine == 1}
+            <th style="line-height: 18px;" >专服名称</th>
+            {/if }
+            {if ($refine >= 4 && $displayMode != 'sum') || ($refine >= 5 && $displayMode == 'sum')}
+            <th style="line-height: 18px;" {if !in_array(27,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道</th>
+            {/if}
+            {if ($refine >= 5 && $displayMode != 'sum') || ($refine == 6)}
+            <th style="line-height: 18px;" {if !in_array(28,$header_id) && $gid eq 17}class="display_table_f"{/if}>包号</th>
+            {/if}
+            <th style="line-height: 18px;" {if !in_array(2,$header_id) && $gid eq 17}class="display_table_f"{/if}>新用户</th>
+            <th style="line-height: 18px;" {if !in_array(3,$header_id) && $gid eq 17}class="display_table_f"{/if}>老用户</th>
+            <th style="line-height: 18px;" {if !in_array(4,$header_id) && $gid eq 17}class="display_table_f"{/if}>活跃用户</th>
+            <th style="line-height: 18px;" {if !in_array(5,$header_id) && $gid eq 17}class="display_table_f"{/if}>付费金额</th>
+            <th style="line-height: 18px;" {if !in_array(6,$header_id) && $gid eq 17}class="display_table_f"{/if}>倍数<span class="question—multiple"><em class="question-content">倍数=付费金额/新增用户人数</em></span></th>
+            <th style="line-height: 18px;" {if !in_array(7,$header_id) && $gid eq 17}class="display_table_f"{/if}>付费人数</th>
+            <th style="line-height: 18px;" {if !in_array(8,$header_id) && $gid eq 17}class="display_table_f"{/if}>ARPPU<span class="question—arppu"><em class="question-content">ARPPU=付费金额/付费人数<br>ARPPU值是指每个付费用户平均收入</em></span></th>
+            <th style="line-height: 18px;" {if !in_array(9,$header_id) && $gid eq 17}class="display_table_f"{/if}>ARPU<span class="question—arpu"><em class="question-content">ARPU=付费金额/活跃用户人数<br>ARPU值是指每个活跃用户平均收入</em></span></th>
+            <th style="line-height: 18px;" {if !in_array(10,$header_id) && $gid eq 17}class="display_table_f"{/if}>活跃</br>付费率</th>
+            <th style="line-height: 18px;" {if !in_array(11,$header_id) && $gid eq 17}class="display_table_f"{/if}>新用户</br>付费人数</th>
+            <th style="line-height: 18px;" {if !in_array(12,$header_id) && $gid eq 17}class="display_table_f"{/if}>新用户</br>付费金额</th>
+            <th style="line-height: 18px;" {if !in_array(13,$header_id) && $gid eq 17}class="display_table_f"{/if}>新用户</br>ARPPU<span class="question—newarppu"><em class="question-content">新用户ARPPU=新用户付费金额/新用户付费人数</em></th>
+            <th style="line-height: 18px;" {if !in_array(14,$header_id) && $gid eq 17}class="display_table_f"{/if}>新用户</br>付费率</th>
+            <th style="line-height: 18px;" {if !in_array(15,$header_id) && $gid eq 17}class="display_table_f"{/if}>老用户</br>付费人数</th>
+            <th style="line-height: 18px;" {if !in_array(16,$header_id) && $gid eq 17}class="display_table_f"{/if}>老用户</br>付费金额</th>
+            <th style="line-height: 18px;" {if !in_array(17,$header_id) && $gid eq 17}class="display_table_f"{/if}>老用户</br>付费率</th>
+            {if  $gid eq 1 || $gid eq 17 || $gid eq 23 || $gid eq 24}
+            <th style="line-height: 18px;" {if !in_array(18,$header_id) && $gid eq 17}class="display_table_f"{/if}>综合支出<span class="question—allpay"><em class="question-content">综合支出=投放支出+项目支出+额外支出<br><div style="color:red">(汇总可能包含提前推广费用)</div></em></span></th>
+            <th style="line-height: 18px;" {if !in_array(19,$header_id) && $gid eq 17}class="display_table_f"{/if}>平均单价</th>
+            <th style="line-height: 18px;" {if !in_array(20,$header_id) && $gid eq 17}class="display_table_f"{/if}>ROI<span class="question—roi"><em class="question-content">ROI=新增用户付费/综合支出</em></span></th>
+            <th style="line-height: 18px;" {if !in_array(21,$header_id) && $gid eq 17}class="display_table_f"{/if}>实收ROI<span class="question-reroi"><em class="question-content">实收ROI=新增用户付费利润/综合支出</em></span></th>
+            <th style="line-height: 18px;" {if !in_array(22,$header_id) && $gid eq 17}class="display_table_f"{/if}>付费A值<span class="question-akey"><em class="question-content"> 付费A值=投放支出/新增付费人数</em></span></th>
+            <th style="line-height: 18px;" {if !in_array(23,$header_id) && $gid eq 17}class="display_table_f"{/if}>回款率<span class="question—returnMoney"><em class="question-content">回款率=付费金额/综合支出</em></th>
+            {if $channel}
+            <th style="line-height: 18px;" {if !in_array(24,$header_id) && $gid eq 17}class="display_table_f"{/if} >实际回款率<span class="question—rereturnMoney"><em class="question-content" style="height: 130px;">不同渠道的实际回款率不同<br>oppo、vivo: 回款率*0.62<br>华为: 回款率*0.5<br>小米: 回款率*0.74<br>ios: 回款率*0.7</em></th>
+            {/if}
+            {/if}
+            {if $uid == 'zijian'}
+            <th style="line-height: 18px;" {if !in_array(18,$header_id) && $gid eq 17}class="display_table_f"{/if}>综合支出</th>
+            {/if}
+        {else}
+            <th style="line-height: 18px; width: 15%;" {if !in_array(25,$header_id) && $gid eq 17}class="display_table_f"{/if}>日期</th>
+            <th style="line-height: 18px; width: 20%;" {if !in_array(26,$header_id) && $gid eq 17}class="display_table_f"{/if}>上级游戏</th>
+            <th style="line-height: 18px; width: 20%;" {if !in_array(1,$header_id) && $gid eq 17}class="display_table_f"{/if}>游戏</th>
+            <th style="line-height: 18px; width: 15%;" {if !in_array(27,$header_id) && $gid eq 17}class="display_table_f"{/if}>渠道</th>
+            <th style="line-height: 18px; width: 15%;" {if !in_array(28,$header_id) && $gid eq 17}class="display_table_f"{/if}>包号</th>
+            <th style="line-height: 18px; width: 15%;" {if !in_array(5,$header_id) && $gid eq 17}class="display_table_f"{/if}>付费金额</th>
+        {/if}
+        {if $refine == 6 && ($uid =='chenjh' || $uid == 'heyongzhen')}
+            <th>操作</th>
+        {/if}
+    </tr>
+    {if $active}
+    {foreach from=$active item=order key=key1}
+    <tr {if ($key1+1)%5 eq 0}style="background-color:#ecffe5;"{/if}>
+        {if $refine != 7}
+            {if ($refine != 1 && $displayMode == 'sum') || $refine == 6}
+            <td {if !in_array(25,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            {/if}
+            {if $displayMode == 'details' && $refine == 1}
+            <td title = '{$order.upperName|truncate:8:"..":true}' {if !in_array(1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.upperName|truncate:8:"..":true}</td>
+            <td>{$order.specialName|truncate:8:"..":true}</td>
+
+            {else}
+            <td title = '{if $order.name} {$order.name} {elseif $order.specialName} {$order.specialName} {else} {$order.upperName} {/if}{if $order.gsChannelName && $gid eq 1}-{$order.gsChannelName}{/if}'
+            {if !in_array(1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{if $order.name}{$order.name|truncate:8:"..":true}{elseif $order.specialName}{$order.specialName|truncate:8:"..":true}
+            {else}{$order.upperName|truncate:8:"..":true}{/if}
+            </td>
+            {/if}
+            {if ($refine >= 4 && $displayMode != 'sum') || ($refine >= 5 && $displayMode == 'sum')}
+            <td {if !in_array(27,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelName}</td>
+            {/if}
+            {if ($refine >= 5 && $displayMode != 'sum') || ($refine == 6)}
+            <td {if !in_array(28,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.apkNum}</td>
+            {/if}
+            <td {if !in_array(2,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.newUser}</td>
+            <td {if !in_array(3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.oldUser}</td>
+            <td {if !in_array(4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.activeUser}</td>
+            <td {if !in_array(5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+            <td {if !in_array(6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.multiple}</td>
+            <td {if !in_array(7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.payUser}</td>
+            <td {if !in_array(8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.arpu}</td>
+            <td {if !in_array(9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.arppu}</td>
+            <td {if !in_array(10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.activeUserRate}</td>
+            <td {if !in_array(11,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.newPayUser}</td>
+            <td {if !in_array(12,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.newAmount}</td>
+            <td {if !in_array(13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.newPayArpu}</td>
+            <td {if !in_array(14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.newUserRate}</td>
+            <td {if !in_array(15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.oldPayUser}</td>
+            <td {if !in_array(16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.oldAmount}</td>
+            <td {if !in_array(17,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.oldUserRate}</td>
+            {if  $gid eq 1 || $gid eq 17 || $gid eq 23 || $gid eq 24}
+            <td {if !in_array(18,$header_id) && $gid eq 17}class="display_table_f"{/if}>{if $order.adPay}{$order.adPay}{else}0{/if}</td>
+            <td {if !in_array(19,$header_id) && $gid eq 17}class="display_table_f"{/if}>{($order.adPay/$order.newUser)|string_format:"%.2f"}</td>
+            <td {if !in_array(20,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.roi}</td>
+            <td {if !in_array(21,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.reRoi|string_format:"%.2f"}</td>
+            <td {if !in_array(22,$header_id) && $gid eq 17}class="display_table_f"{/if}>{($order.adPay/$order.newPayUser)|string_format:"%.2f"}</td>
+            <td {if !in_array(23,$header_id) && $gid eq 17}class="display_table_f"{/if}>{($order.amount/$order.adPay)|string_format:"%.2f"}</td>
+            {if $channel}
+            <td {if !in_array(24,$header_id) && $gid eq 17}class="display_table_f"{/if}>
+                {if $order.amount && $order.adPay}
+                    {if $channel == '000368' || $channel == '000020'}
+                        {(($order.amount/$order.adPay)*0.62)|string_format:"%.2f"}
+                    {elseif $channel == '500001'}
+                        {(($order.amount/$order.adPay)*0.5)|string_format:"%.2f"}
+                    {elseif $channel == '000066'}
+                        {(($order.amount/$order.adPay)*0.74)|string_format:"%.2f"}
+                    {elseif $channel == '500011'}
+                        {(($order.amount/$order.adPay)*0.7)|string_format:"%.2f"}
+                    {/if}
+                {else}
+                0
+                {/if}
+            </td>
+            {/if}
+            {if $refine == 6 && ($uid =='chenjh' || $uid == 'heyongzhen')}
+                <td><a href="index.php?m=statistics&a=changeDataStatus&id={$order.id}&model=consumption" id="change">QA</a></td>
+            {/if}
+            {/if}
+            {if $uid == 'zijian'}
+            <td {if !in_array(18,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.adPay}</td>
+            {/if}
+        {else}
+            <td {if !in_array(25,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.date}</td>
+            <td {if !in_array(26,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.upperName}</td>
+            <td {if !in_array(1,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.name}</td>
+            <td {if !in_array(27,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.channelName}</td>
+            <td {if !in_array(28,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.apkNum}</td>
+            <td {if !in_array(5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$order.amount}</td>
+        {/if}
+    </tr>
+    {/foreach}
+    {else}
+    <tr>
+        <td colspan="23">无相关数据</td>
+    </tr>
+    {/if}
+    {if $active}
+    {foreach from=$summary item=sum}
+    <tr style="background-color:#CCCCCC;">
+        {if $refine != 7}
+            {if ($refine != 1 && $displayMode == 'sum') || $refine == 6}
+            <td {if !in_array(25,$header_id) && $gid eq 17}class="display_table_f"{/if}>-</td>
+            {/if}
+            <td {if !in_array(1,$header_id) && $gid eq 17}class="display_table_f"{/if}>数据汇总</td>
+            {if $displayMode == 'details' && $refine == 1}
+            <td>-</td>
+            {/if}
+            {if ($refine >= 4 && $displayMode != 'sum') || ($refine >= 5 && $displayMode == 'sum')}
+            <td {if !in_array(27,$header_id) && $gid eq 17}class="display_table_f"{/if}>-</td>
+            {/if}
+            {if ($refine >= 5 && $displayMode != 'sum') || ($refine == 6)}
+            <td {if !in_array(28,$header_id) && $gid eq 17}class="display_table_f"{/if}>-</td>
+            {/if}
+            <td {if !in_array(2,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.newUser}</td>
+            <td {if !in_array(3,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.oldUser}</td>
+            <td {if !in_array(4,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.activeUser}</td>
+            <td {if !in_array(5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+            <td {if !in_array(6,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.multiple}</td>
+            <td {if !in_array(7,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.payUser}</td>
+            <td {if !in_array(8,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.arpu}</td>
+            <td {if !in_array(9,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.arppu}</td>
+            <td {if !in_array(10,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.activeUserRate}</td>
+            <td {if !in_array(11,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.newPayUser}</td>
+            <td {if !in_array(12,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.newAmount}</td>
+            <td {if !in_array(13,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.newPayArpu}</td>
+            <td {if !in_array(14,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.newUserRate}</td>
+            <td {if !in_array(15,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.oldPayUser}</td>
+            <td {if !in_array(16,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.oldAmount}</td>
+            <td {if !in_array(17,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.oldUserRate}</td>
+            {if  $gid eq 1 || $gid eq 17 || $gid eq 23 || $gid eq 24}
+            <td {if !in_array(18,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.adPay}</td>
+            <td {if !in_array(19,$header_id) && $gid eq 17}class="display_table_f"{/if}>{($sum.adPay/$sum.newUser)|string_format:"%.2f"}</td>
+            <td {if !in_array(20,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.roi}</td>
+            <td {if !in_array(21,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.reRoi}</td>
+            <td {if !in_array(22,$header_id) && $gid eq 17}class="display_table_f"{/if}>{($sum.adPay/$sum.newPayUser)|string_format:"%.2f"}</td>
+            <td {if !in_array(23,$header_id) && $gid eq 17}class="display_table_f"{/if}>{($sum.amount/$sum.adPay)|string_format:"%.2f"}</td>
+            {if $channel}
+            <td {if !in_array(24,$header_id) && $gid eq 17}class="display_table_f"{/if}>
+                {if $sum.amount && $sum.adPay}
+                    {if $channel == '000368' || $channel == '000020'}
+                        {(($sum.amount/$sum.adPay)*0.62)|string_format:"%.2f"}
+                    {elseif $channel == '500001'}
+                        {(($sum.amount/$sum.adPay)*0.5)|string_format:"%.2f"}
+                    {elseif $channel == '000066'}
+                        {(($sum.amount/$sum.adPay)*0.74)|string_format:"%.2f"}
+                    {elseif $channel == '500011'}
+                        {(($sum.amount/$sum.adPay)*0.7)|string_format:"%.2f"}
+                    {/if}
+                {else}
+                0
+                {/if}
+            </td>
+            {/if}
+            {/if}
+        {else}
+            <td {if !in_array(25,$header_id) && $gid eq 17}class="display_table_f"{/if}>-</td>
+            <td {if !in_array(26,$header_id) && $gid eq 17}class="display_table_f"{/if}>-</td>
+            <td {if !in_array(1,$header_id) && $gid eq 17}class="display_table_f"{/if}>-</td>
+            <td {if !in_array(27,$header_id) && $gid eq 17}class="display_table_f"{/if}>-</td>
+            <td {if !in_array(28,$header_id) && $gid eq 17}class="display_table_f"{/if}>-</td>
+            <td {if !in_array(5,$header_id) && $gid eq 17}class="display_table_f"{/if}>{$sum.amount}</td>
+        {/if}
+    </tr>
+    {/foreach}
+    {/if}
+    <!--隐藏域 start-->
+    <div id="popbg"></div>
+    <div class="pop fastDopost">
+        <form action="/index.php?m=statistics&a=orderImport&target=consumption" method="post" enctype="multipart/form-data">
+            <input name="cardid" id="thisComment" type="hidden" value="" />
+            <h3><span><a href="#" class="popclose">关闭</a></span>导入订单数据</h3>
+            <p ><input name="file[]" id="iconfile" type="file" style=" height:25px; line-height:25px; display:block; margin: 20px 0px 20px 25px;" /></p>
+            <p align="right"><button type="submit" class="su popsubmit">提交</button></p>
+        </form>
+    </div>
+    <!--隐藏域 end-->
+</table>
+{if $gid eq 17}
+    {if ($refine == 1 || $refine == 2 || $refine == 3 || $refine == 4) && ( in_array(1,$header_id) || in_array(2,$header_id) || in_array(3,$header_id) || in_array(4,$header_id)  || in_array(5,$header_id)  || in_array(6,$header_id)  || in_array(7,$header_id)  || in_array(8,$header_id)  || in_array(9,$header_id)  || in_array(10,$header_id)  || in_array(11,$header_id)  || in_array(12,$header_id)  || in_array(13,$header_id)  || in_array(14,$header_id)  || in_array(15,$header_id)  || in_array(16,$header_id)  || in_array(17,$header_id)  || in_array(18,$header_id)  || in_array(19,$header_id)  || in_array(20,$header_id)  || in_array(21,$header_id)  || in_array(22,$header_id)  || in_array(23,$header_id)  ) }
+        <div id="pager"></div>
+    {elseif $refine == 5 && ( in_array(1,$header_id) || in_array(2,$header_id) || in_array(3,$header_id) || in_array(4,$header_id)  || in_array(5,$header_id)  || in_array(6,$header_id)  || in_array(7,$header_id)  || in_array(8,$header_id)  || in_array(9,$header_id)  || in_array(10,$header_id)  || in_array(11,$header_id)  || in_array(12,$header_id)  || in_array(13,$header_id)  || in_array(14,$header_id)  || in_array(15,$header_id)  || in_array(16,$header_id)  || in_array(17,$header_id)  || in_array(18,$header_id)  || in_array(19,$header_id)  || in_array(20,$header_id)  || in_array(21,$header_id)  || in_array(22,$header_id)  || in_array(23,$header_id)  || in_array(27,$header_id)  || in_array(24,$header_id)  ) }
+        <div id="pager"></div>
+    {elseif $refine == 6 && ( in_array(1,$header_id) || in_array(2,$header_id) || in_array(3,$header_id) || in_array(4,$header_id)  || in_array(5,$header_id)  || in_array(6,$header_id)  || in_array(7,$header_id)  || in_array(8,$header_id)  || in_array(9,$header_id)  || in_array(10,$header_id)  || in_array(11,$header_id)  || in_array(12,$header_id)  || in_array(13,$header_id)  || in_array(14,$header_id)  || in_array(15,$header_id)  || in_array(16,$header_id)  || in_array(17,$header_id)  || in_array(18,$header_id)  || in_array(19,$header_id)  || in_array(20,$header_id)  || in_array(21,$header_id)  || in_array(22,$header_id)  || in_array(23,$header_id)  || in_array(27,$header_id)  || in_array(24,$header_id)  || in_array(28,$header_id)  ) }
+        <div id="pager"></div>
+    {/if}
+    <script src="js/pager.js"></script>
+{else}
+    <div id="pager"></div>
+    <script src="js/pager.js"></script>
+{/if}
+<script>
+$('#change').click(function() {
+    return confirm('数据属性将修改，确定要执行？');
+});
+$(function() {
+    $('.quick_query').click(function() {
+        var date = getDate( $(this).attr('data-time') );
+        $('#start_date').val( date.start );
+        $('#end_date').val( date.end );
+        $("#sub").click();
+        return false;
+    });
+});
+$('.list:odd').css({ 'backgroundColor': '#f5f5f5' });
+function gotoNext(page,pagesize){
+    $('#page').val(page);
+    $('.searchbox').submit();
+}
+function gotoNext(page,pagesize){
+        window.location.href = "/index.php?m=statistics&a=consumption&page=" + page+"&game={$game}&channel={$channel}&start_date={$start_date}&end_date={$end_date}&apkNum={$apkNum}&upperName={$upperName}&specialName={$specialName}&gid={$gid}&gsSource={$gsSource}&sourceType={$sourceType}&refine={$refine}&sort={$sort}&displayMode={$displayMode}&source={$source}&status={$status}";
+    }
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+{if $gid eq 1 || $gid eq 6 || $gid eq 12}
+<script>
+$(function(){
+{if ($sourceType == 1)}
+    $('#gs').show();
+    $('#advertising').hide();
+    $('#channel').hide();
+    $('#apkNum').hide();
+    $('#channelTitle').hide();
+    $('#apkNumTitle').hide();
+{else if ($sourceType == 2)}
+    $('#gs').hide();
+    $('#advertising').show();
+    $('#channel').show();
+    $('#apkNum').hide();
+    $('#channelTitle').show();
+    $('#apkNumTitle').hide();
+{else}
+    $('#gs').hide();
+    $('#advertising').hide();
+    $('#channel').show();
+    $('#apkNum').show();
+    $('#channelTitle').show();
+    $('#apkNumTitle').show();
+{/if}
+$("select#sourceType").change(function(){
+    var type = $(this).val();
+    if(type == 1){
+        $('#gs').show();
+        $('#advertising').hide();
+        $('#channel').hide();
+        $('#apkNum').hide();
+        $('#channelTitle').hide();
+        $('#apkNumTitle').hide();
+    }else if(type == 2){
+        $('#gs').hide();
+        $('#advertising').show();
+        $('#channel').show();
+        $('#apkNum').hide();
+        $('#channelTitle').show();
+        $('#apkNumTitle').hide();
+    }else{
+        $('#gs').hide();
+        $('#advertising').hide();
+        $('#channel').show();
+        $('#apkNum').show();
+        $('#channelTitle').show();
+        $('#apkNumTitle').show();
+    }
+})
+});
+</script> 
+{/if}
+{if $gid eq 8 || $gid eq 13}
+<script>
+$(function() {
+	get_servers();
+	$("#game").change(function(){
+		get_servers();
+		return false;
+	});
+    get_apkNum();
+    $("#channel").change(function(){
+        get_apkNum();
+        return false;
+    });
+
+	function get_servers() {
+		var game = $('#game').val();
+        var channel = $('#channel').val();
+        var uid = $('#uid').val();
+		if(game == ''){
+			$("#channel option[text!='']").remove();
+			$("#channel").append('<option value="">请选择</option>').change();
+			return false;
+		}
+
+		$.ajax({
+			type: "POST",
+			url: "/?m=sdkChannel&a=getGameChannels",
+			data: "game="+game+"&channelId="+channel+"&uid="+uid,
+			dataType: 'text',
+
+			success: function(result){
+				$("#channel option[text!='0']").remove();
+				$("#channel").append(result);
+			}
+		});
+		return false;
+	}
+	    function get_apkNum() {
+        var game = $('#game').val();
+        var channel = $('#channel').val();
+        var apkNum = $('#apkNum').val();
+        if(channel == ''){
+            $("#apkNum option[text!='']").remove();
+            $("#apkNum").append('<option value="">请选择</option>').change();
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/?m=statistics&a=getApkNum",
+            data: "game="+game+"&channelId="+channel+"&apkNum="+apkNum,
+            dataType: 'text',
+
+            success: function(result){
+                $("#apkNum option[text!='0']").remove();
+                $("#apkNum").append(result);
+            }
+        });
+        return false;
+    }
+});
+</script>
+{/if}
+{/block}

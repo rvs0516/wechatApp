@@ -1,0 +1,29 @@
+/**
+ * this is for models/flashmessages.php
+ */
+div#box .flashmessages {
+	font-size: 12px;
+	background-color: #EAFFD3;
+	margin: 5px;
+	border-color: black;
+	border-width: 1px;
+	border-style: solid;
+}
+
+div#box .flashmessages .error h3 {
+    background-color: #e0f0f0;
+	font-size: 16px;
+	color:red;
+}
+
+div#box .flashmessages .success h3 {
+    background-color: #e0f0f0;
+	font-size: 16px;
+	color: darkblue;
+}
+
+div#box .flashmessages ul {
+	padding-left: 24px;
+}
+
+

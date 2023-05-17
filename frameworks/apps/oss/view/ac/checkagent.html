@@ -1,0 +1,113 @@
+{extends file='layout/new.html'}
+{block name=title}::儲值對賬-聯運統計{/block}
+{block name=head}
+<style>
+<!--
+.box{
+	width: 100%;
+	height:auto;
+}
+.search{
+	float: right;
+	padding:5px 0;
+}
+.search ul li{
+	float: left;
+	margin:0 5px;
+}
+-->
+</style>
+<script>
+function confirmOrder(ordertime, project, specific){
+	if(confirm("是否確認對賬一致？")){
+		var timestamp = Math.round(new Date().getTime() / 1000);
+		$.ajax({
+            type: 'POST',
+            url:  '?m=ac&a=checkagent&action=ajax',
+            data: 'ordertime='+ ordertime+'&project=' + project + '&specific=' + specific +'&timestamp=' + timestamp,
+            dataType : "json",
+            success: function(msg) {
+				if(msg.code == 1){
+					$("#"+ordertime+project+specific).html("已確認");
+					return true;
+				}else{
+					alert("操作有誤");
+					return false;
+				}
+            }
+        })
+	}else return false;
+}
+</script>
+{/block}
+{block name=body}
+<div class="box">
+	<div>
+		<h3 style="float: left;">聯運統計</h3>
+		<form action="" method="post">
+			<div class="search">
+				<ul>
+					<li style="vertical-align: middle;">
+						<select name="year">
+							{for $i=2012;$i<2016;$i++}<option {if $smarty.post.year == $i}selected="selected"{/if}>{$i}</option>{/for}
+						</select> 年
+					</li>
+					<li>
+						<select name="month">
+							<option value="">全部</option>
+							{for $i=1;$i<13;$i++}<option {if $smarty.post.month == $i}selected="selected"{/if}>{$i}</option>{/for}
+						</select> 月</li>
+					<li>聯運商:
+						<select name="agent">
+							<option value="">全部</option>
+							{foreach item=item key=key from=$agents}<option {if $smarty.post.agent == $item.channel}selected="selected"{/if} value="{$item.channel}">{$item.channel}</option>{/foreach}
+						</select>
+					</li>
+					<li>確認對賬：
+						<select name="isconfirm">
+							<option value="" >全部</option>
+							<option value="1" {if $smarty.post.isconfirm == '1'}selected="selected"{/if}>已確認</option>
+							<option value="2" {if $smarty.post.isconfirm == '2'}selected="selected"{/if}>未確認</option>
+						</select>
+					</li>
+					<li><input type="submit" value="查询" style="width: 50px;height: 25px;"/></li>
+				</ul>
+			</div>
+		</form>
+	<div style="clear: both;">
+		<table class="list">
+			<thead>
+				<tr>
+					<th>開始時間</th>
+					<th>結束時間</th>
+					<th>聯運商</th>
+					<th>遊戲</th>
+					<th>儲值金額(己)</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{if $total && count($total)}
+				{foreach item=item key=key from=$total}
+				<tr>
+					<td>{$item.starttime}</td>
+					<td>{$item.endtime}</td>
+					<td>{$item.agentname}</td>
+					<td>{$item.gamename}</td>
+					<td>{$item.total}</td>
+					{if $item.confirmOrder && $item.confirmOrder == 1}
+					<td>已確認</td>
+					{else}
+					<td id="{$item.ym}{$item.agentname}{$item.game}"><a href="javascript:;" onclick="confirmOrder('{$item.ym}','{$item.agentname}','{$item.game}')">對賬一致</a></td>
+					{/if}
+				</tr>
+				{/foreach}
+				{else}
+				<tr><td colspan="7">數據不存在</td></tr>
+				{/if}
+			</tbody>
+		</table>
+	</div>
+	</div>
+</div>
+{/block}

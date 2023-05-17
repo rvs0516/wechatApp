@@ -1,0 +1,319 @@
+{extends file='layout/new.html'}
+{block name=body}
+{if $checkRoot eq 1}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+	<style>
+		.list td{ padding:10px 0;}
+		.show{ display:block; color:#3d203f; text-decoration:none; width:110px; position:relative; left:0; top:0; z-index:10; float:left;}
+		.show p{ display:none;}
+		.show:hover{ display:block; text-decoration:none; height:100%; position:relative; z-index:1000 !important;}
+		.show:hover p{ display:block; color:#3d203f; background:#cff0fc; position:absolute; left:-10px; top:-10px; white-space:normal; width:700px;; padding:10px; box-shadow:1px 1px 10px #333; cursor:pointer;}
+	</style>
+<!--START 列表頁-->
+
+{if $operation == 'index'}
+	<h3>
+		{if $checkRoot eq 1}
+		<span><a href="/index.php?m=sdkGame&a=gamePay&operation=add">新增支出</a></span>
+		{/if}
+		项目支出
+	</h3>
+	<form class="searchbox" action="/index.php?m=sdkGame&a=gamePay" method="post">
+		{if  $gid eq 2 || $gid eq 11 || $gid eq 15 || $gid eq 13 || $gid eq 17}
+            <input type="hidden" id="gameStr" value="{$gameStr}" />
+            <input type="hidden" id="gid" value="{$gid}" />
+        {/if}
+        <p>
+        <span>来自游戏：</span>
+            <select name="upperName" id="upperName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+            <select name="specialName" id="specialName" style="width: 98px;">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+            <select name="game" id="game" style="width: 98px;"><option value="">请选择</option>
+	            {foreach from=$games item=name key=key1}
+	                <option value="{$key1}" {if $gameAlias eq $key1}selected="selected"{/if}> {$key1|capitalize|truncate:1:"":true} — {$name}</option>
+	            {/foreach}
+	        </select>
+		<span>渠道： </span>
+		<select name="channel" id="channel">
+            <option value="">请选择</option>
+            {foreach from=$channels key=key1 item=data}
+                <option value="{$key1}" {if ($channel == $key1)}selected="selected"{/if}>{$data}</option>
+            {/foreach}
+        </select>
+        <span>包号：</span>
+        <select name="apkNum" id="apkNum" style="width: 180px;">
+            <option value="">请选择</option>
+            {foreach from=$committe_apknum key=key2 item=apk}
+                <option value="{$apk}" {if ($apkNum == $apk)}selected="selected"{/if}>{$apk}</option>
+            {/foreach}
+        </select>
+        <span>时间：</span>
+        <input type="text" name="start_date" id="start_date" class="date" value="{$start_date}" onclick="var end_date=$dp.$('end_date');WdatePicker({ onpicked:function(){ end_date.focus();},minDate:'#F{ ($dp.$D(\'end_date\',{ y:-1,d:0}))}',maxDate:'#F{ $dp.$D(\'end_date\')}'})"> 至 <input type="text" name="end_date" id="end_date" class="date" value="{$end_date}" onclick="WdatePicker({ minDate:'#F{ ($dp.$D(\'start_date\',{ d:0,H:0}))}',maxDate:'#F{ ($dp.$D(\'start_date\',{ y:1,d:0}))}'} )">
+    </p>
+    <p>
+		<span>支出模块：</span>
+		<select name="module" id="module" onchange="fn()">
+            <option value="">请选择</option>
+            <option value="1" {if $module == 1}selected="selected"{/if}>公司模块</option>
+            <option value="2" {if $module == 2}selected="selected"{/if}>项目模块</option>
+            <option value="3" {if $module == 3}selected="selected"{/if}>游戏模块</option>
+        </select>
+		<span style="width: 192px;">支出类型：</span>
+		<select name="type" id="type">
+            <option value="">请选择</option>
+        </select>
+	</p>
+    <table style="clear:both;margin-top:10px; float:right;width:100%;">
+        <tr>
+            <td align="left"><button type="submit" class="su inline" style=" margin-left: 30px;">查询</button>
+        </tr>
+    </table>
+	</form>
+	<table class="list">
+		<tr style="background-color:#CCCCCC;">
+			<th>日期</th>
+			<th>支出模块</th>
+			<th>支出类型</th>
+			<th>游戏项目</th>
+			<th>游戏名称</th>
+			<th>渠道</th>
+			<th>包号</th>
+			<th>运营模式</th>
+			<th>支出</th>
+			<th>详情</th>
+			{if $checkRoot eq 1}
+			<th>操作</th>
+			{/if}
+		</tr>
+		{foreach from=$game_list item=game}
+		<tr>
+			<td>{$game.date}</td>
+			<td><font {if $game.module eq 1} color="red" {elseif $game.module eq 2} color="green" {else} color="blue" {/if}>{$game.moduleName}</font></td>
+			<td>{$game.typeName}</td>
+			<td>{if $game.upperName}{$game.upperName}{else}-{/if}</td>
+			<td>{if $game.gameName}{$game.gameName}{else}-{/if}</td>
+			<td>{if $game.channelName}{$game.channelName}{else}-{/if}</td>
+			<td>{if $game.apkNum}{$game.apkNum}{else}-{/if}</td>
+			<td>{if $game.pattern eq 1}联运{elseif $game.pattern eq 2}投放{elseif $game.pattern eq 2}cps{else}-{/if}</td>
+			<td>{$game.pay}</td>
+			<td>{$game.remark}</td>
+			{if $game.changeRoot eq 1}
+			<td style="width:160px"><a href="/index.php?m=sdkGame&a=gamePay&operation=edit&id={$game.id}" target="_blank">编辑</a> | <a href="/index.php?m=sdkGame&a=gamePay&operation=del&id={$game.id}" class="delete_confirm">刪除</a></td>
+			{/if}
+		</tr>
+		    {foreachelse}
+		<tr>
+		    <td colspan="21">无相关数据</td>
+		</tr>
+		{/foreach}
+		{if $sum > 0}
+		<tr style="background-color:#CCCCCC;">
+			<td>汇总</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td>{$sum}</td>
+			<td></td>
+			<td></td>
+		</tr>
+		{/if}
+	</table>
+	<div id="pager"></div>
+
+<script src="js/pager.js"></script>
+<script>
+$('.delete_confirm').click(function() {
+	return confirm('數據不可恢復，你確定要刪除嗎？');
+});
+
+function gotoNext(page,pagesize){
+	window.location.href = "/index.php?m=sdkGame&a=gamePay&page=" + page+ "&start_date={$start_date}&end_date={$end_date}&upperName={$upperName}&specialName={$specialName}&game={$gameAlias}&channel={$channel}&apkNum={$apkNum}&module={$module}&type={$type}";
+}
+var pageStr = new Page('{$list_page}', '{$list_total}', 5, '{$list_length}', 'gotoNext').GetText();
+document.getElementById('pager').innerHTML = pageStr;
+</script>
+
+
+{elseif $operation == 'add' || $operation == 'edit'}
+<script language="javascript" type="text/javascript" src="/js/DatePicker/WdatePicker.js"></script>
+<script language="javascript" type="text/javascript" src="/js/DatePicker/calendar.js"></script>
+<script language="javascript" type="text/javascript" src="/js/linkage.js"></script>
+
+	<h3>
+		<span><a href="/index.php?m=sdkGame&a=gamePay">返回列表</a></span>
+		{if $operation == 'add'}
+			新增支出
+		{else}
+			编辑支出
+		{/if}
+	</h3>
+	<form action="/index.php?m=sdkGame&a=gamePay&operation=save" method="post" class="searchbox" enctype="multipart/form-data">
+		<input type="hidden" name="id" value="{$gameList.id}" />
+		<p>
+			<span>支出模块：</span>
+			<select name="module" id="module" onchange="fn()">
+	            <option value="">请选择</option>
+	            <option value="1" {if $gameList.module == 1}selected="selected"{/if}>公司模块</option>
+	            <option value="2" {if $gameList.module == 2}selected="selected"{/if}>项目模块</option>
+	            <option value="3" {if $gameList.module == 3}selected="selected"{/if}>游戏模块</option>
+	        </select>
+	        <font color="#FF0000">&nbsp;*&nbsp;</font>
+		</p>
+		<p>
+			<span>支出类型：</span>
+			<select name="type" id="type">
+	            <option value="">请选择</option>
+	        </select>
+	        <font color="#FF0000">&nbsp;*&nbsp;</font>
+		</p>
+		<span id="m2">
+		<p>
+			<span>游戏项目：</span>
+            <select name="upperName" id="upperName">
+                <option value="">请选择</option>
+                {foreach from=$UpperList item=name key=key1}
+                    <option value="{$name.upperName}" {if $gameList.upperName eq $name.upperName}selected="selected"{/if}>{$name.upperName}</option>
+                {/foreach}
+            </select>
+		</p>
+		<span id="m3">
+		<p>
+			<span>专服游戏名：</span>
+            <select name="specialName" id="specialName">
+                <option value="">请选择</option>
+                {foreach from=$specialList item=name key=key1}
+                    <option value="{$name.specialName}" {if $gameList.specialName eq $name.specialName}selected="selected"{/if}>{$name.specialName}</option>
+                {/foreach}
+            </select>
+        </p>
+        <p>
+			<span>游戏：</span>
+                        <select name="game" id="game">
+	            <option value="">请选择</option>
+	            {foreach from=$games item=name key=key1}
+	                <option value="{$key1}" {if $gameList.gameAlias eq $key1}selected="selected"{/if}>{$name}</option>
+	            {/foreach}
+	        </select>
+		</p>
+		<p>
+			<span>渠道：</span>
+			<select name="channel" id="channelList">
+                <option value="">请选择</option>
+				{foreach from=$channels key=key item=data}
+				<option value="{$key}" {if ($key == $gameList.channelId)}selected="selected"{/if}>{$data}</option>
+				{/foreach}
+			</select>
+		</p>
+		<p>
+			<span>包号：</span>
+			<select name="apkNum">
+                <option value="">请选择</option>
+				{foreach from=$committe_apknum key=key item=data}
+				<option value="{$data}" {if ($data == $gameList.apkNum)}selected="selected"{/if}>{$data}</option>
+				{/foreach}
+			</select>
+		</p>
+		<p>
+			<span>运营模式：</span>
+			<select name="pattern">
+                <option value="">请选择</option>
+                <option value="1" {if $gameList.pattern == 1}selected="selected"{/if}>联运</option>
+	            <option value="2" {if $gameList.pattern == 2}selected="selected"{/if}>投放</option>
+	            <option value="3" {if $gameList.pattern == 3}selected="selected"{/if}>cps</option>
+			</select>
+		</p>
+		</span>
+		</span>
+		<p>
+			<span>日期：</span>
+			<input type="text" name="date" value="{$gameList.date|date_format:'%Y-%m-%d'}" onclick="WdatePicker({ maxDate: '9999-12-30', readOnly: true });" placeholder="请填写支出日期" />
+			<font color="#FF0000">&nbsp;*&nbsp;</font>
+		</p>
+		<p>
+			<span>项目支出：</span>
+			<input type="text" name="pay" value="{$gameList.pay}" /><font style="color: red">&nbsp;*&nbsp;请填写人民币金额</font>
+		</p>
+		<p>
+			<span>支出详情：</span>
+			<input type="text" name="remark" value="{$gameList.remark}" /><font style="color: red"></font>
+		</p>
+		<p class="line">
+			<button type="submit" name="do" class="su">立即提交</button>
+			<button type="reset" class="re">条件重置</button>
+		</p>
+	</form>
+<script>
+{if $gameList.module == 2}
+$('#m2').show();
+$('#m3').hide();
+{else if $gameList.module == 3}
+$('#m2').show();
+$('#m3').show();
+{else}
+$('#m2').hide();
+$('#m3').hide();
+{/if}
+$(function(){
+	$("select#module").change(function(){
+		var group = $(this).val();
+		if((group == 2)){
+			$('#m2').show();
+			$('#m3').hide();
+		}else if(group == 3){
+			$('#m2').show();
+			$('#m3').show();
+		}else{
+			$('#m2').hide();
+			$('#m3').hide();
+		}
+	})
+});
+</script> 
+{/if}
+{else}
+<div style="font-size: 20px; color:red; margin:5% 0 0 30%;">无权限查看相关数据</div>
+{/if}
+<!--END 列表頁-->
+<script>
+fn();
+function fn(){
+	var select=document.getElementById("module");
+	var c=select.value;
+	var type=document.getElementById("type");
+	switch(c)
+	{
+	case "1": type.innerHTML="<option value=''>请选择</option>\
+	<option value='1' {if $type == 1}selected='selected'{/if}>资质费用</option>\
+	<option value='2' {if $type == 2}selected='selected'{/if}>推广费用</option>\
+	<option value='3' {if $type == 3}selected='selected'{/if}>企业签</option>\
+	<option value='4' {if $type == 4}selected='selected'{/if}>服务器</option>";
+	break;
+	case "2":type.innerHTML="<option value=''>请选择</option>\
+	<option value='1' {if $type == 1}selected='selected'{/if}>项目支出</option>";
+	break;
+	case "3":type.innerHTML="<option value=''>请选择</option>\
+	<option value='1' {if type == 1}selected='selected'{/if}>自充支出</option>\
+	<option value='2' {if type == 2}selected='selected'{/if}>红包支出</option>\
+	<option value='3' {if $type == 3}selected='selected'{/if}>返利补单</option>\
+	<option value='4' {if $type == 4}selected='selected'{/if}>渠道推广</option>";
+	break;
+	default:type.innerHTML="<option>请选择</option>";
+	}
+};
+</script> 
+{/block}

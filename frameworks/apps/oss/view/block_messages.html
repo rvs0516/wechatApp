@@ -1,0 +1,9 @@
+<link rel="stylesheet" type="text/css" href="/css/messages.css" />
+{if isset($errors) && count($errors)}
+    <div class="errorMessages">
+        <h3>發生錯誤了 : </h3>
+        {foreach $errors as $err}
+        <p>{$err}</p>
+        {/foreach}
+    </div>
+{/if}
