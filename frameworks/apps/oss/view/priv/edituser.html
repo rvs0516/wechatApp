@@ -1,0 +1,34 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3><span><a href="index.php?m=priv&a=listuser">返回后台用户列表</a></span>修改用户</h3>
+<form action="index.php?m=priv&a=edituser&do" method="post" class="searchbox">
+<input type="hidden" name="id" value="{$id}" />
+    <p><span>帳號:</span><input type="text" name="form[uid]"  value="{$row.uid}"/></p>
+    <p><span>新密码:</span><input type="password" name="form[password]" id="passwd" value=""/></p>
+    <p><span>確認新密码:</span><input type="password" name="form[password]" id="passwd2" value=""/></p>
+    <p class="inline"><button type="submit" name="do" class="su" id="tj" value="立即提交" style="margin-top:2px;">立即提交</button><button type="reset" class="su">条件重置</button></p>
+</form>
+<script>
+$(function(){
+	$('#search').click(function(){
+		var uid = $('#uid').val();
+		location.href="index.php?m=priv&a=addrole&menuid={$menuid}&uid="+uid;
+	
+	});
+	$('#parentid').change(function(){
+		location.href = 'index.php?m=priv&a=editmenu&id={$id}&parentid='+$('#parentid').val();
+	});
+	$("#tj").click(function(){
+		if ($("#passwd").val() == '' || $("#passwd2").val() == '') {
+			alert("新密码或確認新密码不能为空！");
+			return false;
+		}
+		if ($("#passwd").val() != $("#passwd2").val()) {
+			alert("新密码和確認密码不一致！");
+			return false;
+		}
+	});
+});
+</script> 
+{/block} 

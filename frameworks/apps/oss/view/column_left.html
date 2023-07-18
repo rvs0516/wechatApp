@@ -1,0 +1,17 @@
+			
+			<div id="sidebar">
+  				<ul>
+                        {if !empty($menus)}
+                        {foreach from=$menus key=k item=v}
+                	<li><h3><a href="#" class="house">{$v.name}</a></h3>
+                        <ul>
+                            {foreach from=$v.list key=k1 item=v1}
+                        	<li><a href="/index.php?m={$v1.module}&a={$v1.action}{$v1.param}" class="report">{$v1.name}</a></li>
+                                {/foreach}
+           
+                        </ul>
+                        {/foreach}
+                        {/if}
+                    </li>
+            </ul>
+          </div>

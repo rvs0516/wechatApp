@@ -1,0 +1,60 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3>
+    部门列表
+</h3>
+
+<div>
+    <div>
+        <span class="tisbutton">
+            <a href="/index.php?m=department&a=syncDepartments">同步部门</a>
+        </span>
+    </div>
+    <div>
+        <table class="list">
+            <thead>
+                <th>部门ID</th>
+                <th>部门名称</th>
+                <th>父部门ID</th>
+                <th>排序</th>
+                <!-- <th>操作</th> -->
+            </thead>
+            <tbody>
+                {if $departmentList}
+                {foreach from=$departmentList key=k item=v}
+                <tr>
+                    <td>{$v.departmentid}</td>
+                    <td>{$v.name}</td>
+                    <td>{$v.parentid}</td>
+                    <td>{$v.order}</td>
+                    <!-- <td style="padding: 5px;">
+                        <a href="index.php?m=department&a=updateDepartment&departmentid={$v.departmentid}">修改</a>
+                    </td> -->
+                </tr>
+                {/foreach}
+                {else}
+                <tr>
+                    <td colspan="12">
+                        噢嚯！当前还没有数据喔
+                    </td>
+                </tr>
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+    function gotoNext(page,pagesize){
+        window.location.href="index.php?m=department&a=departmentList&page="+page;
+    }
+    $(function(){
+        var pageStr = new Page('{$page}', '{$rowcount}',5,'{$row}','gotoNext').GetText();
+        $('#pager').html('');
+        $('#pager').html(pageStr);
+    });
+</script> 
+{/block} 

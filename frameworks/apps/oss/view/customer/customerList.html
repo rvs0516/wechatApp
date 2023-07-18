@@ -1,0 +1,116 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3>
+    <!-- <span><a href="index.php?m=customer&a=addrole&op=add">添加</a></span> -->
+    我的客户
+</h3>
+
+<div>
+    <div>
+        <span class="tisbutton">
+            <a href="/index.php?m=customer&a=synsMyCustomers">同步客户</a>
+        </span>
+    </div>
+    <div>
+        <table class="list">
+            <thead>
+                <th>序号</th>
+                <th>客户名字</th>
+                <th>客户头像</th>
+                <th>性别</th>
+                <th>所属人</th>
+                <th>客户类型</th>
+                <th>客户状态</th>
+                <th>客户来源</th>
+                <th>企业标签</th>
+                <th>个人标签</th>
+                <th>备注名称</th>
+                <th>备注手机号</th>
+                <th>备注企业名称</th>
+                <th>描述</th>
+                <th>公司简称</th>
+                <th>公司全称</th>
+                <th>创建时间</th>
+                <th>重新创建时间</th>
+                <th>被员工删除时间</th>
+                <th>被客户删除时间</th>
+                <th>被客户删除次数</th>
+                <th>修改时间</th>
+                <th>操作</th>
+            </thead>
+            <tbody>
+                {if $customerList}
+                {foreach from=$customerList key=k item=v}
+                <tr>
+                    <td>{$v.id}</td>
+                    <td>{$v.name}</td>
+                    <td style="width: 50px;padding: 5px;">
+                        <img src="{$v.avatar}" alt="" style="width: 100%;">
+                    </td>
+                    <td>{$v.gender}</td>
+                    <td>{$v.follow_userid}</td>
+                    <td>{$v.type}</td>
+                    <td>{$v.state}</td>
+                    <td>{$v.add_way}</td>
+                    <td>{$v.tag_name1}</td>
+                    <td>{$v.tag_name2}</td>
+                    <td>{$v.remark}</td>
+                    <td>{$v.remark_mobiles}</td>
+                    <td>{$v.remark_corp_name}</td>
+                    <td>{$v.description}</td>
+                    <td>{$v.corp_name}</td>
+                    <td>{$v.corp_full_name}</td>
+                    <td>{$v.createtime}</td>
+                    <td>{$v.restart_createtime}</td>
+                    <td>{$v.follow_deletetime}</td>
+                    <td>{$v.customer_deletetime}</td>
+                    <td>{$v.customer_delete_number}</td>
+                    <td>{$v.updatetime}</td>
+                    <td style="padding: 5px;">
+                        <!-- <a href="index.php?m=customer&a=updateCustomerRemark&uid={$v.uid}" class="delete">刪除</a> -->
+                        <a href="index.php?m=customer&a=updateCustomerRemark&external_userid={$v.external_userid}&follow_userid={$v.follow_userid}&op=edit">修改</a>
+                    </td>
+                </tr>
+                {/foreach}
+                {else}
+                <tr>
+                    <td colspan="23">
+                        噢嚯！当前还没有数据喔
+                    </td>
+                </tr>
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+    function gotoNext(page,pagesize){
+        window.location.href="index.php?m=customer&a=customerList&page="+page;
+    }
+    $(function(){
+		$(".delete").click(function(){
+				return confirm("确定刪除？");
+			})
+        var pageStr = new Page('{$page}', '{$rowcount}',5,'{$row}','gotoNext').GetText();
+        $('#pager').html('');
+        $('#pager').html(pageStr);
+        $('#btn1').click(function(){
+            var name=$('#name').val();
+            var display=$('#display').val();
+            $.post('index.php?m=ajax&a=addaroup','name='+encodeURIComponent(name)+'&display='+display,function(data){
+                var o=eval('('+data+')');
+                if(o.status){
+                    alert('操作成功！');
+                    location.href="index.php?m=customer&a=listgroup";
+                } else {
+                    alert(o.msg);
+                }
+            });
+        });
+    });
+</script> 
+{/block} 

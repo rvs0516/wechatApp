@@ -1,0 +1,55 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3><span><a href="index.php?m=priv&a=listmodule">返回模块列表</a></span>添加模块</h3>
+<form action="index.php?m=priv&a=addmodule" method="post" class="searchbox">
+    <p><span>选择模块:</span><select name="form[module]">
+    {foreach from=$modulelist key=k item=v}
+    <option value="{$v.module}">{$v.name}/{$v.module}</option>
+    {/foreach}
+    </select>&nbsp;<a href="#" class="showbox">添加</a></p>
+    <p><span>动作名称:</span><input type="text" name="form[name]" class="text"/></p>
+    <p><span>动作标识:</span><input type="text" name="form[action]"  class="text"/></p>
+    <p><span>参数:</span><input type="text" name="form[param]"  class="text"/></p>
+    <p><span>外链:</span><input type="text" name="form[outlink]"  class="text"/></p>
+    <p><span>排序:</span><input type="text" name="form[sort]" class="text"/></p>
+    <p class="inline">是否显示<input type="checkbox" value="1" name="form[display]"/> &nbsp;是否后台&nbsp;<input type="checkbox" value="1" name="form[isadmin]" /></p>
+    <p><span style="float:left;vertical-align:middle;margin-top:30px;">说明:</span><textarea name="form[des]" class="text"></textarea></p>
+    <p class="inline" style="margin-top:4px;"><button type="submit" name="do" class="su">立即提交</button><button type="reset" class="su">条件重置</button></p>
+</form>
+
+<div id="popbg"></div>
+<div class="pop searchbox">
+	<h3><span><a href="#" class="popclose">关闭</a></span>添加模块</h3>
+    <p><span>模块名称：</span><input type="text" id="name"/></p>
+    <p><span>模块标识：</span><input type="text" id="module"/></p>
+    <p><span>排序：</span><input type="text" id="sort"/></p>
+    <p class="inline" style="padding-top:10px;"><button type="submit" class="su popsubmit" style="margin-top:3px;">立即提交</button></p>
+</div>
+<script src="/js/pop.js"></script>
+<script>
+$(function(){
+	$('.popsubmit').click(function(){
+		if($("#name").val() == ''){
+		alert("模块名称不能为空！");
+		return false;
+		}else if($("#module").val() == ''){
+			alert("模块名称不能为空！");
+			return false;
+		}
+		var name=$('#name').val();
+		var module=$('#module').val();
+		var ssort=$('#sort').val();
+		$.post('index.php?m=ajax&a=addmodule','name='+name+'&module='+module+'&sort='+ssort,function(data){
+			var o=eval('('+data+')');
+			if(o.status){
+				alert('操作成功！');
+				location.reload();
+			} else {
+				alert(o.msg);
+			}
+		});
+	});
+});
+</script>
+{/block}

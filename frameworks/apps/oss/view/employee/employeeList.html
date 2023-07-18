@@ -1,0 +1,73 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3>
+    员工列表
+</h3>
+
+<div>
+    <div>
+        <span class="tisbutton">
+            <a href="/index.php?m=employee&a=syncEmployees">同步员工</a>
+        </span>
+    </div>
+    <div>
+        <table class="list">
+            <thead>
+                <th>序号</th>
+                <th>账号</th>
+                <th>姓名</th>
+                <th>别名</th>
+                <th>状态</th>
+                <th>职务</th>
+                <th>部门</th>
+                <th>手机号码</th>
+                <th>创建时间</th>
+                <th>修改时间</th>
+                <th>操作</th>
+            </thead>
+            <tbody>
+                {if $employeeList}
+                {foreach from=$employeeList key=k item=v}
+                <tr>
+                    <td>{$v.id}</td>
+                    <td>{$v.userid}</td>
+                    <td>{$v.name}</td>
+                    <td>{$v.alias}</td>
+                    <td>{$v.status}</td>
+                    <td>{$v.position}</td>
+                    <td>{$v.department}</td>
+                    <td>{$v.mobile}</td>
+                    <td>{$v.createtime}</td>
+                    <td>{$v.updatetime}</td>
+                    <td style="padding: 5px;">
+                        <a href="index.php?m=employee&a=updateEmployeeDepartment&userid={$v.userid}">变更部门</a>
+                        <!-- <a href="index.php?m=employee&a=updateEmployeeRoleGroup&userid={$v.userid}">变更角色组</a> -->
+                    </td>
+                </tr>
+                {/foreach}
+                {else}
+                <tr>
+                    <td colspan="12">
+                        噢嚯！当前还没有数据喔
+                    </td>
+                </tr>
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+    function gotoNext(page,pagesize){
+        window.location.href="index.php?m=employee&a=employeeList&page="+page;
+    }
+    $(function(){
+        var pageStr = new Page('{$page}', '{$rowcount}',5,'{$row}','gotoNext').GetText();
+        $('#pager').html('');
+        $('#pager').html(pageStr);
+    });
+</script> 
+{/block} 

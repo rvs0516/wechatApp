@@ -1,0 +1,54 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3>
+    <span><a href="index.php?m=customer&a=allCustomerList">返回客户列表</a></span>
+    在职继承
+</h3>
+<form action="index.php?m=customer&a=saveTransferCustomer" method="post" class="searchbox">
+    <p>
+        <input type="hidden" id="external_userid" value="{$external_userid}" name="form[external_userid]"/>
+    </p>
+    <p>
+        <span>客户名称</span>
+        <input type="text" id="name" value="{$name}" name="form[name]" readonly="readonly"/>
+        <font>不可修改。</font>
+    </p>
+    <p>
+        <span>原跟进成员</span>
+        <input type="text" id="follow_userid" value="{$follow_userid}" name="form[follow_userid]" readonly="readonly"/>
+        <font>不可修改。</font>
+    </p>
+    <p>
+        <span>接替成员</span>			
+        <select name="form[new_follow_userid]" id="new_follow_userid">
+            <option value="">请选择接替成员</option>
+            {foreach from=$followuserList key=k item=v}
+            <option value="{$v}">{$v}</option>
+            {/foreach}
+        </select>
+        <font><em style="color:#ff0000;">*必填。</em>接替成员需要配置了客户联系功能。</font>
+    </p>
+    <p class="inline">
+        <button type="submit" class="su" value="立即提交">立即提交</button>
+    </p>
+</form>
+<script>
+$(function(){
+    $(".su").click(function(){
+        var follow_userid = $("#follow_userid").val()
+        var new_follow_userid = $("#new_follow_userid").val()
+
+        if (follow_userid == new_follow_userid) {
+            alert("接替成员不能跟原跟进成员一样！")
+            return false
+        }
+
+        if (!new_follow_userid) {
+            alert("接替成员不能为空！")
+            return false
+        }
+    })
+});
+</script>
+{/block} 

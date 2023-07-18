@@ -1,0 +1,63 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script>
+$(function(){
+$('.delect').click(function(){
+	return confirm("确定刪除？");
+})
+$('#search').click(function(){
+	var uid = $('#uid').val();
+	location.href="index.php?m=priv&a=addrole&op=add&menuid={$menuid}&uid=" + uid;
+})
+// {if (($rolerow.gid == 4 || $rolerow.gid == 11))}
+// $('#employee').show();
+// {else}
+// $('#employee').hide();
+// {/if}
+// $("select#gid").change(function(){
+// 	var group = $(this).val();
+// 	if(group == 4|| group == 11){
+// 		$('#employee').show();
+// 	}else{
+// 		$('#employee').hide();
+// 	}
+// })
+});
+</script> 
+<h3><span><a href="index.php?m=priv&a=listrole">返回角色列表</a></span>{if $smarty.get.op eq 'add'}添加角色{else}修改角色{/if}</h3>
+	<form action="index.php?m=priv&a=addrole" method="post" class="searchbox">
+			<p><span>用户名称</span><input type="text" id="uid" class="text" value="{$ruid}" name="form[uid]"/>{if $smarty.get.op eq 'add'}<input type="button" id="search" class="su" style="margin-left:10px;" value="检测用户"/>{/if}{if $isfound eq 2}<font style="margin-left:5px;" color="red">搜索{$ruid}:沒有找到此用户,請为此用户添加權限</font>{/if}
+			</p>
+            <p>
+				<span>用户组</span>
+				<select id="gid" name="form[gid]">
+				<option value="0">请选择用户组</option>
+				{foreach from=$grouplist key=k2 item=v2}
+				<option  {if $v2.iscurrent}selected="selected"{/if}  value="{$v2.id}">{$v2.name}</option>
+				{/foreach}
+				</select>
+			</p>
+			<p id="employee">
+				<span>授权员工</span>			
+				<select name="form[employee]" id="">
+					<option value="">请选择员工</option>
+					{foreach from=$employeeList key=k item=item}
+					<option value="{$item.userid}" {if $item.userid eq {$rolerow.agent_uid}}selected="selected"{/if} >{$item.userid}</option>
+					{/foreach}
+				</select>
+			</p>
+			{foreach from=$modulelist key=k item=v}
+			<p>{$v.name}</p>
+			<p>
+			{foreach from=$v.list key=k1 item=v1}
+			<span><input type="checkbox" name="form[aid][]" class="text" {if $v1.hasperm}checked="checked"{/if} value="{$v1.id}"/>{$v1.aname}</span>
+			{/foreach}
+			</p>
+			{/foreach}
+             <p><span>真实姓名</span><input id="realname" type="text" name="form[realname]" class="text" value="{$rolerow.realname}"/></p>
+			<p><span>EMAIL</span><input id="mail" type="text" name="form[mail]" class="text" value="{$rolerow.mail}"/></p>
+			<p><span>手机</span><input id="mobile" type="text" name="form[mobile]" class="text"  value="{$rolerow.mobile}"/></p><p><span>密码:</span><input id="password" type="password" class="text" name="form[password]" value=""/>&nbsp;<font color="red">注：若密码为空，则不修改密码。</font></p>
+			<p class="inline"><button type="submit" name="do" class="su" value="立即提交">立即提交</button>&nbsp;<button type="reset" class="su">条件重置</button></p><!--  {if $isfound}<button type="submit" value="刪除" onclick="location.href='index.php?m=priv&a=delrole&uid={$ruid}'" class="su">刪除</button>{/if}</p> -->						
+	  </form>
+{/block} 

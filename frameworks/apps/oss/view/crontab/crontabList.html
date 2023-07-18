@@ -1,0 +1,77 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3>
+    任务列表
+</h3>
+
+<div>
+    <div>
+        <table class="list">
+            <thead>
+                <th>序号</th>
+                <th>任务名称</th>
+                <th>动作标识</th>
+                <th>状态</th>
+                <th>操作用户</th>
+                <th>创建时间</th>
+                <th>完成时间</th>
+                <!-- <th>操作</th> -->
+            </thead>
+            <tbody>
+                {if $crontabList}
+                {foreach from=$crontabList key=k item=v}
+                <tr>
+                    <td>{$v.id}</td>
+                    <td>{$v.name}</td>
+                    <td>{$v.action}</td>
+                    <td>{$v.state}</td>
+                    <td>{$v.uid}</td>
+                    <td>{$v.createtime}</td>
+                    <td>{$v.finishtime}</td>
+                    <!-- <td style="padding: 5px;">
+                        <a href="index.php?m=crontab&a=updatecrontabRemark&external_userid={$v.external_userid}&follow_userid={$v.follow_userid}&op=edit">删除</a>
+                    </td> -->
+                </tr>
+                {/foreach}
+                {else}
+                <tr>
+                    <td colspan="12">
+                        噢嚯！当前还没有数据喔
+                    </td>
+                </tr>
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+    function gotoNext(page,pagesize){
+        window.location.href="index.php?m=crontab&a=crontabList&page="+page;
+    }
+    $(function(){
+		$(".delete").click(function(){
+				return confirm("确定刪除？");
+			})
+        var pageStr = new Page('{$page}', '{$rowcount}',5,'{$row}','gotoNext').GetText();
+        $('#pager').html('');
+        $('#pager').html(pageStr);
+        $('#btn1').click(function(){
+            var name=$('#name').val();
+            var display=$('#display').val();
+            $.post('index.php?m=ajax&a=addaroup','name='+encodeURIComponent(name)+'&display='+display,function(data){
+                var o=eval('('+data+')');
+                if(o.status){
+                    alert('操作成功！');
+                    location.href="index.php?m=crontab&a=listgroup";
+                } else {
+                    alert(o.msg);
+                }
+            });
+        });
+    });
+</script> 
+{/block} 

@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="/css/theme.css" />
+<link rel="stylesheet" type="text/css" href="/css/style.css" />
+<title>{block name=title}海外平台营运数据分析系统{/block}</title>
+<!--[if IE]><link rel="stylesheet" type="text/css" href="/css/ie-sucks.css" /><![endif]-->
+<script>
+	var StyleFile = "theme" + document.cookie.charAt(6) + ".css";
+	document.writeln('<link rel="stylesheet" type="text/css" href="/css/' + StyleFile + '">');
+</script>
+<script src="/js/jquery-1.7.2.min.js"></script>
+{block name=head}{/block}
+</head>
+
+<body>
+	<div id="container">
+		<!-- BEGIN top menu -->
+    	<div id="header">
+        	<h2>Forgame</h2>
+    		<div id="topmenu">
+            	<ul>
+                	<li><a href="/index.html">数据分析系统</a></li>
+                    <li class="current"><a href="{$smarty.server.PHP_SELF}?m=flashgame">资料管理</a></li>
+                	<li><a href="#">客服系统</a></li>
+              	</ul>
+          	</div>
+      	</div>
+		<!-- END top menu -->
+        
+        <div id="wrapper">
+            <div id="content">
+            	{block name=body}fffff{/block}
+            </div>
+            <!-- BEGIN sub menu -->
+            <div id="sidebar">
+                <ul>
+                    <li><h3><a href="#" class="folder_table">FLASH游戏資料維護</a></h3>
+                        <ul>
+                            <li><a href="{$smarty.server.PHP_SELF}?m=flashgame" class="folder_table">游戏列表</a></li>
+                            <li><a href="{$smarty.server.PHP_SELF}?m=flashgame&a=importcsv" class="invoices">匯入游戏CSV檔</a></li>
+                            <!-- <li><a href="{$smarty.server.PHP_SELF}?m=flashgame&a=addgame" class="add">建立新游戏</a></li> -->
+                            <li><a href="{$smarty.server.PHP_SELF}?m=flashgame&a=categories" class="folder_table">分類列表</a></li>
+                            <li><a href="{$smarty.server.PHP_SELF}?m=flashgame&a=addcategory" class="add">建立新分類</a></li>
+                            <li><a href="{$smarty.server.PHP_SELF}?m=flashgame&a=tags" class="folder_table">显示位置列表</a></li>
+                            <li><a href="{$smarty.server.PHP_SELF}?m=flashgame&a=addtag" class="add">建立新位置</a></li>
+
+                        </ul>
+                    </li>
+                    <li><h3><a href="#" class="folder_table">接口調試工具</a></h3>
+                        <ul>
+                            <li><a href="{$smarty.server.PHP_SELF}?m=apitools&a=game" class="folder_table">游戏接口調試</a></li>
+                            <li><a href="{$smarty.server.PHP_SELF}?m=apitools&a=agent" class="add">代理商接口調試</a></li>
+                        </ul>
+                    </li>
+                </ul>       
+            </div>
+            <!-- END sub menu -->
+      </div>
+	  {include file="over_footer.html"}
+</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<script>
+$(function(){
+	$('#search').click(function(){
+		var uid = $('#uid').val();
+		location.href="index.php?m=priv&a=addrole&menuid={$menuid}&uid="+uid;
+	});
+	$('#parentid').change(function(){
+		location.href = 'index.php?m=priv&a=editmenu&id={$id}&parentid='+$('#parentid').val();
+	});
+});
+</script> 
+<h3><span><a href="index.php?m=priv&a=listmenu">返回菜单列表</a></span>修改菜单</h3>
+<form action="index.php?m=priv&a=editmenu&do" method="post" class="searchbox">
+<input type="hidden" name="id" value="{$id}" />
+        <p><span>父菜单:</span>
+        <select name="form[parentid]" id="parentid"/>
+            <option value="0">顶级菜单</option>
+            {foreach from=$topmenulist key=k item=v}
+            <option {if $parentid} {if $parentid==$v.id}selected="selected"{/if}{else}{if $v.current}selected="selected"{/if}{/if} value="{$v.id}" >{$v.name}</option>
+            {/foreach}
+        </select>
+        </p>
+        <p><span>菜单名:</span>
+        <input type="text" name="form[name]" class="text" value="{$menurow.name}"/>
+        </p>
+        <p><span>排序:</span>
+        <input type="text" name="form[sort]" class="text" value="{$menurow.sort}"/>
+        </p>
+        <p><span>链接:</span>
+        <input type="text" name="form[link]" class="text" value="{$menurow.link}"/>
+        </p>
+        <p><span>唯一标识:</span>
+        <input type="text" name="form[flag]" class="text" value="{$menurow.flag}" /><font color="red">(英文)</font>
+        </p>
+        <p><span>是否显示:</span>
+        <select name="form[display]" />
+            <option value="1" {if $menurow.display eq 1}selected="selected"{/if}>是</option>
+            <option value="0" {if $menurow.display eq 0}selected="selected"{/if}>否</option>
+        </select>
+        </p>
+        
+        {if $parentid neq 0}
+        {foreach from=$modulelist key=k item=v}
+        <h3>{$v.name}</h3><p>
+        {foreach from=$v.list key=k1 item=v1}
+        <span style="min-width:160px; text-align:left; margin:3px 15px 0px 0px;"><input type="checkbox" {if $menurow.parentid neq 0} name="form[aid][]" {/if}{if $v1.hasmenu}checked="checked"{/if} value="{$v1.id}"/>{$v1.aname}</span>
+        {/foreach}
+        </p>
+        {/foreach}
+        {/if}
+        {if $parentid eq 0}
+        <p><span>选择菜单入口:</span>
+        <select {if $menurow.parentid eq 0} name="form[aid][]" {/if} >
+        <option value="">请选择</option>
+        {foreach from=$modulelist key=k item=v}
+        {foreach from=$v.list key=k1 item=v1}          
+        <option {if $v1.hasmenu}selected="selected"{/if} value="{$v1.id}">{$v.name}/{$v1.aname}</option>
+        {/foreach}
+        {/foreach}
+        </select>
+        </p>
+        {/if}
+        <p class="inline"><button type="submit" name="do" class="su"/ style="margin-left:4px;">立即提交</button><button type="reset" class="su">条件重置</button></p>						
+  </form>
+{/block} 

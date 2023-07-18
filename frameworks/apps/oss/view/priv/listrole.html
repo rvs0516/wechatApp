@@ -1,0 +1,70 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<div id="popbg"></div>
+<div class="pop" style="display:none">
+    <p class="popclose"><a href="#"></a></p>
+    <p class="popcontent">
+    <div style="padding:5px;"> <span style="font-size:12px;width:80px;">用户组名称:</span> <span>
+            <input type="text" id="name" />
+        </span> </div>
+    <div style="padding:5px;"> <span style="font-size:12px;width:80px; display:block;float:left">是否可見:</span> <span style="font-size:12px;width:80px; display:block;float:left">
+            <select id="display">
+                <option value="1">是</option>
+                <option value="0">否</option>
+            </select>
+        </span> </div>
+    <div style="text-align:center;clear:both;padding:5px;">
+        <input type="button" value="提交" id="btn1" />
+    </div>
+</p>
+</div>
+<h3><span><a href="index.php?m=priv&a=addrole&op=add">添加角色</a></span>角色列表</h3>
+<table class="list">
+	<thead>
+        <th>角色名</th>
+        <th>授权员工</th>
+        <th>角色组</th>
+        <th>操作</th>
+    </thead>
+    {foreach from=$rolelist key=k item=v}
+    <tr>
+        <td>{$v.uid}</td>
+        <td>{$v.agent_uid}</td>
+        <td>{$v.name}</td>
+        <td><a style="cursor:pointer" href="index.php?m=priv&a=delrole&uid={$v.uid}" class="delete">刪除</a>&nbsp;<a href="index.php?m=priv&a=addrole&uid={$v.uid}&menuid={$menuid}&op=edit">修改</a></td>
+    </tr>
+    {/foreach}
+</table>
+</td>
+</tr>
+</table>
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+    function gotoNext(page,pagesize){
+        window.location.href="index.php?m=priv&a=listrole&page="+page;
+    }
+    $(function(){
+		$(".delete").click(function(){
+				return confirm("确定刪除？");
+			})
+        var pageStr = new Page('{$page}', '{$rowcount}',5,'{$offset}','gotoNext').GetText();
+        $('#pager').html('');
+        $('#pager').html(pageStr);
+        $('#btn1').click(function(){
+            var name=$('#name').val();
+            var display=$('#display').val();
+            $.post('index.php?m=ajax&a=addaroup','name='+encodeURIComponent(name)+'&display='+display,function(data){
+                var o=eval('('+data+')');
+                if(o.status){
+                    alert('操作成功！');
+                    location.href="index.php?m=priv&a=listgroup";
+                } else {
+                    alert(o.msg);
+                }
+            });
+        });
+    });
+</script> 
+{/block} 

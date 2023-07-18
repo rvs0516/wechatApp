@@ -1,0 +1,361 @@
+{extends file='layout/new.html'}
+
+{block name=body}
+<h3>
+    会话记录
+</h3>
+
+<div class="contentDiv">
+
+    <!-- 筛选区域 -->
+    <div class="filterDiv">
+        <div class="filterDiv-content">
+            <form action="index.php?m=riskManagement&a=conversationRecord" method="post">
+                <div class="department-box">
+                    <span>部门</span>
+                    <select name="department" id="department">
+                        <option value="0">请选择</option>
+                        {foreach from=$departmentList item=item key=key}
+                        <option value="{$item.departmentid}" {if $departmentId eq $item.departmentid}selected="selected"{/if} >{$item.symbol}{$item.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="space-box"></div>
+                <div class="employee-box">
+                    <span>员工</span>
+                    <input type="text" list="employee" name="employee" value="{$userId}" placeholder="请选择或填写">
+                    <datalist id="employee"></datalist>
+                </div>
+                <div id="submit-form">
+                    <button class="submit-select">查询</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- <div>
+        <span class="tisbutton">
+            <a href="">同步会话</a>
+        </span>
+    </div> -->
+
+    <!-- 列表 -->
+    <div>
+        <table class="list">
+            <thead>
+                <!-- <th>序号</th> -->
+                <th>客户头像</th>
+                <th>客户名字</th>
+                <th>备注名字</th>
+                <th>性别</th>
+                <th>操作</th>
+            </thead>
+            <tbody>
+                {if $customersList}
+                {foreach from=$customersList key=k item=v}
+                <tr>
+                    <!-- <td>{$v.id}</td> -->
+                    <td style="width: 50px;padding: 5px;">
+                        <img src="{$v.avatar}" alt="" style="width: 100%;">
+                    </td>
+                    <td>{$v.name}</td>
+                    <td>{$v.remark}</td>
+                    <td>{$v.gender}</td>
+                    <td style="padding: 5px;">
+                        <!-- <a href="index.php?m=riskManagement&a=checkConversation&follow_userid={$v.follow_userid}&external_userid={$v.external_userid}">查看会话</a> -->
+                        <span class="checkConversation" data-followUserid="{$v.follow_userid}" data-externalUserid="{$v.external_userid}">查看会话</span>
+                    </td>
+                </tr>
+                {/foreach}
+                {else}
+                <tr>
+                    <td colspan="12">
+                        噢嚯！当前还没有数据喔
+                    </td>
+                </tr>
+                {/if}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 查看会话悬浮窗 -->
+    <div class="float-service">
+        <div class="float-service-hearder">
+            <div class="float-service-title">
+                <span>会话内容</span>
+            </div>
+            <div class="float-service-section">
+                <!-- <span class="float-service-inserted"></span> -->
+                <span class="float-service-close"></span>
+            </div>
+        </div>
+        <div class="float-service-content">
+
+            <!-- 客户信息 -->
+            <!-- <div class="customer-info">
+                <div class="msgTime">
+                    <em>2023-07-15 15:03:54</em>
+                </div>
+                <div class="info-main">
+                    <div class="customer-avatar">
+                        <img src="http://wework.qpic.cn/wwhead/dx4Y70y9XcvSiazHvUicn0EyDl8oXwDaGic7MypfKw0iaBT9c8gnt99myuFs1VDl1cVbbGBxpaicjL5o/0" alt="">
+                    </div>
+                    <div class="clear-avatar-float"></div>
+                    <div class="info-content">
+                        <div class="customer-name">
+                            客户名字
+                        </div>
+                        <div class="customer-content">
+                            <span>
+                                嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿嘿
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- 客户信息 -->
+            <!-- <div class="customer-info">
+                <div class="msgTime">
+                    <em>2023-07-15 15:03:54</em>
+                </div>
+                <div class="info-main">
+                    <div class="customer-avatar">
+                        <img src="http://wework.qpic.cn/wwhead/dx4Y70y9XcvSiazHvUicn0EyDl8oXwDaGic7MypfKw0iaBT9c8gnt99myuFs1VDl1cVbbGBxpaicjL5o/0" alt="">
+                    </div>
+                    <div class="clear-avatar-float"></div>
+                    <div class="info-content">
+                        <div class="customer-name">
+                            客户名字
+                        </div>
+                        <div class="customer-content">
+                            <span>
+                                嘿嘿
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- 员工信息 -->
+            <div class="employee-info">
+                <div class="msgTime">
+                    <em>2023-07-15 15:03:54</em>
+                </div>
+                <div class="info-main">
+                    <div class="info-content">
+                        <div class="employee-name">
+                            员工名字
+                        </div>
+                        <div class="employee-content">
+                            <span>
+                                哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈
+                            </span>
+                        </div>
+                    </div>
+                    <div class="employee-avatar">
+                        <img src="http://wx.qlogo.cn/mmhead/PiajxSqBRaELfic8lqKJb9xJV4kIA48whfby6aOewwGjYAS8lpHRia6FQ/0" alt="">
+                    </div>
+                    <div class="clear-avatar-float"></div>
+                </div>
+            </div>
+
+            <!-- 客户信息 -->
+            <!-- <div class="customer-info">
+                <div class="msgTime">
+                    <em>2023-07-15 15:03:54</em>
+                </div>
+                <div class="info-main">
+                    <div class="customer-avatar">
+                        <img src="http://wework.qpic.cn/wwhead/dx4Y70y9XcvSiazHvUicn0EyDl8oXwDaGic7MypfKw0iaBT9c8gnt99myuFs1VDl1cVbbGBxpaicjL5o/0" alt="">
+                    </div>
+                    <div class="clear-avatar-float"></div>
+                    <div class="info-content">
+                        <div class="customer-name">
+                            客户名字
+                        </div>
+                        <div class="customer-content">
+                            <img src="http://test.resource.wxwork.2y9y.com/downloadMedia/5aec4b5292355b018ba85bb4c21334c7.gif" alt="" width="160" height="125">
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- 员工信息 -->
+            <!-- <div class="employee-info">
+                <div class="msgTime">
+                    <em>2023-07-15 15:03:54</em>
+                </div>
+                <div class="info-main">
+                    <div class="info-content">
+                        <div class="employee-name">
+                            员工名字
+                        </div>
+                        <div class="employee-content">
+                            <img src="http://test.resource.wxwork.2y9y.com/downloadMedia/5aec4b5292355b018ba85bb4c21334c7.gif" alt="" width="160" height="125">
+                        </div>
+                    </div>
+                    <div class="employee-avatar">
+                        <span>员工</span>
+                    </div>
+                    <div class="clear-avatar-float"></div>
+                </div>
+            </div> -->
+
+            <!-- 员工信息 -->
+            <!-- <div class="employee-info">
+                <div class="msgTime">
+                    <em>2023-07-15 15:03:54</em>
+                </div>
+                <div class="info-main">
+                    <div class="info-content">
+                        <div class="employee-name">
+                            员工名字
+                        </div>
+                        <div class="employee-content">
+                            <div class="link-card" data-link="https://open.work.weixin.qq.com/help/wap/detail?docid=19697">
+                                <div class="link-card-title">企业微信认证</div>
+                                <div class="link-card-content">
+                                    <div class="link-card-description">
+                                        企业微信认证 一、什么是企业微信认证 二、企业微信认证后可获得的功能 三、如何进行企业微信认证 四、认证费用...
+                                    </div>
+                                    <div class="link-card-img">
+                                        <img src="https://wework.qpic.cn/wwpic/468376_fzBKNHK4TUuGEAB_1684742516/0" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="employee-avatar">
+                        <span>员工</span>
+                    </div>
+                    <div class="clear-avatar-float"></div>
+                </div>
+            </div> -->
+            
+
+        </div>
+    </div>
+
+</div>
+
+<div id="pager"></div>
+<script src="js/pager.js"></script>
+<script>
+
+    function gotoNext(page,pagesize){
+        window.location.href="index.php?m=department&a=departmentList&page="+page;
+    }
+
+    $(function(){
+        var pageStr = new Page('{$page}', '{$rowcount}',5,'{$row}','gotoNext').GetText();
+        $('#pager').html('');
+        $('#pager').html(pageStr);
+    });
+
+    // 员工输入框获得焦点时
+    $("input[name='employee']").focus(function(){
+        getChannelAccount();
+        return false;
+    });
+
+    // 部门下拉框发生改变事件时
+    $("#department").change(function(){
+        getChannelAccount();
+        return false;
+    });
+
+    // 获取选择的部门下的员工列表
+    function getChannelAccount() {
+        var department = $('#department').val();
+        var employee = $('#employee').val();
+
+        // alert(department)
+        // return false
+
+        // 没有选择部门，则不显示员工选择列表，只能使用填写方式
+        if(department == 0){
+            console.log(department)
+            
+            $('input[name="employee"]').val('')
+            $("#employee option[text!='']").remove();
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/?m=riskManagement&a=getDepartmentEmployee",
+            data: "departmentId="+department+"&userId="+employee,
+            dataType: 'text',
+
+            success: function(result){
+                $("#employee option[text!='0']").remove();
+                $("#employee").append(result);
+            }
+        });
+
+        return false;
+    }
+
+    // 触发查看会话悬浮窗按钮事件
+    $('.checkConversation').click(function(){
+
+        // 判断之前是否存在数据
+        var contentText = $('.float-service-content').text();
+        // console.log(contentText)
+        if (contentText) {
+            // 清空之前的数据
+            $('.float-service-content').empty();
+        }
+
+        // 打开查看会话悬浮窗
+        $('.float-service').css('display','block');
+
+        // 员工ID
+        var followUserid = $(this).attr('data-followUserid');
+        // 客户ID
+        var externalUserid = $(this).attr('data-externalUserid');
+
+        // $.ajax({
+        //     type: "POST",
+        //     url: "/?m=riskManagement&a=checkConversation",
+        //     data: "followUserid="+followUserid+"&externalUserid="+externalUserid,
+        //     dataType: 'text',
+        //     success: function(result){
+        //         console.log(result)
+        //         $(".float-service-content").append(result);
+        //     }
+        // });
+
+        $.post("/?m=riskManagement&a=checkConversation", { followUserid:followUserid, externalUserid:externalUserid }, function(result){
+
+            // console.log(result)
+
+            $(".float-service-content").append(result);
+
+            // 点击链接消息卡片打开新页面
+            $('.link-card').click(function(){
+                // 新页面URL
+                var link_url = $(this).attr('data-link');
+
+                // alert(link_url)
+
+                // 在当前页面窗口打开新页面
+                // window.location.href = link_url;
+
+                // 跳转新页面到新开窗口
+                window.open(link_url); 
+            })
+
+        });
+
+    })
+
+    // 关闭查看会话悬浮窗
+    $('.float-service-close').click(function(){
+        $('.float-service').css('display','none');
+    })
+     
+
+</script> 
+{/block} 

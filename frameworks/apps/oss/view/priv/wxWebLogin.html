@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html en="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业微信扫码登录</title>
+    <link rel="stylesheet" type="text/css" href="/css/reset.css">
+</head>
+<style>
+    #login-header{
+        width: 100%;
+        height: 45px;
+        background-color: #FFF;
+        box-shadow: 0 2px 8px 0 rgba(174,186,208,.27);
+    }
+    #login-header-title{
+        margin: 0 30px;
+        color: #252B3A;
+        height: 45px;
+        line-height: 45px;
+        font-size: 14px;
+    }
+    #login-header-title h2{
+        margin-left: 2rem;
+    }
+
+
+    #login-wrap{
+        width: 100%;
+        overflow: hidden;
+    }
+    #login-wrap #login-wrap-left{
+        width: 70%;
+        height: 880px;
+        float: left;
+    }
+    #login-wrap #login-wrap-left img{
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+    }
+    #login-wrap #login-wrap-right{
+        width: 30%;
+        float: right;
+    }
+    #login-wrap #login-wrap-right #login-code{
+        width: 60%;
+        height: 400px;
+        margin: 225px auto;
+        border-radius: 6px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        padding: 10px;
+    }
+    #code-tile{
+        padding: 10px 0;
+        color: #404040;
+    }
+    #code-tile h3{
+        font-weight: 700;
+        font-size: 20px;
+        margin: 0 0 12px;
+    }
+    #code-tile p{
+        font-size: 14px; 
+    }
+    #code{
+        width: 200px;
+        height: 380px;
+        margin: 0 auto;
+    }
+    #other{
+        text-align: right;
+        font-size: 14px;
+    }
+
+
+    #login-footer{
+        width: 100%;
+        color: #252B3A;
+        text-align: center;
+        font-size: 14px;
+        background-color: #eeefef;
+    }
+</style>
+<body>
+    <!-- 顶部 -->
+    <div id="login-header">
+        <div id="login-header-title">
+            <h2>企业微信扫码登录</h2>
+        </div>
+    </div>
+
+    <!-- 中间 -->
+    <div id="login-wrap">
+        <!-- 左边 -->
+        <div id="login-wrap-left">
+            <img src="/img/loginbg.png" alt="">
+        </div>
+
+        <!-- 右边 -->
+        <div id="login-wrap-right">
+            <!-- 二维码盒子 -->
+            <div id="login-code">
+                <!-- <div id="code-tile">
+                    <h3>企业微信扫码登录</h3>
+                    <p>请使用企业微信扫一扫登录</p>
+                </div> -->
+                <div id="code">
+                    <iframe src="{$wxLoginUrl}" frameborder="0" scrolling="no" width="200px" height="380px"></iframe>
+                </div>
+                <div id="other">
+                    <a href="index.php?m=priv&a=login">账号登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div id="login-footer">
+        copyright @2023
+    </div>
+</body>
+</html>

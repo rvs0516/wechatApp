@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CRM管理系统</title>
+{literal}<style type="text/css">
+td {font-size: 13pt;line-height: 1.5;font-family: "宋体";}
+h3 {margin: 0;padding: 0;display: block;font-size: 1.17em;-webkit-margin-start: 0px;-webkit-margin-end: 0px;font-weight: bold;}
+.loginTable tr td input {width: 170px;height: 20px;padding-left: 5px;}
+.loginTable tr td button{
+    width: 100%;
+    height: 30px;
+    margin: 15px 0;
+    border-radius: 3px;
+    border: none;
+    background: #c7000b;
+    color: #fff;
+    font-size: 16px;
+    line-height: 30px;
+}
+.loginTable tr td button:hover{background: #d64a52;}
+</style>{/literal}
+</head>
+<body>
+<form action="index.php?m=priv&a=login&do" method="post">
+    <table width="302" class="loginTable" align="center" style="margin-top:200px; border: 1px solid #000;" cellpadding="0" cellspacing="5">
+        <!-- <tr>
+            <td colspan="2" align="center"><img src="/img/logo.png"></img></td>
+        </tr> -->
+        <tr>
+            <td colspan="2" align="center"><h3>CRM管理系统</h3></td>
+        </tr>
+        <tr>
+            <td>用户名</td>
+            <td>
+                <input type="text" name="username" id="username" value="root" required/>
+            </td>
+        </tr>
+        <tr>
+            <td>密&nbsp;码</td>
+            <td>
+                <input type="password"  name="userpass" id="userpass" value="root" required/>
+            </td>
+        </tr>
+        <tr>
+            <td>验证码</td>
+            <td style="position: relative;">
+                <input type="text" autocomplete="off" name="captcha" value="" required placeholder="验证码" style="width: 65px;position: absolute;top: 0px;">
+                <img src="/index.php?m=captcha" width="100" height="35" alt="验证码" id="verify" style="position: absolute;right: 25px;top: 0;">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="right">
+            <button type="submit">立即登入</button>   
+            <!-- <button type="reset">重置表单</button></td> -->
+        </tr>
+        <tr>
+            <td colspan="2" align="right">
+                <a href="index.php?m=priv&a=wxWebLogin">企业微信扫码登录</a>
+            </td>
+        </tr>
+    </table>
+</form>
+<script type="text/javascript">
+    // 刷新验证码
+    window.onload = function () {
+        var img = document.getElementById("verify");
+        img.onclick = function() {
+            //我们刷新验证码需要重新请求服务器，我们路径不能是一模一样的，不然浏览器会一直加载本地已经缓存的图片，通过加一个时间后缀来欺骗服务器来达到我们的目的。
+            var date = new Date().getTime();
+            img.src = "/index.php?m=captcha&time=" + date;	
+        }
+    }
+</script>
+</body>
+</html>

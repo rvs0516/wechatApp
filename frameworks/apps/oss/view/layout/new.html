@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="/static/style.css" type="text/css" rel="stylesheet" />
+<link rel="stylesheet" href="/js/jquery.treeview/jquery.treeview.css" />
+<title>CRM管理系统{block name=title}{/block}</title>
+<script src="/js/jquery-1.7.2.min.js"></script>
+<script src="/js/jquery.treeview/lib/jquery.cookie.js" type="text/javascript"></script>
+<script src="/js/jquery.treeview/jquery.treeview.js" type="text/javascript"></script>
+<script type="text/javascript" src="/js/jquery.easyui.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/js/easyui.css">
+<script src="/js/common.js" type="text/javascript"></script>
+<script src="/js/clipboard.min.js"></script>
+<script>
+// third example
+function delCookie() {
+	$.cookie("treeview-black", null);
+	return false;
+}
+$(document).ready(function(){
+	// fourth example
+	$("#black, #gray").treeview({
+		control: "#treecontrol",
+		persist: "cookie",
+		cookieId: "treeview-black"
+	});
+	var gid = {$gid}
+	if(gid == 11){
+        $("#black").children().find("ul").children().eq(1).hide();
+    }
+});
+</script>
+{block name=head}{/block}
+</head>
+<body>
+<!--頭部-->
+<div id="header">
+    <div class="wrapper">
+        <p class="title">CRM管理系统</p>
+        <p class="user">欢迎您，{$uid} | </span><a href="?m=priv&a=logout" onclick="delCookie();">退出</a></p>
+        <ul id="menu">
+            <li><a href="?m=home&a=index" title="" id="work">工作台</a></li>
+        	{foreach from=$topmenus key=k item=v}
+            <li{if $menuid==$v.id} class="active"{/if}><a href="/{if empty($v.link)}index.php?m={$v.module}&a={$v.action}{else}{$v.link}{/if}" onclick="delCookie();">{$v.name}</a></li>
+            {/foreach}
+        </ul>
+    </div>
+</div>
+
+<!--中間內容區域-->
+{block name=main}
+<div class="wrapper body">
+    {if !empty($menus)}
+    <div id="subMenu">    
+    	<!--  
+		<div id="treecontrol" style="margin-left:7px;">
+			<a href="#"><img src="/js/jquery.treeview/images/plus.gif" />&nbsp;全关闭</a>
+			<a href="#"><img src="/js/jquery.treeview/images/minus.gif" />&nbsp;全打開</a>
+		</div>
+		-->
+    	<ul id="black" class="treeview-black">
+        {foreach from=$menus item=menu}
+        <li><span style="font-size:14px;color: #252b3a;font-weight:bold; display:block; border-bottom: 1px solid #dfe1e6;padding-left:20px;margin-top: 5px;">{$menu.name}</span>
+        <ul>
+        	{foreach from=$menu.list item=a}
+            <li style=" padding-left:33px; margin:2px 0;"><span>&nbsp;<a href="/index.php?m={$a.module}&a={$a.action}{$a.param}">{$a.name}</a></span></li>
+            {/foreach}
+        </ul>
+        </li>
+        {/foreach}
+        </ul>
+        
+    </div>
+    {/if}
+    <div class="content" {if empty($menus)}id="homePage"{/if} >
+    	{block name=body}{/block}
+    </div>
+</div>
+{/block}
+<!--腳部版權-->
+<!-- <div class="footer middles">xxx网络科技有限公司 版权所有 Copyright&copy;</div> -->
+</body>
+</html>
