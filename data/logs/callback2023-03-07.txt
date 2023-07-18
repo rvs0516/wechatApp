@@ -1,4 +1,0 @@
-
-[2023-03-07 10:08:58]
-{"m":"index","a":"callback","msg_signature":"d9ab991fe7d84be953b9678c87c6bb2f75306603","timestamp":"1678154938","nonce":"1677919770"}
-
