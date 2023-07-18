@@ -1,0 +1,187 @@
+﻿#2023-05-31 创建数据库和表
+
+ fg_member_bind                    
+ fg_members                        
+ role                              
+ role_action                       
+ role_group                        
+ role_menu                         
+ role_module
+
+# 一个主体对应一个DB库
+# create database wechatApp;
+create database qianyou_corpWeixin;
+
+CREATE TABLE `role_group` (
+  `id` tinyint(1) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `name` varchar(50) NOT NULL DEFAULT '' COMMENT '角色组名称',
+  `priv` text COMMENT '拥有访问权限的动作ID',
+  `display` tinyint(2) DEFAULT '0' COMMENT '是否显示',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='管理后台角色分组信息表';
+
+CREATE TABLE `role` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `uid` varchar(25) DEFAULT NULL COMMENT '用户ID',
+  `password` char(32) DEFAULT '' COMMENT '登录密码',
+  `realname` varchar(25) DEFAULT '' COMMENT '用户真实名称',
+  `mobile` varchar(25) DEFAULT '' COMMENT '手机号',
+  `mail` varchar(25) DEFAULT '' COMMENT '邮箱',
+  `gid` int(4) unsigned NOT NULL DEFAULT '0' COMMENT '角色组ID',
+  `priv` varchar(255) DEFAULT NULL COMMENT '权限',
+  `addtime` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '添加时间',
+  `author` varchar(50) DEFAULT '' COMMENT '创建者',
+  `prevloginip` varchar(32) DEFAULT NULL COMMENT '上次登录IP',
+  `prevlogintime` datetime DEFAULT NULL COMMENT '上次登录时间',
+  `lastloginip` varchar(32) DEFAULT NULL COMMENT '最后登录IP',
+  `lastlogintime` datetime DEFAULT NULL COMMENT '最后登录时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uid` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='管理后台角色信息表';
+
+CREATE TABLE `role_action` (
+  `id` smallint(4) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `name` varchar(255) NOT NULL DEFAULT '' COMMENT '动作名称',
+  `module` varchar(50) NOT NULL DEFAULT '' COMMENT '所属模块',
+  `action` varchar(255) NOT NULL DEFAULT '' COMMENT '模块动作',
+  `des` varchar(255) NOT NULL DEFAULT '' COMMENT '说明',
+  `display` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否显示',
+  `isadmin` tinyint(1) unsigned DEFAULT '0' COMMENT '是否后台',
+  `outlink` varchar(255) DEFAULT NULL COMMENT '外连接',
+  `author` varchar(25) DEFAULT NULL COMMENT '创建者',
+  `sort` tinyint(4) DEFAULT '0' COMMENT '排序',
+  `param` varchar(50) DEFAULT '' COMMENT '参数',
+  `ctime` datetime DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `action` (`module`,`name`,`isadmin`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='管理后台动作信息表';
+
+CREATE TABLE `role_menu` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `name` varchar(25) DEFAULT '' COMMENT '菜单名称',
+  `action` varchar(255) DEFAULT '' COMMENT '动作',
+  `parentid` int(4) DEFAULT '0' COMMENT '父级菜单ID',
+  `link` varchar(255) DEFAULT '' COMMENT '连接',
+  `sort` int(4) DEFAULT '0' COMMENT '排序',
+  `addtime` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '添加时间',
+  `author` varchar(50) DEFAULT '' COMMENT '添加者',
+  `display` int(4) DEFAULT '1' COMMENT '是否显示',
+  `flag` varchar(50) DEFAULT '' COMMENT '唯一标识',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='管理后台菜单信息表';
+
+CREATE TABLE `role_module` (
+  `module` varchar(50) NOT NULL DEFAULT '' COMMENT '模块标识',
+  `name` varchar(255) NOT NULL DEFAULT '' COMMENT '模块名称',
+  `sort` int(10) DEFAULT '1' COMMENT '排序',
+  UNIQUE KEY `module` (`module`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='管理后台模块信息表';
+
+CREATE TABLE `crm_customers` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `type` varchar(20) NOT NULL DEFAULT '微信用户' COMMENT '客户类型',
+	`add_way` varchar(64) NOT NULL DEFAULT '未知来源' COMMENT '客户来源',
+	`state` varchar(64) NOT NULL DEFAULT '正常' COMMENT '客户状态：正常，被员工删除，被客户删除，双向删除，重新发送请求添加成功，正在转接中，客户拒绝了在职转接，待企业成员同意',
+  `follow_userid` varchar(255) NOT NULL COMMENT '客户所属企业成员ID',
+  `old_follow_userid` varchar(255) NOT NULL DEFAULT '' COMMENT '客户原所属企业成员ID',
+  `new_follow_userid` varchar(255) NOT NULL DEFAULT '' COMMENT '客户准所属企业成员ID',
+	`external_userid` varchar(32) NOT NULL COMMENT '客户ID',
+	`name` varchar(255) NOT NULL COMMENT '客户微信名称',
+	`gender` enum('男性','女性','未知') NOT NULL DEFAULT '未知' COMMENT '性别',
+  `avatar` text NOT NULL COMMENT '客户微信头像URL',
+  `tag_name1` text NOT NULL COMMENT '企业标签',
+	`tag_name2` text NOT NULL COMMENT '个人标签',
+	`remark` text NOT NULL COMMENT '备注名称',
+  `remark_mobiles` text NOT NULL COMMENT '备注手机号',
+	`remark_corp_name` text NOT NULL COMMENT '备注公司名称',
+	`description` text NOT NULL COMMENT '描述',
+	`corp_name` text NOT NULL COMMENT '公司简称',
+	`corp_full_name` text NOT NULL COMMENT '公司全称',
+  `createtime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `restart_createtime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '重新创建时间',
+  `agree_createtime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '员工确认添加客户时间',
+  `updatetime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `follow_deletetime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '被员工删除时间',
+  `customer_deletetime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '被客户删除时间',
+  `customer_delete_number` int(2) unsigned NOT NULL DEFAULT '0' COMMENT '被客户删除次数',
+  `transfertime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最近在职转接时间',
+  `old_transfertime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '前2次在职转接时间',
+  `transfer_success_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最近在职转接成功时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `follow_external_userid` (`follow_userid`, `external_userid`),
+  KEY `follow_userid` (`follow_userid`),
+  KEY `external_userid` (`external_userid`),
+  KEY `state` (`state`),
+  KEY `type` (`type`),
+  KEY `add_way` (`add_way`),
+  KEY `createtime` (`createtime`),
+  KEY `updatetime` (`updatetime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='客户信息表';
+
+CREATE TABLE `crm_departments` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `departmentid` int(11) unsigned NOT NULL DEFAULT '1' COMMENT '部门ID，根部门为1',
+  `parentid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '父部门ID',
+  `name` varchar(255) NOT NULL COMMENT '部门名称',
+  `order` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '在父部门中的次序值。order值大的排序靠前',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `departmentid_parentid` (`departmentid`, `parentid`),
+  KEY `departmentid` (`departmentid`),
+  KEY `parentid` (`parentid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='部门信息表';
+
+CREATE TABLE `crm_employees` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `userid` varchar(255) NOT NULL COMMENT '员工ID',
+  `name` varchar(255) NOT NULL COMMENT '员工名称',
+  `alias` varchar(255) NOT NULL DEFAULT '' COMMENT '员工别名',
+  `gender` enum('0','1','2') NOT NULL DEFAULT '0' COMMENT '性别：0表示未定义，1表示男性，2表示女性',
+  `status` enum('1','2','3','4','5') NOT NULL DEFAULT '1' COMMENT '员工状态: 1=已激活，2=已禁用，4=未激活，5=退出企业',
+  `avatar` text NOT NULL COMMENT '头像URL',
+  `qr_code` text NOT NULL COMMENT '员工个人二维码',
+  `mobile` int(11) NOT NULL DEFAULT '0' COMMENT '手机号码',
+  `department` varchar(255) NOT NULL COMMENT '员工所属部门id',
+  `position` varchar(255) NOT NULL DEFAULT '' COMMENT '职务信息',
+  `createtime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `updatetime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `userid` (`userid`),
+  UNIQUE KEY `userid_mobile` (`userid`, `mobile`),
+  KEY `createtime` (`createtime`),
+  KEY `updatetime` (`updatetime`),
+  KEY `department` (`department`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='员工信息表';
+
+CREATE TABLE `crm_crontabs` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `uid` varchar(25) NOT NULL COMMENT '操作用户ID',
+  `name` varchar(255) NOT NULL COMMENT '计划任务动作名称',
+  `action` varchar(255) NOT NULL COMMENT '计划任务动作标识',
+  `state` enum('1','2') NOT NULL DEFAULT '2' COMMENT '执行状态：1=需要执行，2=不需要执行或者执行完成',
+  `createtime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `finishtime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '执行完成时间',
+  PRIMARY KEY (`id`),
+  KEY `uid` (`uid`),
+  KEY `name` (`name`),
+  KEY `action` (`action`),
+  KEY `createtime` (`createtime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='计划任务表';
+
+alter table role add column agent_uid varchar(64) NOT NULL COMMENT '员工ID' after gid;
+
+CREATE TABLE `crm_chat_msg` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+	`msgid` varchar(255) NOT NULL COMMENT '消息ID',
+	`action` varchar(64) NOT NULL COMMENT '消息动作:目前有send(发送消息)/recall(撤回消息)/switch(切换企业日志)三种类型',
+  `sender` varchar(255) NOT NULL COMMENT '消息发送方ID',
+	`receiver` varchar(255) NOT NULL COMMENT '消息接收方ID',
+  `msgtype` varchar(64) NOT NULL COMMENT '消息类型',
+	`msgcontent` longtext NOT NULL COMMENT '消息内容',
+	`file_url` text NOT NULL COMMENT '文件访问域名路径',
+  `msgtime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '消息发送时间',
+  PRIMARY KEY (`id`),
+	UNIQUE KEY `msgid_sender_receiver` (`msgid`,`sender`,`receiver`),
+  KEY `sender` (`sender`),
+  KEY `receiver` (`receiver`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='聊天记录表';
+
